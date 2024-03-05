@@ -10,7 +10,8 @@ builder.Services.AddAppllicatgionServices();
 builder.Services.AddDataServices(builder.Configuration);
 builder.Services.AddWebServices();
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+        .AddRazorRuntimeCompilation();
 
 var app = builder.Build();
 
@@ -31,6 +32,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Dashboard}/{action=Index}/{id?}");
 
 app.Run();
