@@ -1,0 +1,64 @@
+﻿using Core.Application.Interfaces;
+using Core.Domain.Common.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+
+namespace Infrastructure.Data.Interceptors
+{
+    public class EntitySaveChangesInterceptor : SaveChangesInterceptor
+    {
+        private readonly ICurrentUserService _currentUserService;
+        private readonly IDateTimeService _dateTime;
+
+        public EntitySaveChangesInterceptor(ICurrentUserService currentUserService, IDateTimeService dateTime)
+        {
+            _currentUserService = currentUserService;
+            _dateTime = dateTime;
+        }
+
+        public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
+        {
+            return base.SavingChanges(eventData, result);
+        }
+
+        public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
+        {
+            return base.SavingChangesAsync(eventData, result, cancellationToken);
+        }
+
+        public void UpdateEntities(DbContext? context)
+        {
+            if (context is null)
+                return;
+
+            foreach (var entry in context.ChangeTracker.Entries<IAuditableEntity>())
+            {
+                entry.Entity.CreatedAt = _dateTime.Now;
+                entry.Entity.CreatedBy = _currentUserService.UserId;
+
+                if (entry.State is EntityState.Added)
+                {
+                    entry.Entity.CreatedAt = _dateTime.Now;
+                    entry.Entity.CreatedBy = _currentUserService.UserId;
+                    entry.Entity.IsDeleted = false;
+                }
+
+                if (entry.State == EntityState.Deleted)
+                {
+                    entry.Entity.IsDeleted = true;
+                    entry.State = EntityState.Unchanged;
+                }
+            }
+        }
+    }
+
+    public static class Extensions
+    {
+        public static bool HasChangedOwnedEntities(this EntityEntry entry) =>
+            entry.References.Any(r =>
+                r.TargetEntry != null &&
+                r.TargetEntry.Metadata.IsOwned() &&
+                r.TargetEntry.State is EntityState.Added or EntityState.Modified);
+    }
+}
