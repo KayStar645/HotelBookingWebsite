@@ -1,6 +1,6 @@
 ﻿namespace Core.Application.Interfaces
 {
-    public interface ICustomerService
+    public interface IBaseService
     {
     }
 }
