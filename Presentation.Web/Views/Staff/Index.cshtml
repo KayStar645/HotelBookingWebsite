@@ -273,7 +273,7 @@
 			e.preventDefault();
 
 			var pRequest = getData();
-			pRequest.id = null;
+			pRequest.id = 0;
 
 			$.ajax({
 				url: "/staff/create",
@@ -281,20 +281,24 @@
 				data: JSON.stringify(pRequest),
 				contentType: "application/json; charset=utf-8",
 				success: function (data) {
-					$.ajax({
-						url: "/staff/index",
-						method: "GET",
-						success: function (data) {
-							var newData = $('<tbody>').html(data).find('#table-body-staff').html();
-							$('#table-body-staff').html(newData);
+					console.log(data)
+					if (data.success) {
+						$.ajax({
+							url: "/staff/index",
+							method: "GET",
+							success: function (data) {
+								var newData = $('<tbody>').html(data).find('#table-body-staff').html();
+								$('#table-body-staff').html(newData);
 
-							$('.btn-secondary[data-dismiss="modal"]').click();
+								$('.btn-secondary[data-dismiss="modal"]').click();
 
-							toastr.success('Thêm mới nhân viên thành công!', 'Thông báo');
-
-							resetButtonClick();
-						},
-					});
+								resetButtonClick();
+							},
+						});
+						toastr.success('Thêm mới nhân viên thành công!', 'Thông báo');
+					} else {
+						toastr.error('Thêm mới nhân viên thất bại! ' + data.error, 'Thông báo');
+					}
 				},
 				error: function (xhr, textStatus, errorThrown) {
 					toastr.error('Thêm mới nhân viên thất bại!', 'Thông báo');
@@ -336,13 +340,13 @@
 
 		function getData() {
 			var formData = {
-				id: $('input[name="id"]').val(),
-				internalCode: $('input[name="internalCode"]').val(),
-				name: $('input[name="name"]').val(),
-				dateOfBirth: $('input[name="dateOfBirth"]').val(),
-				gender: $('select[name="gender"]').val(),
-				address: $('input[name="address"]').val(),
-				phone: $('input[name="phone"]').val(),
+				id: $('input[name="id"]').val() || null,
+				internalCode: $('input[name="internalCode"]').val() || null,
+				name: $('input[name="name"]').val() || null,
+				dateOfBirth: $('input[name="dateOfBirth"]').val() || null,
+				gender: $('select[name="gender"]').val() || null,
+				address: $('input[name="address"]').val() || null,
+				phone: $('input[name="phone"]').val() || null,
 			};
 			return formData;
 		}

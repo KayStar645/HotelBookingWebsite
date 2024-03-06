@@ -2,16 +2,17 @@
 using Core.Application.Exceptions;
 using Core.Application.Interfaces;
 using Core.Application.Responses;
+using Core.Application.Services.Common;
 using Core.Application.Services.Extensions;
 using Core.Application.ViewModels.Common;
 using Core.Application.ViewModels.Staffs;
 using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
+using System.ComponentModel.DataAnnotations;
 
 namespace Core.Application.Services
 {
-    public class StaffService : IStaffService
+	public class StaffService : IStaffService
     {
         private readonly IHotelBookingWebsiteDbContext _context;
         private readonly IMapper _mapper;
@@ -44,7 +45,15 @@ namespace Core.Application.Services
 
         public async Task<StaffVM> Create(StaffRQ pRequest)
         {
-            var staff = _mapper.Map<Staff>(pRequest);
+			var validationResults = BaseService.ValidateModel(pRequest);
+
+			if (validationResults.Any())
+			{
+				var errorMessage = validationResults.Select(result => result.ErrorMessage).ToList();
+				throw new ValidationCustomException(errorMessage);
+			}
+
+			var staff = _mapper.Map<Staff>(pRequest);
 
             var newStaff = await _context.Staffs.AddAsync(staff);
 			await _context.SaveChangesAsync(default(CancellationToken));
