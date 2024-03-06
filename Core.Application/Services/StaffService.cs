@@ -68,7 +68,7 @@ namespace Core.Application.Services
             var newStaff = _context.Staffs.Update(findStaff);
             await _context.SaveChangesAsync(default(CancellationToken));
 
-            var staffVM = _mapper.Map<StaffVM>(newStaff);
+            var staffVM = _mapper.Map<StaffVM>(newStaff.Entity);
 
             return staffVM;
         }

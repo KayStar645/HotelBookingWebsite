@@ -247,9 +247,9 @@
 						method: "GET",
 						success: function (data) {
 							var newData = $('<tbody>').html(data).find('#table-body-staff').html();
-
 							$('#table-body-staff').html(newData);
-							$('#openPopupCreate').modal('hide');
+							
+							$('.btn-secondary[data-dismiss="modal"]').click();
 						},
 						error: function () {
 							console.log("Lỗi rồi!")
@@ -259,8 +259,34 @@
 			});
 		});
 
+		$("#updateButton").on("click", function (e) {
+			e.preventDefault();
 
-		// Tạo mới làm gì có id
+			var pRequest = getData();
+
+			$.ajax({
+				url: "/staff/update",
+				method: "PUT",
+				data: JSON.stringify(pRequest),
+				contentType: "application/json; charset=utf-8",
+				success: function (data) {
+					$.ajax({
+						url: "/staff/index",
+						method: "GET",
+						success: function (data) {
+							var newData = $('<tbody>').html(data).find('#table-body-staff').html();
+							$('#table-body-staff').html(newData);
+
+							$('.btn-secondary[data-dismiss="modal"]').click();
+						},
+						error: function () {
+							console.log("Lỗi rồi!")
+						},
+					});
+				},
+			});
+		});
+
 		function getData() {
 			var formData = {
 				id: $('input[name="id"]').val(),
@@ -272,20 +298,6 @@
 				phone: $('input[name="phone"]').val(),
 			};
 			return formData;
-		}
-
-		function customStringify(obj) {
-			for (var prop in obj) {
-				if (obj[prop] == "" || obj[prop] == null) {
-					if (prop == "dateOfBirth") {
-						obj[prop] = "1950-01-01";
-					}
-					else if (prop == "gender") {
-						obj[prop] = "Khác";
-					}
-				}
-			}
-			return JSON.stringify(obj);
 		}
 	});
 </script>

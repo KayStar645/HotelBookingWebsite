@@ -37,10 +37,11 @@ namespace Presentation.Web.Controllers.Admin
 			return RedirectToAction("index");
 		}
 
-		public async Task<IActionResult> Update(StaffRQ pRequest)
+        [HttpPut]
+		public async Task<IActionResult> Update([FromBody]StaffRQ pRequest)
 		{
-
-			return View();
+            await _staffService.Update(pRequest);
+			return RedirectToAction("index");
 		}
 
         public async Task<IActionResult> Delete(int pId)
