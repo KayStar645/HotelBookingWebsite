@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Core.Application.Interfaces;
 using Core.Application.Profiles;
+using Core.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Core.Application
@@ -13,6 +15,8 @@ namespace Core.Application
                 cfg.AddProfile(new CommonMappingProfile());
                 cfg.AddProfile(new ModuleMappingProfile());
             }).CreateMapper());
+
+            services.AddScoped<IStaffService, StaffService>();
 
             return services;
         }

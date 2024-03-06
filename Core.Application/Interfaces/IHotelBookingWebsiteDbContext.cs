@@ -5,7 +5,7 @@ namespace Core.Application.Interfaces
 {
     public interface IHotelBookingWebsiteDbContext
     {
-        DbSet<Customer> Customers { get; }
+        DbSet<Staff> Staffs { get; }
 
         DbSet<TEntity> Set<TEntity>() where TEntity : class;
 

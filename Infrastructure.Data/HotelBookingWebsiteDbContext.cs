@@ -17,7 +17,7 @@ namespace Infrastructure.Data
         {
             _saveChangesInterceptor = saveChangesInterceptor;
         }
-        public DbSet<Customer> Customers => Set<Customer>();
+        public DbSet<Staff> Staffs => Set<Staff>();
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

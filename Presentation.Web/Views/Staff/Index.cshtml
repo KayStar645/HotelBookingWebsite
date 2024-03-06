@@ -1,0 +1,335 @@
+﻿@using Core.Application.Responses
+@using Core.Application.ViewModels.Staffs
+@{
+    var staffs = ViewBag.list as PaginatedResult<StaffVM>;
+}
+
+@section TitleHeader
+{
+	<div class="row">
+		<div class="col-sm-10 mt-5">
+			<h3 class="page-title mt-3">
+				Nhân viên
+			</h3>
+			<ul class="breadcrumb">
+				<li class="breadcrumb-item active">Danh sách nhân viên</li>
+			</ul>
+		</div>
+		<div class="col-sm-2 mt-5">
+			<div class="text-right">
+				<button type="button" id="createStaff" class="btn btn-primary"
+						data-toggle="modal" data-target="#openPopupCreate">
+					Thêm mới
+				</button>
+			</div>
+		</div>
+	</div>
+}
+
+<div class="card-body">
+	<div class="table-responsive">
+		<table class="table table-hover table-center">
+			<thead>
+				<tr>
+					<th class="min-vw-10"></th>
+					<th>Mã nhân viên</th>
+					<th>Họ tên</th>
+					<th class="text-right">Ngày sinh</th>
+					<th class="text-center">Giới tính</th>
+					<th>Địa chỉ</th>
+					<th class="text-right">Số điện thoại</th>
+					<th class="text-center">Trạng thái</th>
+				</tr>
+			</thead>
+			<tbody id="table-body-staff">
+				@if (staffs != null)
+				{
+					@foreach (var staff in staffs.Data)
+					{
+						<tr>
+							<td class="text-center">
+								<i class=" updatesStaff fa-regular fa-pen-to-square pe-3"
+								   style="color:blue;cursor: pointer;"
+								   data-toggle="modal" data-target="#openPopupCreate"></i>
+								<i class="deletesStaff fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
+							</td>
+							<td class="text-center d-none" data-id="@staff?.Id">@staff?.Id</td>
+							<td class="text-nowrap">
+								<div>@staff?.InternalCode</div>
+							</td>
+							<td class="text-nowrap">
+								@staff?.Name
+							</td>
+							<td class="text-right">
+								@((staff.DateOfBirth.HasValue ?
+															staff.DateOfBirth.Value.ToString("dd/MM/yyyy") :
+															"---"))
+							</td>
+							<td class="text-center">
+								<div>@staff?.Gender</div>
+							</td>
+							<td class="text-nowrap">
+								@staff?.Address
+							</td>
+							<td class="text-right">
+								@staff?.Phone
+							</td>
+							<td class="text-center">
+
+								@{
+									var statusText = staff.IsDeleted == true
+									? "<span class='badge badge-pill bg-danger inv-badge'>Đã xoá</span>"
+									: "<span class='badge badge-pill bg-success inv-badge'>Hoạt động</span>";
+								}
+
+								@Html.Raw(statusText)
+							</td>
+						</tr>
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="openPopupCreate" tabindex="-1" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header bg-success">
+				<h1 class="modal-title text-white font-weight-bold" id="modalTitle">Thêm nhân viên mới</h1>
+				<button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">×</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-lg-12">
+						<form>
+							<div class="row formtype">
+								<div class="col-md-6 d-none">
+									<div class="form-group">
+										<input type="text" name="id" value="" />
+									</div>
+								</div>
+
+								<div class="col-md-6">
+									<div class="form-group">
+										<label class="mb-2">Mã nhân viên</label>
+										<input class="form-control" type="text" name="internalCode" />
+									</div>
+								</div>
+
+								<div class="col-md-6">
+									<div class="form-group">
+										<label class="mb-2">Họ tên</label>
+										<input class="form-control" type="text" name="name" />
+									</div>
+								</div>
+
+								<div class="col-md-6">
+									<div class="form-group">
+										<label class="mb-2">Ngày sinh</label>
+										<div class="">
+											<input type="date" class="form-control" placeholder="dd-mm-yyyy"
+												   min="1950-01-01" max="2030-12-31" name="dateOfBirth" />
+										</div>
+									</div>
+								</div>
+
+								<div class="col-md-6">
+									<div class="form-group">
+										<label class="mb-2">Giới tính</label>
+										<select class="form-control" name="gender">
+											<option>Nam</option>
+											<option>Nữ</option>
+											<option>Khác</option>
+										</select>
+									</div>
+								</div>
+
+								<div class="col-md-6">
+									<div class="form-group">
+										<label class="mb-2">Địa chỉ</label>
+										<input class="form-control" type="text" name="address" />
+									</div>
+								</div>
+
+								<div class="col-md-6">
+									<div class="form-group">
+										<label class="mb-2">Số điện thoại</label>
+										<input class="form-control" type="text" name="phone" />
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+				<button type="button" id="createButton" class="btn btn-primary">Tạo mới</button>
+				<button type="button" id="updateButton" class="btn btn-primary">Cập nhật</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+@* Load giao diện và dữ liệu *@
+<script>
+	function resetButtonClick() {
+		var createOpen = document.getElementById("createStaff");
+		var updateOpens = document.querySelectorAll(".updatesStaff");
+
+		createOpen.addEventListener("click", function (event) {
+
+			var rowData = {
+				internalCode: "",
+				name: "",
+				dateOfBirth: "",
+				gender: "",
+				address: "",
+				phone: "",
+			};
+
+			document.getElementById("modalTitle").innerText = "Thêm nhân viên mới";
+			document.getElementById("createButton").style.display = "inline-block";
+			document.getElementById("updateButton").style.display = "none";
+
+			loadData(rowData);
+		});
+
+		updateOpens.forEach(function (button) {
+			button.addEventListener("click", function () {
+				var parentRow = button.closest("tr");
+				var rowData = {
+					id: parentRow.querySelector("td:nth-child(2)").textContent.trim(),
+					internalCode: parentRow.querySelector("td:nth-child(3)").textContent.trim(),
+					name: parentRow.querySelector("td:nth-child(4)").textContent.trim(),
+					dateOfBirth: parentRow.querySelector("td:nth-child(5)").textContent.trim(),
+					gender: parentRow.querySelector("td:nth-child(6)").textContent.trim(),
+					address: parentRow.querySelector("td:nth-child(7)").textContent.trim(),
+					phone: parentRow.querySelector("td:nth-child(8)").textContent.trim(),
+				};
+
+				document.getElementById("modalTitle").innerText = "Cập nhật thông tin nhân viên";
+				document.getElementById("createButton").style.display = "none";
+				document.getElementById("updateButton").style.display = "inline-block";
+
+				loadData(rowData);
+			});
+		});
+
+		function loadData(data) {
+			const dateParts = data.dateOfBirth.split('/');
+
+			document.querySelector('input[name="id"]').value = data.id;
+			document.querySelector('input[name="internalCode"]').value = data.internalCode;
+			document.querySelector('input[name="name"]').value = data.name;
+			document.querySelector('input[name="dateOfBirth"]').value = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+			document.querySelector('select[name="gender"]').value = data.gender;
+			document.querySelector('input[name="address"]').value = data.address;
+			document.querySelector('input[name="phone"]').value = data.phone;
+		}
+
+
+
+		$(document).ready(function () {
+			$(".deletesStaff").on("click", function () {
+				var itemId = $(this).closest("tr").find("td[data-id]").data("id");
+
+				$.ajax({
+					url: "/staff/delete?pId=" + itemId,
+					method: "DELETE",
+					success: function (data) {
+						$.ajax({
+							url: "/staff/index",
+							method: "GET",
+							success: function (data) {
+								var newData = $('<tbody>').html(data).find('#table-body-staff').html();
+								$('#table-body-staff').html(newData);
+
+								resetButtonClick();
+							},
+						});
+					},
+				});
+			});
+		});
+	}
+
+	resetButtonClick();
+</script>
+
+@* Gọi controller xử lý *@
+<script>
+	$(document).ready(function () {
+		$("#createButton").on("click", function (e) {
+			e.preventDefault();
+
+			var pRequest = getData();
+			pRequest.id = null;
+
+			$.ajax({
+				url: "/staff/create",
+				method: "POST",
+				data: JSON.stringify(pRequest),
+				contentType: "application/json; charset=utf-8",
+				success: function (data) {
+					$.ajax({
+						url: "/staff/index",
+						method: "GET",
+						success: function (data) {
+							var newData = $('<tbody>').html(data).find('#table-body-staff').html();
+							$('#table-body-staff').html(newData);
+
+							$('.btn-secondary[data-dismiss="modal"]').click();
+
+							resetButtonClick();
+						},
+					});
+				},
+			});
+		});
+
+		$("#updateButton").on("click", function (e) {
+			e.preventDefault();
+
+			var pRequest = getData();
+
+			$.ajax({
+				url: "/staff/update",
+				method: "PUT",
+				data: JSON.stringify(pRequest),
+				contentType: "application/json; charset=utf-8",
+				success: function (data) {
+					$.ajax({
+						url: "/staff/index",
+						method: "GET",
+						success: function (data) {
+							var newData = $('<tbody>').html(data).find('#table-body-staff').html();
+							$('#table-body-staff').html(newData);
+
+							$('.btn-secondary[data-dismiss="modal"]').click();
+
+							resetButtonClick();
+						},
+					});
+				},
+			});
+		});
+
+		function getData() {
+			var formData = {
+				id: $('input[name="id"]').val(),
+				internalCode: $('input[name="internalCode"]').val(),
+				name: $('input[name="name"]').val(),
+				dateOfBirth: $('input[name="dateOfBirth"]').val(),
+				gender: $('select[name="gender"]').val(),
+				address: $('input[name="address"]').val(),
+				phone: $('input[name="phone"]').val(),
+			};
+			return formData;
+		}
+	});
+</script>
