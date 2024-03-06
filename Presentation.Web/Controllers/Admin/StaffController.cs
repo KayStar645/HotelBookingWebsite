@@ -22,5 +22,29 @@ namespace Presentation.Web.Controllers.Admin
 
             return View();
         }
-    }
+
+        public async Task<IActionResult> Detail()
+        {
+
+			return View();
+		}
+
+		public async Task<IActionResult> Create()
+		{
+
+			return View();
+		}
+
+		public async Task<IActionResult> Update()
+		{
+
+			return View();
+		}
+
+        public async Task<IActionResult> Delete()
+		{
+
+			return View();
+		}
+	}
 }
