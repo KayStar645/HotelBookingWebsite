@@ -149,13 +149,19 @@
                         <li class="submenu">
                             <a href="#">
                                 <i class="fas fa-suitcase"></i>
-                                <span> Booking </span> <span class="menu-arrow"></span>
+                                <span> Nhân viên </span> <span class="menu-arrow"></span>
                             </a>
                             <ul class="submenu_class"
                                 style="display: none;">
-                                <li><a href="#"> All Booking </a></li>
-                                <li><a href="#"> Edit Booking </a></li>
-                                <li><a href="#"> Add Booking </a></li>
+                                <li>
+                                    <a href="@Url.Action("Index", "Staff")"> Danh sách nhân viên </a>
+                                </li>
+                                <li>
+                                    <a href="#"> Thêm nhân viên mới</a>
+                                </li>
+                                <li>
+                                    <a href="#"> Sửa thông tin nhân viên </a>
+                                </li>
                             </ul>
                         </li>
                         <li class="submenu">
@@ -191,17 +197,7 @@
         <div class="page-wrapper">
             <div class="content container-fluid">
                 <div class="page-header">
-                    <div class="row">
-                        <div class="col-sm-12 mt-5">
-                            <h3 class="page-title mt-3">
-                                Good Morning Soeng
-                                Souy!
-                            </h3>
-                            <ul class="breadcrumb">
-                                <li class="breadcrumb-item active">Dashboard</li>
-                            </ul>
-                        </div>
-                    </div>
+                    @RenderSection("TitleHeader", required: false)
                 </div>
 
                 <div class="row">

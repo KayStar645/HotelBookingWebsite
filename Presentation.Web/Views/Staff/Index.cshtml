@@ -1,0 +1,72 @@
+﻿@using Core.Application.Responses
+@using Core.Application.ViewModels.Staffs
+@{
+    var staffs = ViewBag.list as PaginatedResult<StaffVM>;
+}
+
+@section TitleHeader
+{
+	<div class="row">
+		<div class="col-sm-12 mt-5">
+			<h3 class="page-title mt-3">
+				Nhân viên
+			</h3>
+			<ul class="breadcrumb">
+				<li class="breadcrumb-item active">Danh sách nhân viên</li>
+			</ul>
+		</div>
+	</div>
+}
+
+<div class="card-body">
+	<div class="table-responsive">
+		<table class="table table-hover table-center">
+			<thead>
+				<tr>
+					<th>Mã nhân viên</th>
+					<th>Họ tên</th>
+					<th class="text-right">Ngày sinh</th>
+					<th class="text-center">Giới tính</th>
+					<th>Địa chỉ</th>
+					<th class="text-right">Số điện thoại</th>
+					<th class="text-center">Trạng thái</th>
+				</tr>
+			</thead>
+			<tbody>
+				@if (staffs != null)
+				{
+					@foreach (var staff in staffs.Data)
+					{
+						<tr>
+							<td class="text-nowrap">
+								<div>@staff.InternalCode</div>
+							</td>
+							<td class="text-nowrap">
+								@staff.Name
+							</td>
+							<td class="text-right">
+								@((staff.DateOfBirth.HasValue ? 
+									staff.DateOfBirth.Value.ToString("dd/MM/yyyy") :
+									"---"))
+							</td>
+							<td class="text-center">
+								<div>@staff.Gender</div>
+							</td>
+							<td class="text-nowrap">
+								@staff.Address
+							</td>
+							<td class="text-right">
+								@staff.Phone
+							</td>
+							<td class="text-center">
+								<span class="badge badge-pill bg-success inv-badge">
+									Hoạt động
+								</span>
+							</td>
+						</tr>
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
