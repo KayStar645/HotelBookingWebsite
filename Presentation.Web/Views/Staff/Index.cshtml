@@ -163,7 +163,8 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
-				<button type="button" id="saveButton" class="btn btn-primary">Lưu thay đổi</button>
+				<button type="button" id="createButton" class="btn btn-primary">Tạo mới</button>
+				<button type="button" id="updateButton" class="btn btn-primary">Cập nhật</button>
 			</div>
 		</div>
 	</div>
@@ -185,13 +186,14 @@
 		};
 
 		document.getElementById("modalTitle").innerText = "Thêm nhân viên mới";
-		document.getElementById("saveButton").innerText = "Tạo mới";
+		document.getElementById("createButton").style.display = "inline-block";
+		document.getElementById("updateButton").style.display = "none";
 
 		loadData(rowData);
 	});
 
 	function loadData(data) {
-		const dateParts = data.dateOfBirth.split('-');
+		const dateParts = data.dateOfBirth.split('/');
 
 		document.querySelector('input[name="id"]').value = data.id;
 		document.querySelector('input[name="internalCode"]').value = data.internalCode;
@@ -206,17 +208,18 @@
 		button.addEventListener("click", function () {
 			var parentRow = button.closest("tr");
 			var rowData = {
-				id: parentRow.querySelector("td:nth-child(2)").textContent,
-				internalCode: parentRow.querySelector("td:nth-child(3)").textContent,
-				name: parentRow.querySelector("td:nth-child(4)").textContent,
-				dateOfBirth: parentRow.querySelector("td:nth-child(5)").textContent,
-				gender: parentRow.querySelector("td:nth-child(6)").textContent,
-				address: parentRow.querySelector("td:nth-child(7)").textContent,
-				phone: parentRow.querySelector("td:nth-child(8)").textContent,
+				id: parentRow.querySelector("td:nth-child(2)").textContent.trim(),
+				internalCode: parentRow.querySelector("td:nth-child(3)").textContent.trim(),
+				name: parentRow.querySelector("td:nth-child(4)").textContent.trim(),
+				dateOfBirth: parentRow.querySelector("td:nth-child(5)").textContent.trim(),
+				gender: parentRow.querySelector("td:nth-child(6)").textContent.trim(),
+				address: parentRow.querySelector("td:nth-child(7)").textContent.trim(),
+				phone: parentRow.querySelector("td:nth-child(8)").textContent.trim(),
 			};
 
 			document.getElementById("modalTitle").innerText = "Cập nhật thông tin nhân viên";
-			document.getElementById("saveButton").innerText = "Cập nhật";
+			document.getElementById("createButton").style.display = "none";
+			document.getElementById("updateButton").style.display = "inline-block";
 
 			loadData(rowData);
 		});
