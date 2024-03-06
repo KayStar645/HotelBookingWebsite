@@ -231,6 +231,31 @@
 			document.querySelector('input[name="address"]').value = data.address;
 			document.querySelector('input[name="phone"]').value = data.phone;
 		}
+
+
+
+		$(document).ready(function () {
+			$(".deletesStaff").on("click", function () {
+				var itemId = $(this).closest("tr").find("td[data-id]").data("id");
+
+				$.ajax({
+					url: "/staff/delete?pId=" + itemId,
+					method: "DELETE",
+					success: function (data) {
+						$.ajax({
+							url: "/staff/index",
+							method: "GET",
+							success: function (data) {
+								var newData = $('<tbody>').html(data).find('#table-body-staff').html();
+								$('#table-body-staff').html(newData);
+
+								resetButtonClick();
+							},
+						});
+					},
+				});
+			});
+		});
 	}
 
 	resetButtonClick();
@@ -262,9 +287,6 @@
 
 							resetButtonClick();
 						},
-						error: function () {
-							console.log("Lỗi rồi!")
-						},
 					});
 				},
 			});
@@ -292,31 +314,8 @@
 
 							resetButtonClick();
 						},
-						error: function () {
-							console.log("Lỗi rồi!")
-						},
 					});
 				},
-			});
-		});
-
-		$(document).ready(function () {
-			$(".deletesStaff").on("click", function () {
-				var itemId = $(this).closest("tr").find("td[data-id]").data("id");
-
-				$.ajax({
-					url: "/staff/delete?pId=" + itemId,
-					method: "DELETE",
-					success: function (data) {
-						var newData = $('<tbody>').html(data).find('#table-body-staff').html();
-						$('#table-body-staff').html(newData);
-
-						resetButtonClick();
-					},
-					error: function () {
-						console.log("Lỗi rồi!")
-					}
-				});
 			});
 		});
 
