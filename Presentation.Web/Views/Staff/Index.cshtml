@@ -249,10 +249,15 @@
 								var newData = $('<tbody>').html(data).find('#table-body-staff').html();
 								$('#table-body-staff').html(newData);
 
+								toastr.success('Xoá nhân viên thành công!', 'Thông báo');
+
 								resetButtonClick();
 							},
 						});
 					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Xoá nhân viên thất bại!', 'Thông báo');
+					}
 				});
 			});
 		});
@@ -285,10 +290,15 @@
 
 							$('.btn-secondary[data-dismiss="modal"]').click();
 
+							toastr.success('Thêm mới nhân viên thành công!', 'Thông báo');
+
 							resetButtonClick();
 						},
 					});
 				},
+				error: function (xhr, textStatus, errorThrown) {
+					toastr.error('Thêm mới nhân viên thất bại!', 'Thông báo');
+				}
 			});
 		});
 
@@ -312,10 +322,15 @@
 
 							$('.btn-secondary[data-dismiss="modal"]').click();
 
+							toastr.success('Cập nhật thông tin nhân viên thành công!', 'Thông báo');
+
 							resetButtonClick();
 						},
 					});
 				},
+				error: function (xhr, textStatus, errorThrown) {
+					toastr.error('Cập nhật thông tin nhân viên thất bại!', 'Thông báo');
+				}
 			});
 		});
 
