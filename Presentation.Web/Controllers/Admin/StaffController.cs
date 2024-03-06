@@ -1,5 +1,6 @@
 ﻿using Core.Application.Interfaces;
 using Core.Application.ViewModels.Common;
+using Core.Application.ViewModels.Staffs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Web.Controllers.Admin
@@ -23,25 +24,26 @@ namespace Presentation.Web.Controllers.Admin
             return View();
         }
 
-        public async Task<IActionResult> Detail()
+        public async Task<IActionResult> Detail(int pId)
         {
 
 			return View();
 		}
 
-		public async Task<IActionResult> Create()
+        [HttpPost]
+		public async Task<IActionResult> Create([FromBody]StaffRQ pRequest)
+		{
+            await _staffService.Create(pRequest);
+			return RedirectToAction("index");
+		}
+
+		public async Task<IActionResult> Update(StaffRQ pRequest)
 		{
 
 			return View();
 		}
 
-		public async Task<IActionResult> Update()
-		{
-
-			return View();
-		}
-
-        public async Task<IActionResult> Delete()
+        public async Task<IActionResult> Delete(int pId)
 		{
 
 			return View();

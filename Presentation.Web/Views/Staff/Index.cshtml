@@ -18,7 +18,7 @@
 		<div class="col-sm-2 mt-5">
 			<div class="text-right">
 				<button type="button" id="createStaff" class="btn btn-primary"
-					data-toggle="modal" data-target="#openPopupCreate">
+						data-toggle="modal" data-target="#openPopupCreate">
 					Thêm mới
 				</button>
 			</div>
@@ -41,14 +41,14 @@
 					<th class="text-center">Trạng thái</th>
 				</tr>
 			</thead>
-			<tbody>
+			<tbody id="table-body-staff">
 				@if (staffs != null)
 				{
 					@foreach (var staff in staffs.Data)
 					{
 						<tr>
 							<td class="text-center">
-								<i class="fa-regular fa-pen-to-square pe-3" 
+								<i class="fa-regular fa-pen-to-square pe-3"
 								   style="color:blue;cursor: pointer;"
 								   data-toggle="modal" data-target="#openPopupCreate"></i>
 								<i class="fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
@@ -61,9 +61,9 @@
 								@staff?.Name
 							</td>
 							<td class="text-right">
-								@((staff.DateOfBirth.HasValue ? 
-									staff.DateOfBirth.Value.ToString("dd/MM/yyyy") :
-									"---"))
+								@((staff.DateOfBirth.HasValue ?
+															staff.DateOfBirth.Value.ToString("dd/MM/yyyy") :
+															"---"))
 							</td>
 							<td class="text-center">
 								<div>@staff?.Gender</div>
@@ -170,6 +170,7 @@
 	</div>
 </div>
 
+@* Load giao diện và dữ liệu *@
 <script>
 	var createOpen = document.getElementById("createStaff");
 	var updateOpens = document.querySelectorAll(".fa-regular.fa-pen-to-square");
@@ -223,5 +224,68 @@
 
 			loadData(rowData);
 		});
+	});
+</script>
+
+@* Gọi controller xử lý *@
+<script>
+	$(document).ready(function () {
+		$("#createButton").on("click", function (e) {
+			e.preventDefault();
+
+			var pRequest = getData();
+			pRequest.id = null;
+
+			$.ajax({
+				url: "/staff/create",
+				method: "POST",
+				data: JSON.stringify(pRequest),
+				contentType: "application/json; charset=utf-8",
+				success: function (data) {
+					$.ajax({
+						url: "/staff/index",
+						method: "GET",
+						success: function (data) {
+							var newData = $('<tbody>').html(data).find('#table-body-staff').html();
+
+							$('#table-body-staff').html(newData);
+							$('#openPopupCreate').modal('hide');
+						},
+						error: function () {
+							console.log("Lỗi rồi!")
+						},
+					});
+				},
+			});
+		});
+
+
+		// Tạo mới làm gì có id
+		function getData() {
+			var formData = {
+				id: $('input[name="id"]').val(),
+				internalCode: $('input[name="internalCode"]').val(),
+				name: $('input[name="name"]').val(),
+				dateOfBirth: $('input[name="dateOfBirth"]').val(),
+				gender: $('select[name="gender"]').val(),
+				address: $('input[name="address"]').val(),
+				phone: $('input[name="phone"]').val(),
+			};
+			return formData;
+		}
+
+		function customStringify(obj) {
+			for (var prop in obj) {
+				if (obj[prop] == "" || obj[prop] == null) {
+					if (prop == "dateOfBirth") {
+						obj[prop] = "1950-01-01";
+					}
+					else if (prop == "gender") {
+						obj[prop] = "Khác";
+					}
+				}
+			}
+			return JSON.stringify(obj);
+		}
 	});
 </script>

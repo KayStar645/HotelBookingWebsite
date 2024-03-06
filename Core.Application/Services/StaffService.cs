@@ -47,8 +47,9 @@ namespace Core.Application.Services
             var staff = _mapper.Map<Staff>(pRequest);
 
             var newStaff = await _context.Staffs.AddAsync(staff);
+			await _context.SaveChangesAsync(default(CancellationToken));
 
-            var staffVM = _mapper.Map<StaffVM>(newStaff);
+			var staffVM = _mapper.Map<StaffVM>(newStaff.Entity);
 
             return staffVM;
         }
