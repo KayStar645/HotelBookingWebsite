@@ -46,7 +46,7 @@ namespace Presentation.Web.Controllers.Admin
 
         public async Task<IActionResult> Delete(int pId)
 		{
-
+            await _staffService.Delete(pId);
 			return View();
 		}
 	}

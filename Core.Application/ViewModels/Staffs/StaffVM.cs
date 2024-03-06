@@ -15,5 +15,7 @@ namespace Core.Application.ViewModels.Staffs
         public string? Address { get; set; }
 
         public string? Phone { get; set; }
-    }
+
+		public bool? IsDeleted { get; set; }
+	}
 }

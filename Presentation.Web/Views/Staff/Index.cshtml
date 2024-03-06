@@ -51,7 +51,7 @@
 								<i class=" updatesStaff fa-regular fa-pen-to-square pe-3"
 								   style="color:blue;cursor: pointer;"
 								   data-toggle="modal" data-target="#openPopupCreate"></i>
-								<i class="fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
+								<i class="deletesStaff fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
 							</td>
 							<td class="text-center d-none" data-id="@staff?.Id">@staff?.Id</td>
 							<td class="text-nowrap">
@@ -75,9 +75,14 @@
 								@staff?.Phone
 							</td>
 							<td class="text-center">
-								<span class="badge badge-pill bg-success inv-badge">
-									Hoạt động
-								</span>
+
+								@{
+									var statusText = staff.IsDeleted == true
+									? "<span class='badge badge-pill bg-danger inv-badge'>Đã xoá</span>"
+									: "<span class='badge badge-pill bg-success inv-badge'>Hoạt động</span>";
+								}
+
+								@Html.Raw(statusText)
 							</td>
 						</tr>
 					}
@@ -172,59 +177,63 @@
 
 @* Load giao diện và dữ liệu *@
 <script>
-	var createOpen = document.getElementById("createStaff");
-	var updateOpens = document.querySelectorAll(".updatesStaff");
+	function resetButtonClick() {
+		var createOpen = document.getElementById("createStaff");
+		var updateOpens = document.querySelectorAll(".updatesStaff");
 
-	createOpen.addEventListener("click", function (event) {
+		createOpen.addEventListener("click", function (event) {
 
-		var rowData = {
-			internalCode: "",
-			name: "",
-			dateOfBirth: "",
-			gender: "",
-			address: "",
-			phone: "",
-		};
-
-		document.getElementById("modalTitle").innerText = "Thêm nhân viên mới";
-		document.getElementById("createButton").style.display = "inline-block";
-		document.getElementById("updateButton").style.display = "none";
-
-		loadData(rowData);
-	});
-
-	function loadData(data) {
-		const dateParts = data.dateOfBirth.split('/');
-
-		document.querySelector('input[name="id"]').value = data.id;
-		document.querySelector('input[name="internalCode"]').value = data.internalCode;
-		document.querySelector('input[name="name"]').value = data.name;
-		document.querySelector('input[name="dateOfBirth"]').value = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
-		document.querySelector('select[name="gender"]').value = data.gender;
-		document.querySelector('input[name="address"]').value = data.address;
-		document.querySelector('input[name="phone"]').value = data.phone;
-	}
-
-	updateOpens.forEach(function (button) {
-		button.addEventListener("click", function () {
-			var parentRow = button.closest("tr");
 			var rowData = {
-				id: parentRow.querySelector("td:nth-child(2)").textContent.trim(),
-				internalCode: parentRow.querySelector("td:nth-child(3)").textContent.trim(),
-				name: parentRow.querySelector("td:nth-child(4)").textContent.trim(),
-				dateOfBirth: parentRow.querySelector("td:nth-child(5)").textContent.trim(),
-				gender: parentRow.querySelector("td:nth-child(6)").textContent.trim(),
-				address: parentRow.querySelector("td:nth-child(7)").textContent.trim(),
-				phone: parentRow.querySelector("td:nth-child(8)").textContent.trim(),
+				internalCode: "",
+				name: "",
+				dateOfBirth: "",
+				gender: "",
+				address: "",
+				phone: "",
 			};
 
-			document.getElementById("modalTitle").innerText = "Cập nhật thông tin nhân viên";
-			document.getElementById("createButton").style.display = "none";
-			document.getElementById("updateButton").style.display = "inline-block";
+			document.getElementById("modalTitle").innerText = "Thêm nhân viên mới";
+			document.getElementById("createButton").style.display = "inline-block";
+			document.getElementById("updateButton").style.display = "none";
 
 			loadData(rowData);
 		});
-	});
+
+		updateOpens.forEach(function (button) {
+			button.addEventListener("click", function () {
+				var parentRow = button.closest("tr");
+				var rowData = {
+					id: parentRow.querySelector("td:nth-child(2)").textContent.trim(),
+					internalCode: parentRow.querySelector("td:nth-child(3)").textContent.trim(),
+					name: parentRow.querySelector("td:nth-child(4)").textContent.trim(),
+					dateOfBirth: parentRow.querySelector("td:nth-child(5)").textContent.trim(),
+					gender: parentRow.querySelector("td:nth-child(6)").textContent.trim(),
+					address: parentRow.querySelector("td:nth-child(7)").textContent.trim(),
+					phone: parentRow.querySelector("td:nth-child(8)").textContent.trim(),
+				};
+
+				document.getElementById("modalTitle").innerText = "Cập nhật thông tin nhân viên";
+				document.getElementById("createButton").style.display = "none";
+				document.getElementById("updateButton").style.display = "inline-block";
+
+				loadData(rowData);
+			});
+		});
+
+		function loadData(data) {
+			const dateParts = data.dateOfBirth.split('/');
+
+			document.querySelector('input[name="id"]').value = data.id;
+			document.querySelector('input[name="internalCode"]').value = data.internalCode;
+			document.querySelector('input[name="name"]').value = data.name;
+			document.querySelector('input[name="dateOfBirth"]').value = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+			document.querySelector('select[name="gender"]').value = data.gender;
+			document.querySelector('input[name="address"]').value = data.address;
+			document.querySelector('input[name="phone"]').value = data.phone;
+		}
+	}
+
+	resetButtonClick();
 </script>
 
 @* Gọi controller xử lý *@
@@ -248,8 +257,10 @@
 						success: function (data) {
 							var newData = $('<tbody>').html(data).find('#table-body-staff').html();
 							$('#table-body-staff').html(newData);
-							
+
 							$('.btn-secondary[data-dismiss="modal"]').click();
+
+							resetButtonClick();
 						},
 						error: function () {
 							console.log("Lỗi rồi!")
@@ -278,12 +289,34 @@
 							$('#table-body-staff').html(newData);
 
 							$('.btn-secondary[data-dismiss="modal"]').click();
+
+							resetButtonClick();
 						},
 						error: function () {
 							console.log("Lỗi rồi!")
 						},
 					});
 				},
+			});
+		});
+
+		$(document).ready(function () {
+			$(".deletesStaff").on("click", function () {
+				var itemId = $(this).closest("tr").find("td[data-id]").data("id");
+
+				$.ajax({
+					url: "/staff/delete?pId=" + itemId,
+					method: "DELETE",
+					success: function (data) {
+						var newData = $('<tbody>').html(data).find('#table-body-staff').html();
+						$('#table-body-staff').html(newData);
+
+						resetButtonClick();
+					},
+					error: function () {
+						console.log("Lỗi rồi!")
+					}
+				});
 			});
 		});
 
