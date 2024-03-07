@@ -8,8 +8,6 @@ using Core.Application.ViewModels.Common;
 using Core.Application.ViewModels.Staffs;
 using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 namespace Core.Application.Services
 {
@@ -18,7 +16,15 @@ namespace Core.Application.Services
         private readonly IHotelBookingWebsiteDbContext _context;
         private readonly IMapper _mapper;
 
-        public StaffService(IHotelBookingWebsiteDbContext pContext, IMapper pMapper)
+		private List<string> _seachers { get; } = new List<string>()
+		{
+			"InternalCode",
+			"Name",
+			"Address",
+			"Phone",
+		};
+
+		public StaffService(IHotelBookingWebsiteDbContext pContext, IMapper pMapper)
         {
             _context = pContext;
             _mapper = pMapper;
@@ -27,6 +33,17 @@ namespace Core.Application.Services
         public async Task<PaginatedResult<StaffVM>> List(BaseListRQ pRequest)
         {
             var query = _context.Staffs.AsQueryable();
+
+            if (pRequest.Filters != null)
+            {
+				var sanitizedFilters = BaseService.RemoveDiacritics(pRequest.Filters.ToLower());
+
+				query = query.Where(x =>
+					x.InternalCode.ToLower().Contains(sanitizedFilters) ||
+					x.Name.ToLower().Contains(sanitizedFilters) ||
+					x.Address.ToLower().Contains(sanitizedFilters) ||
+					x.Phone.ToLower().Contains(sanitizedFilters));
+			}
 
 			var totalItems = await query.CountAsync();
 			var staff = await query

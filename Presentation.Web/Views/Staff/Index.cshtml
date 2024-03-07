@@ -12,8 +12,9 @@
 				Nhân viên
 			</h3>
 			<div class="form-outline col-sm-6 p-0 mt-2" data-mdb-input-init>
-				<input type="search" class="form-control" />
+				<input type="search" class="form-control" id="searchInput" placeholder="Tìm kiếm..." />
 			</div>
+
 		</div>
 		<div class="col-sm-2 mt-5">
 			<div class="text-right">
@@ -159,7 +160,7 @@
 									<div class="form-group">
 										<label class="mb-2">Giới tính</label>
 										<select class="form-control" name="gender">
-											<option>Nam</option>
+											<option selected>Nam</option>
 											<option>Nữ</option>
 											<option>Khác</option>
 										</select>
@@ -208,6 +209,42 @@
 	var addressInput = $('input[name="address"]');
 	var phoneInput = $('input[name="phone"]');
 
+	var searchTimer;
+
+</script>
+
+@* Tìm kiếm *@
+<script>
+	$(document).ready(function () {
+		$('#searchInput').on('input', function () {
+			clearTimeout(searchTimer);
+
+			searchTimer = setTimeout(function () {
+				performSearch();
+			}, 600);
+		});
+
+		function performSearch() {
+			var searchTerm = $('#searchInput').val();
+
+			$.ajax({
+				url: '/staff/index',
+				method: 'GET',
+				data: { filters: searchTerm, page: 1 },
+				contentType: 'application/json; charset=utf-8',
+				success: function (data) {
+					var newData = $('<tbody>').html(data).find('#table-body-staff').html();
+					$('#table-body-staff').html(newData);
+
+					var newPaginated = $('<div>').html(data).find('#paginated').html();
+					$('#paginated').html(newPaginated);
+				},
+				error: function (xhr, textStatus, errorThrown) {
+					toastr.error('Lỗi khi thực hiện tìm kiếm!', 'Thông báo');
+				}
+			});
+		}
+	});
 </script>
 
 @* Phân trang *@
@@ -238,7 +275,6 @@
 		$('.pagination a[data-page="' + activePage + '"]').addClass('active').closest('.pageCurrent').addClass('active');
 	}
 </script>
-
 
 @* Load giao diện và dữ liệu *@
 <script>
