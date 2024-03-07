@@ -117,6 +117,7 @@
 									<div class="form-group">
 										<label class="mb-2">Mã nhân viên</label>
 										<input class="form-control" type="text" name="internalCode" />
+										<span class="text-danger" id="internalCodeError"></span>
 									</div>
 								</div>
 
@@ -124,6 +125,7 @@
 									<div class="form-group">
 										<label class="mb-2">Họ tên</label>
 										<input class="form-control" type="text" name="name" />
+										<span class="text-danger" id="nameError"></span>
 									</div>
 								</div>
 
@@ -134,6 +136,7 @@
 											<input type="date" class="form-control" placeholder="dd-mm-yyyy"
 												   min="1950-01-01" max="2030-12-31" name="dateOfBirth" />
 										</div>
+										<span class="text-danger" id="dateOfBirthError"></span>
 									</div>
 								</div>
 
@@ -145,6 +148,7 @@
 											<option>Nữ</option>
 											<option>Khác</option>
 										</select>
+										<span class="text-danger" id="genderError"></span>
 									</div>
 								</div>
 
@@ -152,6 +156,7 @@
 									<div class="form-group">
 										<label class="mb-2">Địa chỉ</label>
 										<input class="form-control" type="text" name="address" />
+										<span class="text-danger" id="addressError"></span>
 									</div>
 								</div>
 
@@ -159,6 +164,7 @@
 									<div class="form-group">
 										<label class="mb-2">Số điện thoại</label>
 										<input class="form-control" type="text" name="phone" />
+										<span class="text-danger" id="phoneError"></span>
 									</div>
 								</div>
 							</div>
@@ -175,12 +181,23 @@
 	</div>
 </div>
 
+@* Khởi tạo biến *@
+<script>
+	var createOpen = document.getElementById("createStaff");
+	var updateOpens = document.querySelectorAll(".updatesStaff");
+
+	var internalCodeInput = $('input[name="internalCode"]');
+	var nameInput = $('input[name="name"]');
+	var dateOfBirthInput = $('input[name="dateOfBirth"]');
+	var genderInput = $('select[name="gender"]');
+	var addressInput = $('input[name="address"]');
+	var phoneInput = $('input[name="phone"]');
+
+</script>
+
 @* Load giao diện và dữ liệu *@
 <script>
 	function resetButtonClick() {
-		var createOpen = document.getElementById("createStaff");
-		var updateOpens = document.querySelectorAll(".updatesStaff");
-
 		createOpen.addEventListener("click", function (event) {
 
 			var rowData = {
@@ -220,18 +237,6 @@
 			});
 		});
 
-		function loadData(data) {
-			const dateParts = data.dateOfBirth.split('/');
-
-			document.querySelector('input[name="id"]').value = data.id;
-			document.querySelector('input[name="internalCode"]').value = data.internalCode;
-			document.querySelector('input[name="name"]').value = data.name;
-			document.querySelector('input[name="dateOfBirth"]').value = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
-			document.querySelector('select[name="gender"]').value = data.gender;
-			document.querySelector('input[name="address"]').value = data.address;
-			document.querySelector('input[name="phone"]').value = data.phone;
-		}
-
 
 
 		$(document).ready(function () {
@@ -249,13 +254,45 @@
 								var newData = $('<tbody>').html(data).find('#table-body-staff').html();
 								$('#table-body-staff').html(newData);
 
+								toastr.success('Xoá nhân viên thành công!', 'Thông báo');
+
 								resetButtonClick();
 							},
 						});
 					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Xoá nhân viên thất bại!', 'Thông báo');
+					}
 				});
 			});
 		});
+	}
+
+
+
+	function loadData(data) {
+		const dateParts = data.dateOfBirth.split('/');
+
+		document.querySelector('input[name="id"]').value = data.id;
+		document.querySelector('input[name="internalCode"]').value = data.internalCode;
+		document.querySelector('input[name="name"]').value = data.name;
+		document.querySelector('input[name="dateOfBirth"]').value = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+		document.querySelector('select[name="gender"]').value = data.gender;
+		document.querySelector('input[name="address"]').value = data.address;
+		document.querySelector('input[name="phone"]').value = data.phone;
+
+		removeValidator();
+	}
+
+	function removeValidator() {
+		$(".text-danger").text("");
+
+		internalCodeInput.removeClass("border-danger");
+		nameInput.removeClass("border-danger");
+		dateOfBirthInput.removeClass("border-danger");
+		genderInput.removeClass("border-danger");
+		addressInput.removeClass("border-danger");
+		phoneInput.removeClass("border-danger");
 	}
 
 	resetButtonClick();
@@ -267,69 +304,161 @@
 		$("#createButton").on("click", function (e) {
 			e.preventDefault();
 
+			removeValidator();
+
 			var pRequest = getData();
-			pRequest.id = null;
+			pRequest.id = 0;
 
-			$.ajax({
-				url: "/staff/create",
-				method: "POST",
-				data: JSON.stringify(pRequest),
-				contentType: "application/json; charset=utf-8",
-				success: function (data) {
-					$.ajax({
-						url: "/staff/index",
-						method: "GET",
-						success: function (data) {
-							var newData = $('<tbody>').html(data).find('#table-body-staff').html();
-							$('#table-body-staff').html(newData);
+			var isValid = validateForm(pRequest);
 
-							$('.btn-secondary[data-dismiss="modal"]').click();
+			if (isValid) {
+				$.ajax({
+					url: "/staff/create",
+					method: "POST",
+					data: JSON.stringify(pRequest),
+					contentType: "application/json; charset=utf-8",
+					success: function (data) {
+						if (data.success) {
+							$.ajax({
+								url: "/staff/index",
+								method: "GET",
+								success: function (data) {
+									var newData = $('<tbody>').html(data).find('#table-body-staff').html();
+									$('#table-body-staff').html(newData);
 
-							resetButtonClick();
-						},
-					});
-				},
-			});
+									$('.btn-secondary[data-dismiss="modal"]').click();
+
+									resetButtonClick();
+								},
+							});
+							toastr.success('Thêm mới nhân viên thành công!', 'Thông báo');
+						} else {
+							toastr.error(data.errors[0], 'Thông báo');
+						}
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Thêm mới nhân viên thất bại!', 'Thông báo');
+					}
+				});
+			}
 		});
 
 		$("#updateButton").on("click", function (e) {
 			e.preventDefault();
 
+			removeValidator();
+
 			var pRequest = getData();
 
-			$.ajax({
-				url: "/staff/update",
-				method: "PUT",
-				data: JSON.stringify(pRequest),
-				contentType: "application/json; charset=utf-8",
-				success: function (data) {
-					$.ajax({
-						url: "/staff/index",
-						method: "GET",
-						success: function (data) {
-							var newData = $('<tbody>').html(data).find('#table-body-staff').html();
-							$('#table-body-staff').html(newData);
+			var isValid = validateForm(pRequest);
 
-							$('.btn-secondary[data-dismiss="modal"]').click();
+			if (isValid) {
+				$.ajax({
+					url: "/staff/update",
+					method: "PUT",
+					data: JSON.stringify(pRequest),
+					contentType: "application/json; charset=utf-8",
+					success: function (data) {
+						$.ajax({
+							url: "/staff/index",
+							method: "GET",
+							success: function (data) {
+								var newData = $('<tbody>').html(data).find('#table-body-staff').html();
+								$('#table-body-staff').html(newData);
 
-							resetButtonClick();
-						},
-					});
-				},
-			});
+								$('.btn-secondary[data-dismiss="modal"]').click();
+
+								toastr.success('Cập nhật thông tin nhân viên thành công!', 'Thông báo');
+
+								resetButtonClick();
+							},
+						});
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Cập nhật thông tin nhân viên thất bại!', 'Thông báo');
+					}
+				});
+			}
 		});
-
-		function getData() {
-			var formData = {
-				id: $('input[name="id"]').val(),
-				internalCode: $('input[name="internalCode"]').val(),
-				name: $('input[name="name"]').val(),
-				dateOfBirth: $('input[name="dateOfBirth"]').val(),
-				gender: $('select[name="gender"]').val(),
-				address: $('input[name="address"]').val(),
-				phone: $('input[name="phone"]').val(),
-			};
-			return formData;
-		}
 	});
+
+	function getData() {
+		var formData = {
+			id: $('input[name="id"]').val() || null,
+			internalCode: $('input[name="internalCode"]').val() || null,
+			name: $('input[name="name"]').val() || null,
+			dateOfBirth: $('input[name="dateOfBirth"]').val() || null,
+			gender: $('select[name="gender"]').val() || null,
+			address: $('input[name="address"]').val() || null,
+			phone: $('input[name="phone"]').val() || null,
+		};
+		return formData;
+	}
+
+	function validateForm(data) {
+		var isValid = true;
+
+		// Validate internalCode
+		if (!data.internalCode) {
+			$("#internalCodeError").text("Mã nhân viên không được để trống");
+			$('input[name="internalCode"]').addClass("border-danger");
+			isValid = false;
+		} else if (data.internalCode.length > 100) {
+			$("#internalCodeError").text("Mã nhân viên không được vượt quá 100 ký tự.");
+			$('input[name="internalCode"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		// Validate name
+		if (!data.name) {
+			$("#nameError").text("Tên nhân viên không được để trống");
+			$('input[name="name"]').addClass("border-danger");
+			isValid = false;
+		} else if (data.name.length > 100) {
+			$("#nameError").text("Tên nhân viên không được vượt quá 100 ký tự.");
+			$('input[name="name"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		// Validate dateOfBirth
+		if (!data.dateOfBirth) {
+			$("#dateOfBirthError").text("Ngày sinh không được để trống");
+			$('input[name="dateOfBirth"]').addClass("border-danger");
+			isValid = false;
+		} else {
+			var birthDate = new Date(data.dateOfBirth);
+			var currentDate = new Date();
+			var age = currentDate.getFullYear() - birthDate.getFullYear();
+
+			if (age < 18) {
+				$("#dateOfBirthError").text("Nhân viên phải đủ 18 tuổi trở lên.");
+				$('input[name="dateOfBirth"]').addClass("border-danger");
+				isValid = false;
+			}
+		}
+
+		// Validate gender
+		if (!data.gender) {
+			$("#genderError").text("Giới tính không được để trống");
+			$('select[name="gender"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		// Validate address
+		if (data.address && data.address.length > 300) {
+			$("#addressError").text("Địa chỉ không được vượt quá 300 ký tự.");
+			$('input[name="address"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		// Validate phone
+		if (!data.phone && !/^\d{10,15}$/.test(data.phone)) {
+			$("#phoneError").text("Số điện thoại không hợp lệ.");
+			$('input[name="phone"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		return isValid;
+	}
+
 </script>
