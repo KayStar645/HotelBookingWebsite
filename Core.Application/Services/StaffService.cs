@@ -16,14 +16,6 @@ namespace Core.Application.Services
         private readonly IHotelBookingWebsiteDbContext _context;
         private readonly IMapper _mapper;
 
-		private List<string> _seachers { get; } = new List<string>()
-		{
-			"InternalCode",
-			"Name",
-			"Address",
-			"Phone",
-		};
-
 		public StaffService(IHotelBookingWebsiteDbContext pContext, IMapper pMapper)
         {
             _context = pContext;
@@ -44,6 +36,11 @@ namespace Core.Application.Services
 					x.Address.ToLower().Contains(sanitizedFilters) ||
 					x.Phone.ToLower().Contains(sanitizedFilters));
 			}
+
+            if(pRequest.Sorts != null)
+            {
+				query = BaseService.ApplySorting(query, pRequest.Sorts);
+			}    
 
 			var totalItems = await query.CountAsync();
 			var staff = await query

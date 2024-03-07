@@ -29,15 +29,15 @@
 
 <div class="card-body">
 	<div class="table-responsive" style="overflow-y: auto;">
-		<table class="table table-hover table-center">
+		<table id="tableSort" class="table table-hover table-center table-striped table-bordered">
 			<thead>
 				<tr>
 					<th class="min-vw-10"></th>
-					<th>Mã nhân viên</th>
-					<th>Họ tên</th>
-					<th class="text-right">Ngày sinh</th>
-					<th class="text-center">Giới tính</th>
-					<th>Địa chỉ</th>
+					<th class="th-sm">Mã nhân viên</th>
+					<th class="th-sm">Họ tên</th>
+					<th class="text-center th-sm">Ngày sinh</th>
+					<th class="text-center th-sm">Giới tính</th>
+					<th class="th-sm">Địa chỉ</th>
 					<th class="text-right">Số điện thoại</th>
 					<th class="text-center">Trạng thái</th>
 				</tr>
@@ -61,7 +61,7 @@
 							<td class="text-nowrap">
 								@staff?.Name
 							</td>
-							<td class="text-right">
+							<td class="text-center">
 								@((staff.DateOfBirth.HasValue ?
 															staff.DateOfBirth.Value.ToString("dd/MM/yyyy") :
 															"---"))
@@ -197,6 +197,8 @@
 	</div>
 </div>
 
+ @* ĐÂY LÀ JS *@
+
 @* Khởi tạo biến *@
 <script>
 	var createOpen = document.getElementById("createStaff");
@@ -210,6 +212,8 @@
 	var phoneInput = $('input[name="phone"]');
 
 	var searchTimer;
+
+	var sorted_asc = true;
 
 </script>
 
@@ -230,7 +234,7 @@
 			$.ajax({
 				url: '/staff/index',
 				method: 'GET',
-				data: { filters: searchTerm, page: 1 },
+				data: { filters: searchTerm, page: 1, sorts: "Name,InternalCode" },
 				contentType: 'application/json; charset=utf-8',
 				success: function (data) {
 					var newData = $('<tbody>').html(data).find('#table-body-staff').html();
@@ -245,6 +249,13 @@
 			});
 		}
 	});
+</script>
+
+@* Sắp xếp *@
+<script>
+	// $(document).ready(function () {
+	// 	$("#tableSort").DataTable();
+	// });
 </script>
 
 @* Phân trang *@
