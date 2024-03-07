@@ -1,4 +1,5 @@
-﻿using Core.Application.Interfaces;
+﻿using Core.Application.Exceptions;
+using Core.Application.Interfaces;
 using Core.Application.ViewModels.Common;
 using Core.Application.ViewModels.Staffs;
 using Microsoft.AspNetCore.Mvc;
@@ -39,15 +40,9 @@ namespace Presentation.Web.Controllers.Admin
 				await _staffService.Create(pRequest);
 				return Json(new { success = true });
 			}
-			catch (ValidationException ex)
+			catch (ValidationCustomException ex)
 			{
-				var errorDetails = new
-				{
-					success = false,
-					errors = ex
-				};
-
-				return Json(errorDetails);
+				return Json(new { success = false, errors = ex.Errors });
 			}
 			catch (Exception ex)
 			{
