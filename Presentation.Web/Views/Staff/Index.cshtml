@@ -181,12 +181,23 @@
 	</div>
 </div>
 
+@* Khởi tạo biến *@
+<script>
+	var createOpen = document.getElementById("createStaff");
+	var updateOpens = document.querySelectorAll(".updatesStaff");
+
+	var internalCodeInput = $('input[name="internalCode"]');
+	var nameInput = $('input[name="name"]');
+	var dateOfBirthInput = $('input[name="dateOfBirth"]');
+	var genderInput = $('select[name="gender"]');
+	var addressInput = $('input[name="address"]');
+	var phoneInput = $('input[name="phone"]');
+
+</script>
+
 @* Load giao diện và dữ liệu *@
 <script>
 	function resetButtonClick() {
-		var createOpen = document.getElementById("createStaff");
-		var updateOpens = document.querySelectorAll(".updatesStaff");
-
 		createOpen.addEventListener("click", function (event) {
 
 			var rowData = {
@@ -226,20 +237,6 @@
 			});
 		});
 
-		function loadData(data) {
-			const dateParts = data.dateOfBirth.split('/');
-
-			document.querySelector('input[name="id"]').value = data.id;
-			document.querySelector('input[name="internalCode"]').value = data.internalCode;
-			document.querySelector('input[name="name"]').value = data.name;
-			document.querySelector('input[name="dateOfBirth"]').value = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
-			document.querySelector('select[name="gender"]').value = data.gender;
-			document.querySelector('input[name="address"]').value = data.address;
-			document.querySelector('input[name="phone"]').value = data.phone;
-
-			$(".text-danger").text("");
-		}
-
 
 
 		$(document).ready(function () {
@@ -271,6 +268,33 @@
 		});
 	}
 
+
+
+	function loadData(data) {
+		const dateParts = data.dateOfBirth.split('/');
+
+		document.querySelector('input[name="id"]').value = data.id;
+		document.querySelector('input[name="internalCode"]').value = data.internalCode;
+		document.querySelector('input[name="name"]').value = data.name;
+		document.querySelector('input[name="dateOfBirth"]').value = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+		document.querySelector('select[name="gender"]').value = data.gender;
+		document.querySelector('input[name="address"]').value = data.address;
+		document.querySelector('input[name="phone"]').value = data.phone;
+
+		removeValidator();
+	}
+
+	function removeValidator() {
+		$(".text-danger").text("");
+
+		internalCodeInput.removeClass("border-danger");
+		nameInput.removeClass("border-danger");
+		dateOfBirthInput.removeClass("border-danger");
+		genderInput.removeClass("border-danger");
+		addressInput.removeClass("border-danger");
+		phoneInput.removeClass("border-danger");
+	}
+
 	resetButtonClick();
 </script>
 
@@ -280,7 +304,7 @@
 		$("#createButton").on("click", function (e) {
 			e.preventDefault();
 
-			$(".text-danger").text("");
+			removeValidator();
 
 			var pRequest = getData();
 			pRequest.id = 0;
@@ -288,16 +312,53 @@
 			var isValid = validateForm(pRequest);
 
 			if (isValid) {
-				// ... existing code ...
-			}
+				$.ajax({
+					url: "/staff/create",
+					method: "POST",
+					data: JSON.stringify(pRequest),
+					contentType: "application/json; charset=utf-8",
+					success: function (data) {
+						if (data.success) {
+							$.ajax({
+								url: "/staff/index",
+								method: "GET",
+								success: function (data) {
+									var newData = $('<tbody>').html(data).find('#table-body-staff').html();
+									$('#table-body-staff').html(newData);
 
-			$.ajax({
-				url: "/staff/create",
-				method: "POST",
-				data: JSON.stringify(pRequest),
-				contentType: "application/json; charset=utf-8",
-				success: function (data) {
-					if (data.success) {
+									$('.btn-secondary[data-dismiss="modal"]').click();
+
+									resetButtonClick();
+								},
+							});
+							toastr.success('Thêm mới nhân viên thành công!', 'Thông báo');
+						} else {
+							toastr.error(data.errors[0], 'Thông báo');
+						}
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Thêm mới nhân viên thất bại!', 'Thông báo');
+					}
+				});
+			}
+		});
+
+		$("#updateButton").on("click", function (e) {
+			e.preventDefault();
+
+			removeValidator();
+
+			var pRequest = getData();
+
+			var isValid = validateForm(pRequest);
+
+			if (isValid) {
+				$.ajax({
+					url: "/staff/update",
+					method: "PUT",
+					data: JSON.stringify(pRequest),
+					contentType: "application/json; charset=utf-8",
+					success: function (data) {
 						$.ajax({
 							url: "/staff/index",
 							method: "GET",
@@ -307,50 +368,17 @@
 
 								$('.btn-secondary[data-dismiss="modal"]').click();
 
+								toastr.success('Cập nhật thông tin nhân viên thành công!', 'Thông báo');
+
 								resetButtonClick();
 							},
 						});
-						toastr.success('Thêm mới nhân viên thành công!', 'Thông báo');
-					} else {
-						toastr.error(data.errors[0], 'Thông báo');
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Cập nhật thông tin nhân viên thất bại!', 'Thông báo');
 					}
-				},
-				error: function (xhr, textStatus, errorThrown) {
-					toastr.error('Thêm mới nhân viên thất bại!', 'Thông báo');
-				}
-			});
-		});
-
-		$("#updateButton").on("click", function (e) {
-			e.preventDefault();
-
-			var pRequest = getData();
-
-			$.ajax({
-				url: "/staff/update",
-				method: "PUT",
-				data: JSON.stringify(pRequest),
-				contentType: "application/json; charset=utf-8",
-				success: function (data) {
-					$.ajax({
-						url: "/staff/index",
-						method: "GET",
-						success: function (data) {
-							var newData = $('<tbody>').html(data).find('#table-body-staff').html();
-							$('#table-body-staff').html(newData);
-
-							$('.btn-secondary[data-dismiss="modal"]').click();
-
-							toastr.success('Cập nhật thông tin nhân viên thành công!', 'Thông báo');
-
-							resetButtonClick();
-						},
-					});
-				},
-				error: function (xhr, textStatus, errorThrown) {
-					toastr.error('Cập nhật thông tin nhân viên thất bại!', 'Thông báo');
-				}
-			});
+				});
+			}
 		});
 	});
 
