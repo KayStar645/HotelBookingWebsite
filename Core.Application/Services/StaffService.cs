@@ -64,8 +64,16 @@ namespace Core.Application.Services
         }
 
         public async Task<StaffVM> Update(StaffRQ pRequest)
-        {
-            var findStaff = await _context.Staffs.FindAsync(pRequest.Id);
+		{
+			var validationResults = BaseService.ValidateModel(pRequest);
+
+			if (validationResults.Any())
+			{
+				var errorMessage = validationResults.Select(result => result.ErrorMessage).ToList();
+				throw new ValidationCustomException(errorMessage);
+			}
+
+			var findStaff = await _context.Staffs.FindAsync(pRequest.Id);
 
             if(findStaff == null)
             {

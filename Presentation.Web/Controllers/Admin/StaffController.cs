@@ -54,8 +54,19 @@ namespace Presentation.Web.Controllers.Admin
 		[HttpPut]
 		public async Task<IActionResult> Update([FromBody]StaffRQ pRequest)
 		{
-            await _staffService.Update(pRequest);
-			return RedirectToAction("index");
+			try
+			{
+				await _staffService.Update(pRequest);
+				return Json(new { success = true });
+			}
+			catch (ValidationCustomException ex)
+			{
+				return Json(new { success = false, errors = ex.Errors });
+			}
+			catch (Exception ex)
+			{
+				return Json(new { success = false, error = "Lỗi server: " + ex.Message });
+			}
 		}
 
         public async Task<IActionResult> Delete(int pId)
