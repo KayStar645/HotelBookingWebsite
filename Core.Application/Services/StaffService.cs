@@ -9,6 +9,7 @@ using Core.Application.ViewModels.Staffs;
 using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace Core.Application.Services
 {
@@ -27,11 +28,15 @@ namespace Core.Application.Services
         {
             var query = _context.Staffs.AsQueryable();
 
-            var staff = await query.ToListAsync();
+			var totalItems = await query.CountAsync();
+			var staff = await query
+                        .Skip(((int)pRequest.Page - 1) * (int)pRequest.PageSize)
+		                .Take((int)pRequest.PageSize)
+		                .ToListAsync();
 
             var staffVM = _mapper.Map<List<StaffVM>>(staff);
 
-            return new PaginatedResult<StaffVM>(staffVM);
+            return new PaginatedResult<StaffVM>(staffVM, totalItems, pRequest.Page, pRequest.PageSize);
         }
 
         public async Task<StaffVM> Detail(int pId)

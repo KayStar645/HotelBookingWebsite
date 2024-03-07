@@ -12,7 +12,7 @@
             Extra = new Extra(pCount, pCurrentPage, pPageSize);
         }
 
-        public static PaginatedResult<T> Create(List<T> pData, int pCount, int pPageNumber, int pPageSize, int pCode)
+        public static PaginatedResult<T> Create(List<T> pData, int pCount, int pPageNumber, int pPageSize)
         {
             return new PaginatedResult<T>(pData, pCount, pPageNumber, pPageSize);
         }
