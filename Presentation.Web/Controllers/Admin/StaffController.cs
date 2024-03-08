@@ -65,8 +65,15 @@ namespace Presentation.Web.Controllers.Admin
 		[HttpDelete]
         public async Task<IActionResult> Delete([FromQuery] int pId)
 		{
-            await _staffService.Delete(pId);
-			return RedirectToAction("index");
+            try
+            {
+                await _staffService.Delete(pId);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, error = "Lỗi server: " + ex.Message });
+            }
 		}
 	}
 }

@@ -7,21 +7,34 @@
 @section TitleHeader
 {
 	<div class="row">
-		<div class="col-sm-10 mt-3">
+		<div class="col-sm-12 mt-3">
 			<h3 class="page-title mt-3">
 				Nhân viên
 			</h3>
-			<div class="form-outline col-sm-6 p-0 mt-2" data-mdb-input-init>
-				<input type="search" class="form-control" id="searchInput" placeholder="Tìm kiếm..." />
-			</div>
+			<div class="row mt-3">
+				<div class="col-sm-4">
+					<div class="form-outline p-0 mt-2" data-mdb-input-init>
+						<input type="search" class="form-control" id="searchInput" placeholder="Tìm kiếm..." />
+					</div>
+				</div>
+				<div class="col-sm-3">
+					<select class="form-control selectpicker" name="filterGender">
+						<option value="Nam">Nam</option>
+						<option value="Nữ" selected>Nữ</option>
+						<option value="Khác">Khác</option>
+					</select>
 
-		</div>
-		<div class="col-sm-2 mt-5">
-			<div class="text-right">
-				<button type="button" id="createStaff" class="btn btn-primary"
-						data-toggle="modal" data-target="#openPopupCreate">
-					Thêm mới
-				</button>
+				</div>
+				<div class="col-sm-3">
+				</div>
+				<div class="col-sm-2">
+					<div class="text-right">
+						<button type="button" id="createStaff" class="btn btn-primary"
+								data-toggle="modal" data-target="#openPopupCreate">
+							Thêm mới
+						</button>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -160,9 +173,9 @@
 									<div class="form-group">
 										<label class="mb-2">Giới tính</label>
 										<select class="form-control" name="gender">
-											<option selected>Nam</option>
-											<option>Nữ</option>
-											<option>Khác</option>
+											<option value="Nam">Nam</option>
+											<option value="Nữ" selected>Nữ</option>
+											<option value="Khác">Khác</option>
 										</select>
 										<span class="text-danger" id="genderError"></span>
 									</div>
@@ -214,7 +227,6 @@
 	var searchTimer;
 
 	var sorted_asc = true;
-
 </script>
 
 @* Tìm kiếm *@
@@ -329,41 +341,6 @@
 			});
 		});
 
-
-
-		$(document).ready(function () {
-			$(".deletesStaff").on("click", function () {
-				var itemId = $(this).closest("tr").find("td[data-id]").data("id");
-
-				$.ajax({
-					url: "/staff/delete?pId=" + itemId,
-					method: "DELETE",
-					success: function (data) {
-						$.ajax({
-							url: "/staff/index",
-							method: "GET",
-							data: { search: null, sorts: null, page: 1, pageSize: 30 },
-							contentType: "application/json; charset=utf-8",
-							success: function (data) {
-								var newData = $('<tbody>').html(data).find('#table-body-staff').html();
-								$('#table-body-staff').html(newData);
-
-								var newPaginated = $('<div>').html(data).find('#paginated').html();
-								$('#paginated').html(newPaginated);
-
-								toastr.success('Xoá nhân viên thành công!', 'Thông báo');
-
-								resetButtonClick();
-							},
-						});
-					},
-					error: function (xhr, textStatus, errorThrown) {
-						toastr.error('Xoá nhân viên thất bại!', 'Thông báo');
-					}
-				});
-			});
-		});
-
 		$(document).ready(function () {
 			$(".deletesStaff").on("click", function () {
 				var itemId = $(this).closest("tr").find("td[data-id]").data("id");
@@ -385,7 +362,6 @@
 								resetButtonClick();
 							},
 						});
-
 						toastr.success('Xoá nhân viên thành công!', 'Thông báo');
 					},
 					error: function (xhr, textStatus, errorThrown) {
