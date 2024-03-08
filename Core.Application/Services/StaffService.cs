@@ -26,15 +26,15 @@ namespace Core.Application.Services
         {
             var query = _context.Staffs.AsQueryable();
 
-            if (pRequest.Filters != null)
+            if (pRequest.Search != null)
             {
-				var sanitizedFilters = BaseService.RemoveDiacritics(pRequest.Filters.ToLower());
+				var sanitizedSearch = BaseService.RemoveDiacritics(pRequest.Search.ToLower());
 
 				query = query.Where(x =>
-					x.InternalCode.ToLower().Contains(sanitizedFilters) ||
-					x.Name.ToLower().Contains(sanitizedFilters) ||
-					x.Address.ToLower().Contains(sanitizedFilters) ||
-					x.Phone.ToLower().Contains(sanitizedFilters));
+					x.InternalCode.ToLower().Contains(sanitizedSearch) ||
+					x.Name.ToLower().Contains(sanitizedSearch) ||
+					x.Address.ToLower().Contains(sanitizedSearch) ||
+					x.Phone.ToLower().Contains(sanitizedSearch));
 			}
 
             if(pRequest.Sorts != null)

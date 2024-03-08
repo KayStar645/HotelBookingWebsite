@@ -62,7 +62,8 @@ namespace Presentation.Web.Controllers.Admin
 			}
 		}
 
-        public async Task<IActionResult> Delete(int pId)
+		[HttpDelete]
+        public async Task<IActionResult> Delete([FromQuery] int pId)
 		{
             await _staffService.Delete(pId);
 			return RedirectToAction("index");

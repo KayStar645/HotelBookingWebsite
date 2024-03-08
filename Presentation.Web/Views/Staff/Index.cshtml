@@ -234,7 +234,7 @@
 			$.ajax({
 				url: '/staff/index',
 				method: 'GET',
-				data: { filters: searchTerm, page: 1, sorts: "Name,InternalCode" },
+				data: { search: searchTerm, page: 1, sorts: "Name,InternalCode" },
 				contentType: 'application/json; charset=utf-8',
 				success: function (data) {
 					var newData = $('<tbody>').html(data).find('#table-body-staff').html();
