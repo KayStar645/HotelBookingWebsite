@@ -3,6 +3,7 @@ using Core.Application.Interfaces;
 using Core.Application.ViewModels.Common;
 using Core.Application.ViewModels.Staffs;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Presentation.Web.Controllers.Admin
@@ -16,21 +17,13 @@ namespace Presentation.Web.Controllers.Admin
             _staffService = pStaffService;
         }
 
-        public async Task<IActionResult> Index()
+		[HttpGet()]
+        public async Task<IActionResult> Index([FromQuery] BaseListRQ pRequest)
         {
-            var rq = new BaseListRQ();
-            var list = await _staffService.List(rq);
-
-            ViewBag.List = list;
+			ViewBag.List = await _staffService.List(pRequest);
 
             return View();
         }
-
-        public async Task<IActionResult> Detail(int pId)
-        {
-
-			return View();
-		}
 
 		[HttpPost]
 		public async Task<IActionResult> Create([FromBody] StaffRQ pRequest)
@@ -69,10 +62,18 @@ namespace Presentation.Web.Controllers.Admin
 			}
 		}
 
-        public async Task<IActionResult> Delete(int pId)
+		[HttpDelete]
+        public async Task<IActionResult> Delete([FromQuery] int pId)
 		{
-            await _staffService.Delete(pId);
-			return RedirectToAction("index");
+            try
+            {
+                await _staffService.Delete(pId);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, error = "Lỗi server: " + ex.Message });
+            }
 		}
 	}
 }

@@ -8,7 +8,6 @@ using Core.Application.ViewModels.Common;
 using Core.Application.ViewModels.Staffs;
 using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
 
 namespace Core.Application.Services
 {
@@ -17,7 +16,7 @@ namespace Core.Application.Services
         private readonly IHotelBookingWebsiteDbContext _context;
         private readonly IMapper _mapper;
 
-        public StaffService(IHotelBookingWebsiteDbContext pContext, IMapper pMapper)
+		public StaffService(IHotelBookingWebsiteDbContext pContext, IMapper pMapper)
         {
             _context = pContext;
             _mapper = pMapper;
@@ -27,11 +26,36 @@ namespace Core.Application.Services
         {
             var query = _context.Staffs.AsQueryable();
 
-            var staff = await query.ToListAsync();
+            if (pRequest.Search != null)
+            {
+				var sanitizedSearch = BaseService.RemoveDiacritics(pRequest.Search.ToLower());
+
+				query = query.Where(x =>
+					x.InternalCode.ToLower().Contains(sanitizedSearch) ||
+					x.Name.ToLower().Contains(sanitizedSearch) ||
+					x.Address.ToLower().Contains(sanitizedSearch) ||
+					x.Phone.ToLower().Contains(sanitizedSearch));
+			}
+
+            if(pRequest.Filters != null)
+            {
+                query = BaseService.ApplyFilters(query, pRequest.Filters);
+            }   
+            
+            if(pRequest.Sorts != null)
+            {
+				query = BaseService.ApplySorting(query, pRequest.Sorts);
+			}    
+
+			var totalItems = await query.CountAsync();
+			var staff = await query
+                        .Skip(((int)pRequest.Page - 1) * (int)pRequest.PageSize)
+		                .Take((int)pRequest.PageSize)
+		                .ToListAsync();
 
             var staffVM = _mapper.Map<List<StaffVM>>(staff);
 
-            return new PaginatedResult<StaffVM>(staffVM);
+            return new PaginatedResult<StaffVM>(staffVM, totalItems, pRequest.Page, pRequest.PageSize);
         }
 
         public async Task<StaffVM> Detail(int pId)

@@ -25,7 +25,9 @@ namespace Infrastructure.Data
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
             base.OnModelCreating(modelBuilder);
-        }
+
+			modelBuilder.UseCollation("SQL_Latin1_General_CP1_CI_AI");
+		}
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

@@ -7,36 +7,54 @@
 @section TitleHeader
 {
 	<div class="row">
-		<div class="col-sm-10 mt-5">
+		<div class="col-sm-12 mt-3">
 			<h3 class="page-title mt-3">
 				Nhân viên
 			</h3>
-			<ul class="breadcrumb">
-				<li class="breadcrumb-item active">Danh sách nhân viên</li>
-			</ul>
-		</div>
-		<div class="col-sm-2 mt-5">
-			<div class="text-right">
-				<button type="button" id="createStaff" class="btn btn-primary"
-						data-toggle="modal" data-target="#openPopupCreate">
-					Thêm mới
-				</button>
+			<div class="row mt-3">
+				<div class="col-sm-4">
+					<label class="font-weight-bold mb-1">Tìm kiếm</label>
+					<div class="form-outline p-0" data-mdb-input-init>
+						<input type="search" class="form-control" id="searchInput" placeholder="Tìm kiếm..." />
+					</div>
+				</div>
+				<div class="col-sm-2">
+					<label class="font-weight-bold mb-1">Giới tính</label>
+					<div class="form-outline p-0">
+						<select id="filterGender" class="form-control" name="filterGender">
+							<option value="">Tất cả</option>
+							<option value="Nam">Nam</option>
+							<option value="Nữ">Nữ</option>
+							<option value="Khác">Khác</option>
+						</select>
+					</div>
+				</div>
+				<div class="col-sm-4">
+				</div>
+				<div class="col-sm-2">
+					<div class="text-right">
+						<button type="button" id="createStaff" class="btn btn-primary"
+								data-toggle="modal" data-target="#openPopupCreate">
+							Thêm mới
+						</button>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
 }
 
 <div class="card-body">
-	<div class="table-responsive">
-		<table class="table table-hover table-center">
+	<div class="table-responsive" style="overflow-y: auto;">
+		<table class="table table-hover table-center table-striped table-bordered">
 			<thead>
 				<tr>
 					<th class="min-vw-10"></th>
-					<th>Mã nhân viên</th>
-					<th>Họ tên</th>
-					<th class="text-right">Ngày sinh</th>
-					<th class="text-center">Giới tính</th>
-					<th>Địa chỉ</th>
+					<th class="th-sm">Mã nhân viên</th>
+					<th class="th-sm">Họ tên</th>
+					<th class="text-center th-sm">Ngày sinh</th>
+					<th class="text-center th-sm">Giới tính</th>
+					<th class="th-sm">Địa chỉ</th>
 					<th class="text-right">Số điện thoại</th>
 					<th class="text-center">Trạng thái</th>
 				</tr>
@@ -60,7 +78,7 @@
 							<td class="text-nowrap">
 								@staff?.Name
 							</td>
-							<td class="text-right">
+							<td class="text-center">
 								@((staff.DateOfBirth.HasValue ?
 															staff.DateOfBirth.Value.ToString("dd/MM/yyyy") :
 															"---"))
@@ -92,6 +110,21 @@
 	</div>
 </div>
 
+@* Phân trang *@
+<div id="paginated" class="d-flex justify-content-end mt-4">
+	<nav aria-label="Page navigation example">
+		<ul class="pagination">
+			@for (int i = 1; i <= staffs.Extra.TotalPages; i++)
+			{
+				<li class="page-item pageCurrent @(staffs.Extra.CurrentPage == i ? "active" : "")">
+					<a class="page-link" data-page="@i">@i</a>
+				</li>
+			}
+		</ul>
+	</nav>
+</div>
+
+
 <!-- Modal -->
 <div class="modal fade" id="openPopupCreate" tabindex="-1" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -115,7 +148,7 @@
 
 								<div class="col-md-6">
 									<div class="form-group">
-										<label class="mb-2">Mã nhân viên</label>
+										<label class="font-weight-bold mb-2">Mã nhân viên</label>
 										<input class="form-control" type="text" name="internalCode" />
 										<span class="text-danger" id="internalCodeError"></span>
 									</div>
@@ -123,7 +156,7 @@
 
 								<div class="col-md-6">
 									<div class="form-group">
-										<label class="mb-2">Họ tên</label>
+										<label class="font-weight-bold mb-2">Họ tên</label>
 										<input class="form-control" type="text" name="name" />
 										<span class="text-danger" id="nameError"></span>
 									</div>
@@ -131,7 +164,7 @@
 
 								<div class="col-md-6">
 									<div class="form-group">
-										<label class="mb-2">Ngày sinh</label>
+										<label class="font-weight-bold mb-2">Ngày sinh</label>
 										<div class="">
 											<input type="date" class="form-control" placeholder="dd-mm-yyyy"
 												   min="1950-01-01" max="2030-12-31" name="dateOfBirth" />
@@ -142,9 +175,9 @@
 
 								<div class="col-md-6">
 									<div class="form-group">
-										<label class="mb-2">Giới tính</label>
+										<label class="font-weight-bold mb-2">Giới tính</label>
 										<select class="form-control" name="gender">
-											<option>Nam</option>
+											<option value="" selected>Nam</option>
 											<option>Nữ</option>
 											<option>Khác</option>
 										</select>
@@ -154,7 +187,7 @@
 
 								<div class="col-md-6">
 									<div class="form-group">
-										<label class="mb-2">Địa chỉ</label>
+										<label class="font-weight-bold mb-2">Địa chỉ</label>
 										<input class="form-control" type="text" name="address" />
 										<span class="text-danger" id="addressError"></span>
 									</div>
@@ -162,7 +195,7 @@
 
 								<div class="col-md-6">
 									<div class="form-group">
-										<label class="mb-2">Số điện thoại</label>
+										<label class="font-weight-bold mb-2">Số điện thoại</label>
 										<input class="form-control" type="text" name="phone" />
 										<span class="text-danger" id="phoneError"></span>
 									</div>
@@ -181,6 +214,8 @@
 	</div>
 </div>
 
+ @* ĐÂY LÀ JS *@
+
 @* Khởi tạo biến *@
 <script>
 	var createOpen = document.getElementById("createStaff");
@@ -193,6 +228,82 @@
 	var addressInput = $('input[name="address"]');
 	var phoneInput = $('input[name="phone"]');
 
+	var searchTimer;
+
+	var sorted_asc = true;
+</script>
+
+@* Tìm kiếm và lọc *@
+<script>
+	$(document).ready(function () {
+		$('#searchInput').on('input', function () {
+			clearTimeout(searchTimer);
+
+			searchTimer = setTimeout(function () {
+				performSearch();
+			}, 600);
+		});
+
+		$('#filterGender').change(function () {
+			performSearch();
+		});
+
+		function performSearch() {
+			var searchTerm = $('#searchInput').val();
+			var selectedGender = $('#filterGender').val();
+
+			$.ajax({
+				url: '/staff/index',
+				method: 'GET',
+				data: { 
+					search: searchTerm,
+					page: 1,
+					sorts: null,
+					filters: `gender:${selectedGender}`
+				},
+				contentType: 'application/json; charset=utf-8',
+				success: function (data) {
+					var newData = $('<tbody>').html(data).find('#table-body-staff').html();
+					$('#table-body-staff').html(newData);
+
+					var newPaginated = $('<div>').html(data).find('#paginated').html();
+					$('#paginated').html(newPaginated);
+				},
+				error: function (xhr, textStatus, errorThrown) {
+					toastr.error('Lỗi khi thực hiện tìm kiếm!', 'Thông báo');
+				}
+			});
+		}
+	});
+</script>
+
+@* Phân trang *@
+<script>
+	$(document).ready(function () {
+		$('.pagination a').on('click', function (e) {
+			e.preventDefault();
+			var page = $(this).data('page');
+			paginatedResult(page);
+		});
+	});
+
+	function paginatedResult(page) {
+		$.ajax({
+			url: `/staff/index?page=${page}`,
+			method: 'GET',
+			success: function (data) {
+				var newData = $('<tbody>').html(data).find('#table-body-staff').html();
+				$('#table-body-staff').html(newData);
+
+				updatePagination(page);
+			},
+		});
+	}
+
+	function updatePagination(activePage) {
+		$('.pageCurrent').removeClass('active');
+		$('.pagination a[data-page="' + activePage + '"]').addClass('active').closest('.pageCurrent').addClass('active');
+	}
 </script>
 
 @* Load giao diện và dữ liệu *@
@@ -237,8 +348,6 @@
 			});
 		});
 
-
-
 		$(document).ready(function () {
 			$(".deletesStaff").on("click", function () {
 				var itemId = $(this).closest("tr").find("td[data-id]").data("id");
@@ -254,11 +363,13 @@
 								var newData = $('<tbody>').html(data).find('#table-body-staff').html();
 								$('#table-body-staff').html(newData);
 
-								toastr.success('Xoá nhân viên thành công!', 'Thông báo');
+								var newPaginated = $('<div>').html(data).find('#paginated').html();
+								$('#paginated').html(newPaginated);
 
 								resetButtonClick();
 							},
 						});
+						toastr.success('Xoá nhân viên thành công!', 'Thông báo');
 					},
 					error: function (xhr, textStatus, errorThrown) {
 						toastr.error('Xoá nhân viên thất bại!', 'Thông báo');
@@ -322,9 +433,14 @@
 							$.ajax({
 								url: "/staff/index",
 								method: "GET",
+								data: { search: null, sorts: null, page: 1, pageSize: 30 },
+								contentType: "application/json; charset=utf-8",
 								success: function (data) {
 									var newData = $('<tbody>').html(data).find('#table-body-staff').html();
 									$('#table-body-staff').html(newData);
+
+									var newPaginated = $('<div>').html(data).find('#paginated').html();
+									$('#paginated').html(newPaginated);
 
 									$('.btn-secondary[data-dismiss="modal"]').click();
 
@@ -362,6 +478,8 @@
 						$.ajax({
 							url: "/staff/index",
 							method: "GET",
+							data: { search: null, sorts: null, page: 1, pageSize: 30 },
+							contentType: "application/json; charset=utf-8",
 							success: function (data) {
 								var newData = $('<tbody>').html(data).find('#table-body-staff').html();
 								$('#table-body-staff').html(newData);
@@ -460,5 +578,4 @@
 
 		return isValid;
 	}
-
 </script>
