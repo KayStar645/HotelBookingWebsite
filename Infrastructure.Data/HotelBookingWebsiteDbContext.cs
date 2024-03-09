@@ -18,9 +18,11 @@ namespace Infrastructure.Data
             _saveChangesInterceptor = saveChangesInterceptor;
         }
         public DbSet<Staff> Staffs => Set<Staff>();
+		public DbSet<KindRoom> KindRooms => Set<KindRoom>();
+		public DbSet<Room> Rooms => Set<Room>();
 
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
