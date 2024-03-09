@@ -1,10 +1,105 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using Core.Application.Responses
+@using Core.Application.ViewModels.Rooms
 @{
+	var rooms = ViewBag.list as PaginatedResult<RoomVM>;
 }
 
-Phòng
+@section TitleHeader
+{
+	<div class="row">
+		<div class="col-sm-12 mt-3">
+			<h3 class="page-title mt-3">
+				Danh sách phòng
+			</h3>
+			<div class="row mt-3">
+				<div class="col-sm-4">
+					<label class="font-weight-bold mb-1">Tìm kiếm</label>
+					<div class="form-outline p-0" data-mdb-input-init>
+						<input type="search" class="form-control" id="searchInput" placeholder="Tìm kiếm..." />
+					</div>
+				</div>
+				<div class="col-sm-2">
+				</div>
+				<div class="col-sm-4">
+				</div>
+				<div class="col-sm-2">
+					<div class="text-right">
+						<button type="button" id="createStaff" class="btn btn-primary"
+								data-toggle="modal" data-target="#openPopupCreate">
+							Thêm mới
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+<div class="card-body">
+	<div class="table-responsive" style="overflow-y: auto;">
+		<table class="table table-hover table-center table-striped table-bordered">
+			<thead>
+				<tr>
+					<th class="min-vw-10"></th>
+					<th class="th-sm">Mã phòng</th>
+					<th class="th-sm text-center">Loại phòng</th>
+					<th class="th-sm text-center">Trạng thái</th>
+					<th class="th-sm text-center"></th>
+				</tr>
+			</thead>
+			<tbody id="table-body-kind-room">
+				@if (rooms != null)
+				{
+					@foreach (var room in rooms.Data)
+					{
+						<tr>
+							<td class="text-center">
+								<i class=" updatesStaff fa-regular fa-pen-to-square pe-3"
+								   style="color:blue;cursor: pointer;"
+								   data-toggle="modal" data-target="#openPopupCreate"></i>
+								<i class="deletesStaff fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
+							</td>
+							<td class="text-center d-none" data-id="@room?.Id">@room?.Id</td>
+							<td class="text-nowrap">
+								<div>@room?.InternalCode</div>
+							</td>
+							<td class="text-nowrap">
+								@room?.KindRoomVM?.Name
+							</td>
+							<td class="text-center">
+								@room?.Status
+							</td>
+							<td class="text-center">
+
+								@{
+									var statusText = room.IsDeleted == true
+									? "<span class='badge badge-pill bg-danger inv-badge'>Đã xoá</span>"
+									: "<span class='badge badge-pill bg-success inv-badge'>Hoạt động</span>";
+								}
+
+								@Html.Raw(statusText)
+							</td>
+						</tr>
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+@* Phân trang *@
+<div id="paginated" class="d-flex justify-content-end mt-4">
+	<nav aria-label="Page navigation example">
+		<ul class="pagination">
+			@for (int i = 1; i <= rooms.Extra.TotalPages; i++)
+			{
+				<li class="page-item pageCurrent @(rooms.Extra.CurrentPage == i ? "active" : "")">
+					<a class="page-link" data-page="@i">@i</a>
+				</li>
+			}
+		</ul>
+	</nav>
+</div>
 
 @* Đây là JS nè *@
 <script>
