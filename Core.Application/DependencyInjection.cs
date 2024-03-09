@@ -17,6 +17,8 @@ namespace Core.Application
             }).CreateMapper());
 
             services.AddScoped<IStaffService, StaffService>();
+            services.AddScoped<IKindRoomService, KindRoomService>();
+            services.AddScoped<IRoomService, RoomService>();
 
             return services;
         }
