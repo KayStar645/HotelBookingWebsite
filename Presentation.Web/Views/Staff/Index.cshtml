@@ -46,7 +46,7 @@
 
 <div class="card-body">
 	<div class="table-responsive" style="overflow-y: auto;">
-		<table id="tableSort" class="table table-hover table-center table-striped table-bordered">
+		<table class="table table-hover table-center table-striped table-bordered">
 			<thead>
 				<tr>
 					<th class="min-vw-10"></th>
@@ -233,7 +233,7 @@
 	var sorted_asc = true;
 </script>
 
-@* Tìm kiếm *@
+@* Tìm kiếm và lọc *@
 <script>
 	$(document).ready(function () {
 		$('#searchInput').on('input', function () {
@@ -275,13 +275,6 @@
 			});
 		}
 	});
-</script>
-
-@* Sắp xếp *@
-<script>
-	// $(document).ready(function () {
-	// 	$("#tableSort").DataTable();
-	// });
 </script>
 
 @* Phân trang *@
@@ -585,5 +578,4 @@
 
 		return isValid;
 	}
-
 </script>
