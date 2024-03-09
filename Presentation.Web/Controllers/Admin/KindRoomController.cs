@@ -3,6 +3,7 @@ using Core.Application.Interfaces;
 using Core.Application.ViewModels.Common;
 using Core.Application.ViewModels.KindRooms;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace Presentation.Web.Controllers.Admin
 {
@@ -22,6 +23,15 @@ namespace Presentation.Web.Controllers.Admin
 
 			return View();
 		}
+
+		[HttpGet("/kindroom/detail")]
+		public async Task<IActionResult> Detail([FromQuery] int pId)
+		{
+			ViewBag.Detail = await _kindRoomService.Detail(pId);
+
+			return View();
+		}
+
 
 		[HttpPost]
 		public async Task<IActionResult> Create([FromBody] KindRoomRQ pRequest)

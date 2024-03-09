@@ -1,0 +1,116 @@
+﻿@using Core.Application.ViewModels.KindRooms
+@{
+	var kindRoom = ViewBag.detail as KindRoomVM;
+}
+<style>
+	.ck.ck-content.ck-editor__editable.ck-rounded-corners.ck-editor__editable_inline {
+		min-height: 300px;
+	}
+</style>
+
+@section TitleHeader
+{
+	<div class="row">
+		<div class="col-sm-12 mt-3">
+			<div class="row mt-3">
+				<div class="col-sm-4">
+					<h3 class="page-title mb-1">Chi tiết loại phòng</h3>
+				</div>
+				<div class="col-sm-2">
+				</div>
+				<div class="col-sm-4">
+				</div>
+				<div class="col-sm-2">
+					<div class="text-right">
+						<a href="" id="createKindRoom"
+						   class="btn btn-primary @(kindRoom?.Id == 0 ? "d-none" : "d-inline-block")">
+							Thêm mới
+						</a>
+						<a href="" id="updateKindRoom"
+						   class="btn btn-primary @(kindRoom?.Id == 0 ? "d-inline-block" : "d-none")">
+							Cập nhật
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+<div class="card py-4 px-2">
+	<div class="row col-sm-12">
+		<div class="col-sm-4">
+			<div class="form-group">
+				<label class="font-weight-bold mb-2">Mã loại phòng</label>
+				<input class="form-control" type="text" name="internalCode" />
+				<span class="text-danger" id="internalCodeError"></span>
+			</div>
+		</div>
+		<div class="col-sm-4">
+			<div class="form-group">
+				<label class="font-weight-bold mb-2">Loại phòng</label>
+				<input class="form-control" type="text" name="name" />
+				<span class="text-danger" id="nameError"></span>
+			</div>
+		</div>
+		<div class="col-sm-4">
+			<div class="form-group">
+				<label class="font-weight-bold mb-2">Giá</label>
+				<input class="form-control" type="text" name="price" />
+				<span class="text-danger" id="priceError"></span>
+			</div>
+		</div>
+	</div>
+	<div class="row col-sm-12">
+		<div class="col-sm-9">
+			<div class="form-group">
+				<label class="font-weight-bold mb-2">Hình ảnh</label>
+				<input class="form-control" type="text" name="images" />
+				<span class="text-danger" id="imagesError"></span>
+			</div>
+		</div>
+		<div class="col-sm-3">
+			<div class="form-group">
+				<label class="font-weight-bold mb-2">Số người</label>
+				<input class="form-control" type="number" name="maximumPeople" />
+				<span class="text-danger" id="maximumPeopleError"></span>
+			</div>
+		</div>
+	</div>
+	<div class="col-12">
+		<label class="p-1 fw-bolder label">Mô tả</label> <br />
+		<div id="describe">
+
+		</div>
+	</div>
+</div>
+
+@* ĐÂY LÀ JS *@
+<script>
+	$("#master-data").addClass("active");
+	$("#master-data").next("ul").addClass("d-block");
+	$("#master-data-kind-room").addClass("active");
+
+	$(".link-parent").on("click", function (e) {
+		e.preventDefault();
+
+		$(".nav-childs").removeClass("active");
+		$(".link-parent").removeClass("active");
+
+		$(".link-parent").next("ul").not($(this).next("ul")).removeClass("d-block");
+
+		$(this).closest(".link-parent").addClass("active");
+	});
+</script>
+
+
+<script>
+	ClassicEditor
+		.create(document.querySelector('#describe'))
+		.then(editor => {
+			window.editor = editor;
+		})
+		.catch(error => {
+			console.error('There was a problem initializing the editor.', error);
+		});
+</script>
