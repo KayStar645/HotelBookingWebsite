@@ -1,6 +1,6 @@
 ﻿using Core.Application.ViewModels.Common;
 
-namespace Core.Application.ViewModels.KinbRoom
+namespace Core.Application.ViewModels.KindRooms
 {
 	public class KindRoomVM : BaseVM
 	{

@@ -3,12 +3,10 @@ using Core.Application.Interfaces;
 using Core.Application.ViewModels.Common;
 using Core.Application.ViewModels.Staffs;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace Presentation.Web.Controllers.Admin
 {
-    public class StaffController : Controller
+	public class StaffController : Controller
     {
         private readonly IStaffService _staffService;
 

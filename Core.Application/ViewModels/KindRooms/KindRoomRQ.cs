@@ -1,7 +1,7 @@
 ﻿using Core.Application.ViewModels.Common;
 using System.ComponentModel.DataAnnotations;
 
-namespace Core.Application.ViewModels.KinbRoom
+namespace Core.Application.ViewModels.KindRooms
 {
 	public class KindRoomRQ : BaseRQ
 	{

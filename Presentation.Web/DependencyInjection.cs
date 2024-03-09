@@ -1,4 +1,4 @@
-﻿using Core.Application.Interfaces;
+﻿using Core.Application.Interfaces.Common;
 using Presentation.Web.Services;
 
 namespace Presentation.Web

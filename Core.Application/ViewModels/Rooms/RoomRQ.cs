@@ -1,7 +1,7 @@
 ﻿using Core.Application.ViewModels.Common;
 using System.ComponentModel.DataAnnotations;
 
-namespace Core.Application.ViewModels.Room
+namespace Core.Application.ViewModels.Rooms
 {
 	public class RoomRQ : BaseRQ
 	{

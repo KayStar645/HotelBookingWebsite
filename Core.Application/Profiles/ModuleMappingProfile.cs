@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Core.Application.ViewModels.KinbRoom;
-using Core.Application.ViewModels.Room;
+using Core.Application.ViewModels.KindRooms;
+using Core.Application.ViewModels.Rooms;
 using Core.Application.ViewModels.Staffs;
 using Core.Domain.Entities;
 

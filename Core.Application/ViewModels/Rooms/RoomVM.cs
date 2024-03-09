@@ -1,6 +1,6 @@
 ﻿using Core.Application.ViewModels.Common;
 
-namespace Core.Application.ViewModels.Room
+namespace Core.Application.ViewModels.Rooms
 {
 	public class RoomVM : BaseVM
 	{

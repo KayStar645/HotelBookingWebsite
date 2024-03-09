@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Core.Application.Interfaces;
+using Core.Application.Interfaces.Common;
 using Core.Application.Services.Common;
 using Core.Application.ViewModels.Common;
 using Core.Application.ViewModels.Staffs;
@@ -7,7 +8,7 @@ using Core.Domain.Entities;
 
 namespace Core.Application.Services
 {
-	public class StaffService : BaseService<Staff, StaffRQ, StaffVM, BaseListRQ>, IStaffService
+    public class StaffService : BaseService<Staff, StaffRQ, StaffVM, BaseListRQ>, IStaffService
 	{
 		public StaffService(IHotelBookingWebsiteDbContext pContext, IMapper pMapper) :
 			base(pContext, pMapper) { }

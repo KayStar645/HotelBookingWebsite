@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Core.Application.Exceptions;
-using Core.Application.Interfaces;
+using Core.Application.Interfaces.Common;
 using Core.Application.Responses;
 using Core.Application.Services.Extensions;
 using Core.Application.ViewModels.Common;
@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Application.Services.Common
 {
-	public abstract class BaseService<TEntity, TRequest, TViewModel, TListRequest> 
+    public abstract class BaseService<TEntity, TRequest, TViewModel, TListRequest> 
 		: IBaseService<TEntity, TRequest, TViewModel, TListRequest>
 		where TEntity : AuditableEntity
 		where TRequest : BaseRQ
