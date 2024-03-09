@@ -37,6 +37,11 @@ namespace Core.Application.Services
 					x.Phone.ToLower().Contains(sanitizedSearch));
 			}
 
+            if(pRequest.Filters != null)
+            {
+                query = BaseService.ApplyFilters(query, pRequest.Filters);
+            }   
+            
             if(pRequest.Sorts != null)
             {
 				query = BaseService.ApplySorting(query, pRequest.Sorts);

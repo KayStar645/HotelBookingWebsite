@@ -13,19 +13,23 @@
 			</h3>
 			<div class="row mt-3">
 				<div class="col-sm-4">
-					<div class="form-outline p-0 mt-2" data-mdb-input-init>
+					<label class="font-weight-bold mb-1">Tìm kiếm</label>
+					<div class="form-outline p-0" data-mdb-input-init>
 						<input type="search" class="form-control" id="searchInput" placeholder="Tìm kiếm..." />
 					</div>
 				</div>
-				<div class="col-sm-3">
-					<select class="form-control selectpicker" name="filterGender">
-						<option value="Nam">Nam</option>
-						<option value="Nữ" selected>Nữ</option>
-						<option value="Khác">Khác</option>
-					</select>
-
+				<div class="col-sm-2">
+					<label class="font-weight-bold mb-1">Giới tính</label>
+					<div class="form-outline p-0">
+						<select id="filterGender" class="form-control" name="filterGender">
+							<option value="">Tất cả</option>
+							<option value="Nam">Nam</option>
+							<option value="Nữ">Nữ</option>
+							<option value="Khác">Khác</option>
+						</select>
+					</div>
 				</div>
-				<div class="col-sm-3">
+				<div class="col-sm-4">
 				</div>
 				<div class="col-sm-2">
 					<div class="text-right">
@@ -144,7 +148,7 @@
 
 								<div class="col-md-6">
 									<div class="form-group">
-										<label class="mb-2">Mã nhân viên</label>
+										<label class="font-weight-bold mb-2">Mã nhân viên</label>
 										<input class="form-control" type="text" name="internalCode" />
 										<span class="text-danger" id="internalCodeError"></span>
 									</div>
@@ -152,7 +156,7 @@
 
 								<div class="col-md-6">
 									<div class="form-group">
-										<label class="mb-2">Họ tên</label>
+										<label class="font-weight-bold mb-2">Họ tên</label>
 										<input class="form-control" type="text" name="name" />
 										<span class="text-danger" id="nameError"></span>
 									</div>
@@ -160,7 +164,7 @@
 
 								<div class="col-md-6">
 									<div class="form-group">
-										<label class="mb-2">Ngày sinh</label>
+										<label class="font-weight-bold mb-2">Ngày sinh</label>
 										<div class="">
 											<input type="date" class="form-control" placeholder="dd-mm-yyyy"
 												   min="1950-01-01" max="2030-12-31" name="dateOfBirth" />
@@ -171,11 +175,11 @@
 
 								<div class="col-md-6">
 									<div class="form-group">
-										<label class="mb-2">Giới tính</label>
+										<label class="font-weight-bold mb-2">Giới tính</label>
 										<select class="form-control" name="gender">
-											<option value="Nam">Nam</option>
-											<option value="Nữ" selected>Nữ</option>
-											<option value="Khác">Khác</option>
+											<option value="" selected>Nam</option>
+											<option>Nữ</option>
+											<option>Khác</option>
 										</select>
 										<span class="text-danger" id="genderError"></span>
 									</div>
@@ -183,7 +187,7 @@
 
 								<div class="col-md-6">
 									<div class="form-group">
-										<label class="mb-2">Địa chỉ</label>
+										<label class="font-weight-bold mb-2">Địa chỉ</label>
 										<input class="form-control" type="text" name="address" />
 										<span class="text-danger" id="addressError"></span>
 									</div>
@@ -191,7 +195,7 @@
 
 								<div class="col-md-6">
 									<div class="form-group">
-										<label class="mb-2">Số điện thoại</label>
+										<label class="font-weight-bold mb-2">Số điện thoại</label>
 										<input class="form-control" type="text" name="phone" />
 										<span class="text-danger" id="phoneError"></span>
 									</div>
@@ -240,13 +244,23 @@
 			}, 600);
 		});
 
+		$('#filterGender').change(function () {
+			performSearch();
+		});
+
 		function performSearch() {
 			var searchTerm = $('#searchInput').val();
+			var selectedGender = $('#filterGender').val();
 
 			$.ajax({
 				url: '/staff/index',
 				method: 'GET',
-				data: { search: searchTerm, page: 1, sorts: "Name,InternalCode" },
+				data: { 
+					search: searchTerm,
+					page: 1,
+					sorts: null,
+					filters: `gender:${selectedGender}`
+				},
 				contentType: 'application/json; charset=utf-8',
 				success: function (data) {
 					var newData = $('<tbody>').html(data).find('#table-body-staff').html();
