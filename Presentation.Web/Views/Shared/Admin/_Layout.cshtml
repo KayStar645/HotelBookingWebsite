@@ -138,50 +138,92 @@
                 <div id="sidebar-menu" class="sidebar-menu">
                     <ul>
                         <li class="active">
-                            <a >
+                            <a href="/">
                                 <i class="fas fa-tachometer-alt"></i>
                                 <span>Dashboard</span>
                             </a>
                         </li>
                         <li class="list-divider"></li>
                         <li class="nav-item">
-                            <a class="nav-link border link-parent" style="cursor:pointer;">
+                            <a id="master-data" class="nav-link link-parent border" style="cursor:pointer;">
                                 <i class="fas fa-suitcase"></i>
                                 <span>Dữ liệu nguồn</span>
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul class="me-0">
-                                <li class="nav-item d-block nav-childs">
-                                    <a href="@Url.Action("index", "staff")" class="nav-link d-flex align-items-center">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p class="mb-0 ml-2">Danh sách nhân viên</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item d-block nav-childs">
+                                <li class="nav-item d-block">
                                     <a href="" class="nav-link d-flex align-items-center">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p class="mb-0 ml-2">Danh sách phòng ban</p>
+                                        <p class="mb-0 ml-2">Loại phòng</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item d-block">
+                                    <a href="" class="nav-link d-flex align-items-center">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p class="mb-0 ml-2">Khách hàng</p>
                                     </a>
                                 </li>
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link border link-parent" style="cursor:pointer;">
+                            <a class="nav-link link-parent border" style="cursor:pointer;">
                                 <i class="fas fa-suitcase"></i>
-                                <span>Dữ liệu nguồn</span>
+                                <span>Phòng và Dịch vụ</span>
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul class="me-0">
-                                <li class="nav-item d-block nav-childs">
+                                <li class="nav-item d-block">
                                     <a href="" class="nav-link d-flex align-items-center">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p class="mb-0 ml-2">Danh sách phòng ban</p>
+                                        <p class="mb-0 ml-2">Phòng</p>
                                     </a>
                                 </li>
-                                <li class="nav-item d-block nav-childs">
+                                <li class="nav-item d-block">
                                     <a href="" class="nav-link d-flex align-items-center">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p class="mb-0 ml-2">Danh sách phòng ban</p>
+                                        <p class="mb-0 ml-2">Dịch vụ</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link link-parent border" style="cursor:pointer;">
+                                <i class="fas fa-suitcase"></i>
+                                <span>Kinh doanh</span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul class="me-0">
+                                <li class="nav-item d-block">
+                                    <a href="" class="nav-link d-flex align-items-center">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p class="mb-0 ml-2">Đơn đặt phòng</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item d-block">
+                                    <a href="" class="nav-link d-flex align-items-center">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p class="mb-0 ml-2">Chương trình khuyến mãi</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link link-parent border" style="cursor:pointer;">
+                                <i class="fas fa-suitcase"></i>
+                                <span>Hệ thống</span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul class="me-0">
+                                <li id="master-data-staff" class="nav-item d-block">
+                                    <a href="@Url.Action("index", "staff")" class="nav-link d-flex align-items-center">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p class="mb-0 ml-2">Nhân viên</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item d-block">
+                                    <a href="" class="nav-link d-flex align-items-center">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p class="mb-0 ml-2">Vai trò</p>
                                     </a>
                                 </li>
                             </ul>
@@ -204,16 +246,6 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>
-        $(".nav-childs a.nav-link").on("click", function (e) {
-            //e.preventDefault();
-
-            $(".nav-childs").removeClass("active");
-            $(".link-parent").removeClass("active");
-
-            $(this).closest(".nav-childs").addClass("active");
-            this.parentElement.parentElement.parentElement.querySelector('a.link-parent').classList.add("active");
-        });
-
         $(".link-parent").on("click", function (e) {
             e.preventDefault();
 

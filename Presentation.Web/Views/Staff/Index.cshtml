@@ -216,6 +216,24 @@
 
 
  @* ĐÂY LÀ JS *@
+ @* Active menu *@
+<script>
+	$("#master-data").addClass("active");
+	$("#master-data").next("ul").addClass("d-block");
+	$("#master-data-staff").addClass("active");
+
+	$(".link-parent").on("click", function (e) {
+		e.preventDefault();
+
+		$(".nav-childs").removeClass("active");
+		$(".link-parent").removeClass("active");
+
+		$(".link-parent").next("ul").not($(this).next("ul")).removeClass("d-block");
+
+		$(this).closest(".link-parent").addClass("active");
+	});
+</script>
+
 @* Khởi tạo biến *@
 <script>
 	var createOpen = document.getElementById("createStaff");
