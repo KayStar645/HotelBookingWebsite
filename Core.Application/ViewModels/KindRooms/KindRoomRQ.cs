@@ -12,7 +12,7 @@ namespace Core.Application.ViewModels.KindRooms
 		[StringLength(100, ErrorMessage = "Tên loại phòng không vượt quá 100 ký tự.")]
 		public string? Name { get; set; }
 
-		[Required(ErrorMessage = "Hình ảnh là trường bắt buộc.")]
+		//[Required(ErrorMessage = "Hình ảnh là trường bắt buộc.")]
 		[RegularExpression(@"^[^.]+\.(jpg|jpeg|png|gif)$", ErrorMessage = "Định dạng hình ảnh không hợp lệ.")]
 		public List<string>? Images { get; set; }
 
@@ -25,7 +25,7 @@ namespace Core.Application.ViewModels.KindRooms
 		public int? MaximumPeople { get; set; }
 
 		[Required(ErrorMessage = "Mô tả là trường bắt buộc.")]
-		[StringLength(500, ErrorMessage = "Mô tả không được vượt quá 500 ký tự.")]
+		[StringLength(5000, ErrorMessage = "Mô tả không được vượt quá 5000 ký tự.")]
 		public string? Describe { get; set; }
 	}
 }

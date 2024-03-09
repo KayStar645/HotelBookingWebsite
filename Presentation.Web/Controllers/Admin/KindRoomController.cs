@@ -3,11 +3,10 @@ using Core.Application.Interfaces;
 using Core.Application.ViewModels.Common;
 using Core.Application.ViewModels.KindRooms;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 
 namespace Presentation.Web.Controllers.Admin
 {
-	public class KindRoomController : Controller
+    public class KindRoomController : Controller
 	{
 		private readonly IKindRoomService _kindRoomService;
 
@@ -16,7 +15,7 @@ namespace Presentation.Web.Controllers.Admin
 			_kindRoomService = pKindRoomService;
 		}
 
-		[HttpGet()]
+		[HttpGet]
 		public async Task<IActionResult> Index([FromQuery] BaseListRQ pRequest)
 		{
 			ViewBag.List = await _kindRoomService.List(pRequest);

@@ -57,10 +57,11 @@
 					{
 						<tr>
 							<td class="text-center">
-								<i class=" updatesStaff fa-regular fa-pen-to-square pe-3"
-								   style="color:blue;cursor: pointer;"
-								   data-toggle="modal" data-target="#openPopupCreate"></i>
-								<i class="deletesStaff fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
+								<a href="@Url.Action("detail", "kindRoom", new { pId = kindRoom.Id })" class="updatesKindRoom">
+									<i class="far fa-pen-to-square pe-3" style="color: blue; cursor: pointer;"></i>
+								</a>
+
+								<i class="deletesKindRoom fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
 							</td>
 							<td class="text-center d-none" data-id="@kindRoom?.Id">@kindRoom?.Id</td>
 							<td class="text-nowrap">
@@ -73,7 +74,9 @@
 								<img src="@kindRoom.Images.FirstOrDefault()" />
 							</td>
 							<td class="text-right">
-								<div>@kindRoom?.Price</div>
+								<div>
+									@String.Format("{0:N0} VNĐ", kindRoom?.Price)
+								</div>
 							</td>
 							<td class="text-right">
 								@kindRoom?.MaximumPeople
@@ -125,5 +128,38 @@
 		$(".link-parent").next("ul").not($(this).next("ul")).removeClass("d-block");
 
 		$(this).closest(".link-parent").addClass("active");
+	});
+</script>
+
+@* Gọi Controller xử lý *@
+<script>
+	$(document).ready(function () {
+		$(".deletesKindRoom").on("click", function () {
+			var itemId = $(this).closest("tr").find("td[data-id]").data("id");
+
+			$.ajax({
+				url: "/kindRoom/delete?pId=" + itemId,
+				method: "DELETE",
+				success: function (data) {
+					$.ajax({
+						url: "/kindRoom/index",
+						method: "GET",
+						success: function (data) {
+							var newData = $('<tbody>').html(data).find('#table-body-kind-room').html();
+							$('#table-body-kind-room').html(newData);
+
+							var newPaginated = $('<div>').html(data).find('#paginated').html();
+							$('#paginated').html(newPaginated);
+
+							resetButtonClick();
+						},
+					});
+					toastr.success('Xoá loại phòng thành công!', 'Thông báo');
+				},
+				error: function (xhr, textStatus, errorThrown) {
+					toastr.error('Xoá loại phòng thất bại!', 'Thông báo');
+				}
+			});
+		});
 	});
 </script>
