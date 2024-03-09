@@ -1,4 +1,4 @@
-﻿using Core.Application.Interfaces;
+﻿using Core.Application.Interfaces.Common;
 using Core.Domain.Entities;
 using Infrastructure.Data.Interceptors;
 using Microsoft.EntityFrameworkCore;
@@ -18,9 +18,11 @@ namespace Infrastructure.Data
             _saveChangesInterceptor = saveChangesInterceptor;
         }
         public DbSet<Staff> Staffs => Set<Staff>();
+		public DbSet<KindRoom> KindRooms => Set<KindRoom>();
+		public DbSet<Room> Rooms => Set<Room>();
 
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 

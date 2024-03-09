@@ -1,4 +1,4 @@
-﻿using Core.Application.Interfaces;
+﻿using Core.Application.Interfaces.Common;
 using System.Security.Claims;
 
 namespace Presentation.Web.Services

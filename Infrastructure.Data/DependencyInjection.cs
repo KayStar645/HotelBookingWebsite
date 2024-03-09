@@ -1,4 +1,4 @@
-﻿using Core.Application.Interfaces;
+﻿using Core.Application.Interfaces.Common;
 using Infrastructure.Data.Interceptors;
 using Infrastructure.Data.Services;
 using Microsoft.EntityFrameworkCore;

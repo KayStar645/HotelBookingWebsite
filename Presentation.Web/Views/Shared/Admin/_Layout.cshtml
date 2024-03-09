@@ -20,8 +20,7 @@
     <link rel="stylesheet" href="~/css/toastr.min.css">
     <script src="~/assets/js/jquery-3.5.1.min.js"></script>
     <script src="~/js/toastr.min.js"></script>
-
-
+    <script src="~/lib/ckeditor5/build/ckeditor.js"></script>
 </head>
 
 <body>
@@ -138,56 +137,94 @@
                 <div id="sidebar-menu" class="sidebar-menu">
                     <ul>
                         <li class="active">
-                            <a href="#">
+                            <a href="/" style="background-color: #00ffe7 !important;">
                                 <i class="fas fa-tachometer-alt"></i>
                                 <span>Dashboard</span>
                             </a>
                         </li>
                         <li class="list-divider"></li>
-                        <li class="submenu">
-                            <a href="#">
+                        <li class="nav-item">
+                            <a id="master-data" class="nav-link link-parent border" style="cursor:pointer;">
                                 <i class="fas fa-suitcase"></i>
-                                <span> Nhân viên </span> <span class="menu-arrow"></span>
+                                <span>Dữ liệu nguồn</span>
+                                <span class="menu-arrow"></span>
                             </a>
-                            <ul class="submenu_class"
-                                style="display: none;">
-                                <li>
-                                    <a href="@Url.Action("index", "staff")">
-                                        Danh sách nhân viên
+                            <ul class="me-0">
+                                <li id="master-data-kind-room" class="nav-item d-block">
+                                    <a href="@Url.Action("index", "kindRoom")" class="nav-link d-flex align-items-center">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p class="mb-0 ml-2">Loại phòng</p>
                                     </a>
                                 </li>
-                                <li>
-                                    <a href="#"> Thêm nhân viên mới</a>
-                                </li>
-                                <li>
-                                    <a href="#"> Sửa thông tin nhân viên </a>
+                                <li id="master-data-customer" class="nav-item d-block">
+                                    <a href="" class="nav-link d-flex align-items-center">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p class="mb-0 ml-2">Khách hàng</p>
+                                    </a>
                                 </li>
                             </ul>
                         </li>
-                        <li class="submenu">
-                            <a href="#">
-                                <i class="fas fa-user"></i> <span>
-                                    Customers
-                                </span> <span class="menu-arrow"></span>
+                        <li class="nav-item">
+                            <a id="room-service" class="nav-link link-parent border" style="cursor:pointer;">
+                                <i class="fas fa-suitcase"></i>
+                                <span>Phòng và Dịch vụ</span>
+                                <span class="menu-arrow"></span>
                             </a>
-                            <ul class="submenu_class"
-                                style="display: none;">
-                                <li><a href="#"> All customers </a></li>
-                                <li><a href="#"> Edit Customer </a></li>
-                                <li><a href="#"> Add Customer </a></li>
+                            <ul class="me-0">
+                                <li id="room-service-room" class="nav-item d-block">
+                                    <a href="@Url.Action("index", "room")" class="nav-link d-flex align-items-center">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p class="mb-0 ml-2">Phòng</p>
+                                    </a>
+                                </li>
+                                <li id="room-service-service" class="nav-item d-block">
+                                    <a href="" class="nav-link d-flex align-items-center">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p class="mb-0 ml-2">Dịch vụ</p>
+                                    </a>
+                                </li>
                             </ul>
                         </li>
-                        <li class="submenu">
-                            <a href="#">
-                                <i class="fas fa-key"></i> <span>
-                                    Rooms
-                                </span> <span class="menu-arrow"></span>
+                        <li class="nav-item">
+                            <a id="business" class="nav-link link-parent border" style="cursor:pointer;">
+                                <i class="fas fa-suitcase"></i>
+                                <span>Kinh doanh</span>
+                                <span class="menu-arrow"></span>
                             </a>
-                            <ul class="submenu_class"
-                                style="display: none;">
-                                <li><a href="#">All Rooms </a></li>
-                                <li><a href="#"> Edit Rooms </a></li>
-                                <li><a href="#"> Add Rooms </a></li>
+                            <ul class="me-0">
+                                <li id="business-booking" class="nav-item d-block">
+                                    <a href="" class="nav-link d-flex align-items-center">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p class="mb-0 ml-2">Đơn đặt phòng</p>
+                                    </a>
+                                </li>
+                                <li id="business-promotion" class="nav-item d-block">
+                                    <a href="" class="nav-link d-flex align-items-center">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p class="mb-0 ml-2">Chương trình khuyến mãi</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a id="system" class="nav-link link-parent border" style="cursor:pointer;">
+                                <i class="fas fa-suitcase"></i>
+                                <span>Hệ thống</span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul class="me-0">
+                                <li id="system-staff" class="nav-item d-block">
+                                    <a href="@Url.Action("index", "staff")" class="nav-link d-flex align-items-center">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p class="mb-0 ml-2">Nhân viên</p>
+                                    </a>
+                                </li>
+                                <li id="system-role" class="nav-item d-block">
+                                    <a href="" class="nav-link d-flex align-items-center">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p class="mb-0 ml-2">Vai trò</p>
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                     </ul>
@@ -200,12 +237,24 @@
                     @RenderSection("TitleHeader", required: false)
                 </div>
 
-                <div class="row">
+                <div id="layout-content" class="row">
                     @RenderBody()
                 </div>
             </div>
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $(".link-parent").on("click", function (e) {
+            e.preventDefault();
+
+            $(".nav-childs").removeClass("active");
+            $(".link-parent").removeClass("active");
+
+            $(this).closest(".link-parent").addClass("active");
+        });
+    </script>
+
     <script src="~/assets/js/popper.min.js"></script>
     <script src="~/assets/js/bootstrap.min.js"></script>
     <script src="~/assets/plugins/slimscroll/jquery.slimscroll.min.js"></script>

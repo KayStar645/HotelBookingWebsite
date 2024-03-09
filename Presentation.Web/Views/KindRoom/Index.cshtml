@@ -1,0 +1,165 @@
+﻿@using Core.Application.Responses
+@using Core.Application.ViewModels.KindRooms
+@{
+	var kindRooms = ViewBag.list as PaginatedResult<KindRoomVM>;
+}
+
+@section TitleHeader
+{
+	<div class="row">
+		<div class="col-sm-12 mt-3">
+			<h3 class="page-title mt-3">
+				Danh sách loại phòng
+			</h3>
+			<div class="row mt-3">
+				<div class="col-sm-4">
+					<label class="font-weight-bold mb-1">Tìm kiếm</label>
+					<div class="form-outline p-0" data-mdb-input-init>
+						<input type="search" class="form-control" id="searchInput" placeholder="Tìm kiếm..." />
+					</div>
+				</div>
+				<div class="col-sm-2">
+					
+				</div>
+				<div class="col-sm-4">
+				</div>
+				<div class="col-sm-2">
+					<div class="text-right">
+						<a href="@Url.Action("detail", "kindRoom", new { pId = 0 })"
+								id="createKindRoom" class="btn btn-primary">
+							Thêm mới
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+<div class="card-body">
+	<div class="table-responsive" style="overflow-y: auto;">
+		<table class="table table-hover table-center table-striped table-bordered">
+			<thead>
+				<tr>
+					<th class="min-vw-10"></th>
+					<th class="th-sm">Mã loại phòng</th>
+					<th class="th-sm">Tên loại phòng</th>
+					<th class="th-sm text-center">Hình ảnh</th>
+					<th class="th-sm text-right">Giá</th>
+					<th class="th-sm text-right">Số người</th>
+					<th class="th-sm text-center"></th>
+				</tr>
+			</thead>
+			<tbody id="table-body-kind-room">
+				@if (kindRooms != null)
+				{
+					@foreach (var kindRoom in kindRooms.Data)
+					{
+						<tr>
+							<td class="text-center">
+								<a href="@Url.Action("detail", "kindRoom", new { pId = kindRoom.Id })" class="updatesKindRoom">
+									<i class="far fa-pen-to-square pe-3" style="color: blue; cursor: pointer;"></i>
+								</a>
+
+								<i class="deletesKindRoom fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
+							</td>
+							<td class="text-center d-none" data-id="@kindRoom?.Id">@kindRoom?.Id</td>
+							<td class="text-nowrap">
+								<div>@kindRoom?.InternalCode</div>
+							</td>
+							<td class="text-nowrap">
+								@kindRoom?.Name
+							</td>
+							<td class="text-center">
+								<img src="@kindRoom.Images.FirstOrDefault()" />
+							</td>
+							<td class="text-right">
+								<div>
+									@String.Format("{0:N0} VNĐ", kindRoom?.Price)
+								</div>
+							</td>
+							<td class="text-right">
+								@kindRoom?.MaximumPeople
+							</td>
+							<td class="text-center">
+
+								@{
+									var statusText = kindRoom.IsDeleted == true
+									? "<span class='badge badge-pill bg-danger inv-badge'>Đã xoá</span>"
+									: "<span class='badge badge-pill bg-success inv-badge'>Hoạt động</span>";
+								}
+
+								@Html.Raw(statusText)
+							</td>
+						</tr>
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+@* Phân trang *@
+<div id="paginated" class="d-flex justify-content-end mt-4">
+	<nav aria-label="Page navigation example">
+		<ul class="pagination">
+			@for (int i = 1; i <= kindRooms.Extra.TotalPages; i++)
+			{
+				<li class="page-item pageCurrent @(kindRooms.Extra.CurrentPage == i ? "active" : "")">
+					<a class="page-link" data-page="@i">@i</a>
+				</li>
+			}
+		</ul>
+	</nav>
+</div>
+
+@* ĐÂY LÀ JS *@
+<script>
+	$("#master-data").addClass("active");
+	$("#master-data").next("ul").addClass("d-block");
+	$("#master-data-kind-room").addClass("active");
+
+	$(".link-parent").on("click", function (e) {
+		e.preventDefault();
+
+		$(".nav-childs").removeClass("active");
+		$(".link-parent").removeClass("active");
+
+		$(".link-parent").next("ul").not($(this).next("ul")).removeClass("d-block");
+
+		$(this).closest(".link-parent").addClass("active");
+	});
+</script>
+
+@* Gọi Controller xử lý *@
+<script>
+	$(document).ready(function () {
+		$(".deletesKindRoom").on("click", function () {
+			var itemId = $(this).closest("tr").find("td[data-id]").data("id");
+
+			$.ajax({
+				url: "/kindRoom/delete?pId=" + itemId,
+				method: "DELETE",
+				success: function (data) {
+					$.ajax({
+						url: "/kindRoom/index",
+						method: "GET",
+						success: function (data) {
+							var newData = $('<tbody>').html(data).find('#table-body-kind-room').html();
+							$('#table-body-kind-room').html(newData);
+
+							var newPaginated = $('<div>').html(data).find('#paginated').html();
+							$('#paginated').html(newPaginated);
+
+							resetButtonClick();
+						},
+					});
+					toastr.success('Xoá loại phòng thành công!', 'Thông báo');
+				},
+				error: function (xhr, textStatus, errorThrown) {
+					toastr.error('Xoá loại phòng thất bại!', 'Thông báo');
+				}
+			});
+		});
+	});
+</script>

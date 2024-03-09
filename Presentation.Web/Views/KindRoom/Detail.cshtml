@@ -1,0 +1,297 @@
+﻿@using Core.Application.ViewModels.KindRooms
+@{
+	var kindRoom = ViewBag.detail as KindRoomVM;
+}
+<style>
+	.ck.ck-content.ck-editor__editable.ck-rounded-corners.ck-editor__editable_inline {
+		min-height: 300px;
+	}
+</style>
+
+@section TitleHeader
+{
+	<div class="row">
+		<div class="col-sm-12 mt-3">
+			<div class="row mt-3">
+				<div class="col-sm-4">
+					<h3 class="page-title mb-1">
+						@(kindRoom == null ? "Thêm mới loại phòng" : "Chi tiết loại phòng " + kindRoom?.InternalCode)
+					</h3>
+				</div>
+				<div class="col-sm-2">
+				</div>
+				<div class="col-sm-4">
+				</div>
+				<div class="col-sm-2">
+					<div class="text-right">
+						<a href="" id="createKindRoom"
+						   class="btn btn-primary @(kindRoom == null || kindRoom.Id == 0 ? "d-inline-block" : "d-none")">
+							Thêm mới
+						</a>
+						<a href="" id="updateKindRoom"
+						   class="btn btn-primary @(kindRoom != null && kindRoom.Id > 0 ? "d-inline-block" : "d-none")">
+							Cập nhật
+						</a>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+<div id="detail-kindroom" class="card py-4 px-2" data-kind-room-id="@kindRoom?.Id">
+	<div class="row col-sm-12">
+		<div class="col-sm-4">
+			<div class="form-group">
+				<label class="font-weight-bold mb-2">Mã loại phòng</label>
+				<input class="form-control" type="text" name="internalCode"
+					   value="@(kindRoom == null ? "" : kindRoom.InternalCode)" />
+				<span class="text-danger" id="internalCodeError"></span>
+			</div>
+		</div>
+		<div class="col-sm-4">
+			<div class="form-group">
+				<label class="font-weight-bold mb-2">Loại phòng</label>
+				<input class="form-control" type="text" name="name"
+					   value="@(kindRoom == null ? "" : kindRoom.Name)" />
+				<span class="text-danger" id="nameError"></span>
+			</div>
+		</div>
+		<div class="col-sm-4">
+			<div class="form-group">
+				<label class="font-weight-bold mb-2">Giá</label>
+				<input class="form-control" type="number" name="price"
+					   value="@(kindRoom == null ? "0" : kindRoom.Price)" />
+				<span class="text-danger" id="priceError"></span>
+			</div>
+		</div>
+	</div>
+	<div class="row col-sm-12">
+		<div class="col-sm-9">
+			<div class="form-group">
+				<label class="font-weight-bold mb-2">Hình ảnh</label>
+				<input type="file" id="imageInput" accept="image/*">
+				<div id="imageContainer"></div>
+				<span class="text-danger" id="imagesError"></span>
+			</div>
+		</div>
+		<div class="col-sm-3">
+			<div class="form-group">
+				<label class="font-weight-bold mb-2">Số người</label>
+				<input class="form-control" type="number" name="maximumPeople"
+					   value="@(kindRoom == null ? "1" : kindRoom.MaximumPeople)" />
+				<span class="text-danger" id="maximumPeopleError"></span>
+			</div>
+		</div>
+	</div>
+	<div class="col-12">
+		<label class="p-1 fw-bolder label">Mô tả loại phòng</label> <br />
+		<div id="describe">
+			@Html.Raw(kindRoom?.Describe)
+		</div>
+	</div>
+</div>
+
+@* ĐÂY LÀ JS *@
+<script>
+	$("#master-data").addClass("active");
+	$("#master-data").next("ul").addClass("d-block");
+	$("#master-data-kind-room").addClass("active");
+
+	$(".link-parent").on("click", function (e) {
+		e.preventDefault();
+
+		$(".nav-childs").removeClass("active");
+		$(".link-parent").removeClass("active");
+
+		$(".link-parent").next("ul").not($(this).next("ul")).removeClass("d-block");
+
+		$(this).closest(".link-parent").addClass("active");
+	});
+</script>
+
+@* Ckeditor *@
+<script>
+	var _describeEditor;
+
+	ClassicEditor
+		.create(document.querySelector('#describe'))
+		.then(editor => {
+			_describeEditor = editor;
+		})
+		.catch(error => {
+			console.error('There was a problem initializing the editor.', error);
+		});
+</script>
+
+@* Khai báo và hàm hỗ trợ *@
+<script>
+	var kindRoomId = document.getElementById('detail-kindroom').dataset.kindRoomId;
+
+	var internalCodeInput = $('input[name="internalCode"]');
+	var nameInput = $('input[name="name"]');
+	//var imagesInput = $('input[name="images"]');
+	var priceInput = $('input[name="price"]');
+	var maximumPeopleInput = $('input[name="maximumPeople"]');
+
+
+	function removeValidator() {
+		$(".text-danger").text("");
+
+		internalCodeInput.removeClass("border-danger");
+		nameInput.removeClass("border-danger");
+		//dateOfBirthInput.removeClass("border-danger");
+		priceInput.removeClass("border-danger");
+		maximumPeopleInput.removeClass("border-danger");
+	}
+
+	function validateForm(pRequest) {
+		var isValid = true;
+
+		// Validate internalCode
+		if (!pRequest.internalCode) {
+			$("#internalCodeError").text("Mã loại phòng không được để trống");
+			$('input[name="internalCode"]').addClass("border-danger");
+			isValid = false;
+		} else if (pRequest.internalCode.length > 100) {
+			$("#internalCodeError").text("Mã loại phòng không được vượt quá 100 ký tự");
+			$('input[name="internalCode"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		// Validate name
+		if (!pRequest.name) {
+			$("#nameError").text("Loại phòng không được để trống");
+			$('input[name="name"]').addClass("border-danger");
+			isValid = false;
+		} else if (pRequest.name.length > 100) {
+			$("#nameError").text("Loại phòng không được vượt quá 100 ký tự");
+			$('input[name="name"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		// Validate price
+		if (!pRequest.price || pRequest.price < 0) {
+			$("#priceError").text("Giá là bắt buộc và ít nhất phải bằng 0đ");
+			$('input[name="price"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		// Validate phone
+		if (!pRequest.maximumPeople || pRequest.maximumPeople < 1) {
+			$("#maximumPeopleError").text("Số người là bắt buộc và ít nhất phải >= 1");
+			$('input[name="maximumPeople"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		return isValid;
+	}
+
+	function getData(isCreate) {
+		var data = {
+			id: isCreate == true ? 0 : kindRoomId,
+			internalCode: document.querySelector('input[name="internalCode"]').value,
+			name: document.querySelector('input[name="name"]').value,
+			price: document.querySelector('input[name="price"]').value,
+			maximumPeople: document.querySelector('input[name="maximumPeople"]').value,
+			images: null,
+			describe: _describeEditor.getData(),
+		}
+		return data;
+	}
+
+</script>
+
+@* Chọn nhiều hình ảnh *@
+<script>
+	document.getElementById("imageInput").addEventListener("change", function (e) {
+		var files = e.target.files;
+
+		for (var i = 0; i < files.length; i++) {
+			var file = files[i];
+
+			var formData = new FormData();
+			formData.append("file", file);
+			formData.append("fileName", `Hotel/KindRoom/${kindRoomId}-` + file.name.split('.')[0]);
+
+			$.ajax({
+				url: "/googleDrive/UploadFile",
+				method: "POST",
+				data: formData,
+				contentType: false,
+				processData: false,
+				success: function (data) {
+					console.log(data)
+					console.log(data.data.path)
+					var imageUrl = data.data.path;
+
+					var image = document.createElement("img");
+					image.src = imageUrl;
+
+					document.getElementById("imageContainer").appendChild(image);
+				},
+				error: function (xhr, textStatus, errorThrown) {
+					toastr.error('Tải hình ảnh lên thất bại!', 'Thông báo');
+				}
+			});
+
+		}
+	});
+</script>
+
+@* Gọi Controller xử lý *@
+<script>
+	$(document).ready(function () {
+		$("#createKindRoom").on("click", function (e) {
+			e.preventDefault();
+
+			removeValidator();
+
+			var pRequest = getData(true);
+			
+			isValid = validateForm(pRequest);
+
+			if(isValid) {
+				console.log(JSON.stringify(pRequest));
+				$.ajax({
+					url: "create",
+					method: "POST",
+					data: JSON.stringify(pRequest),
+					contentType: "application/json; charset=utf-8",
+					success: function(data) {
+						window.location.href = "/kindroom"
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Thêm mới loại phòng thất bại!', 'Thông báo');
+					}
+				});
+			}
+		});
+
+		$("#updateKindRoom").on("click", function (e) {
+			e.preventDefault();
+
+			removeValidator();
+
+			var pRequest = getData(false);
+
+			isValid = validateForm(pRequest);
+
+			if (isValid) {
+				$.ajax({
+					url: "update",
+					method: "PUT",
+					data: JSON.stringify(pRequest),
+					contentType: "application/json; charset=utf-8",
+					success: function (data) {
+						window.location.href = "/kindroom"
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Cập nhật loại phòng thất bại!', 'Thông báo');
+					}
+				});
+			}
+		});
+	});
+</script>

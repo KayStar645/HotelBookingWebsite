@@ -9,7 +9,7 @@
 	<div class="row">
 		<div class="col-sm-12 mt-3">
 			<h3 class="page-title mt-3">
-				Nhân viên
+				Danh sách nhân viên
 			</h3>
 			<div class="row mt-3">
 				<div class="col-sm-4">
@@ -52,11 +52,11 @@
 					<th class="min-vw-10"></th>
 					<th class="th-sm">Mã nhân viên</th>
 					<th class="th-sm">Họ tên</th>
-					<th class="text-center th-sm">Ngày sinh</th>
-					<th class="text-center th-sm">Giới tính</th>
+					<th class="th-smtext-center">Ngày sinh</th>
+					<th class="th-smtext-center">Giới tính</th>
 					<th class="th-sm">Địa chỉ</th>
-					<th class="text-right">Số điện thoại</th>
-					<th class="text-center">Trạng thái</th>
+					<th class="th-sm text-right">Số điện thoại</th>
+					<th class="th-smtext-center"></th>
 				</tr>
 			</thead>
 			<tbody id="table-body-staff">
@@ -214,7 +214,25 @@
 	</div>
 </div>
 
+
  @* ĐÂY LÀ JS *@
+ @* Active menu *@
+<script>
+	$("#system").addClass("active");
+	$("#system").next("ul").addClass("d-block");
+	$("#system-staff").addClass("active");
+
+	$(".link-parent").on("click", function (e) {
+		e.preventDefault();
+
+		$(".nav-childs").removeClass("active");
+		$(".link-parent").removeClass("active");
+
+		$(".link-parent").next("ul").not($(this).next("ul")).removeClass("d-block");
+
+		$(this).closest(".link-parent").addClass("active");
+	});
+</script>
 
 @* Khởi tạo biến *@
 <script>
@@ -307,7 +325,7 @@
 	}
 </script>
 
-@* Load giao diện và dữ liệu *@
+@* Lắng nghe sự kiện + load giao diện và dữ liệu *@
 <script>
 	function resetButtonClick() {
 		createOpen.addEventListener("click", function (event) {

@@ -1,13 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Core.Application.ViewModels.Common;
+using System.ComponentModel.DataAnnotations;
 
 namespace Core.Application.ViewModels.Staffs
 {
-    public class StaffRQ
-    {
-
-		[Required(ErrorMessage = "Id is required.")]
-		public int? Id { get; set; }
-
+    public class StaffRQ : BaseRQ
+	{
 		[Required(ErrorMessage = "Mã nhân viên là trường bắt buộc.")]
 		public string? InternalCode { get; set; }
 
