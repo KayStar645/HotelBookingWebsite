@@ -213,22 +213,29 @@
 
 			var formData = new FormData();
 			formData.append("file", file);
+			formData.append("fileName", `Hotel/KindRoom/${kindRoomId}-` + file.name.split('.')[0]);
 
 			$.ajax({
-				url: "/Upload/UploadImage",
+				url: "/googleDrive/UploadFile",
 				method: "POST",
 				data: formData,
 				contentType: false,
 				processData: false,
 				success: function (data) {
-					var imageUrl = data.imageUrl;
+					console.log(data)
+					console.log(data.data.path)
+					var imageUrl = data.data.path;
 
 					var image = document.createElement("img");
 					image.src = imageUrl;
 
 					document.getElementById("imageContainer").appendChild(image);
+				},
+				error: function (xhr, textStatus, errorThrown) {
+					toastr.error('Tải hình ảnh lên thất bại!', 'Thông báo');
 				}
 			});
+
 		}
 	});
 </script>
