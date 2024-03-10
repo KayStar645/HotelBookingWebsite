@@ -71,7 +71,7 @@
 								@kindRoom?.Name
 							</td>
 							<td class="text-center">
-								<img src="@kindRoom.Images.FirstOrDefault()" />
+								<img src="@kindRoom?.Images?.FirstOrDefault()" />
 							</td>
 							<td class="text-right">
 								<div>
@@ -131,35 +131,105 @@
 	});
 </script>
 
-@* Gọi Controller xử lý *@
+@* Lắng nghe sự kiện *@
 <script>
-	$(document).ready(function () {
-		$(".deletesKindRoom").on("click", function () {
-			var itemId = $(this).closest("tr").find("td[data-id]").data("id");
+	function resetEvent() {
+		$(document).ready(function () {
+			$(".deletesKindRoom").on("click", function () {
+				var itemId = $(this).closest("tr").find("td[data-id]").data("id");
 
-			$.ajax({
-				url: "/kindRoom/delete?pId=" + itemId,
-				method: "DELETE",
-				success: function (data) {
-					$.ajax({
-						url: "/kindRoom/index",
-						method: "GET",
-						success: function (data) {
-							var newData = $('<tbody>').html(data).find('#table-body-kind-room').html();
-							$('#table-body-kind-room').html(newData);
+				$.ajax({
+					url: "/kindRoom/delete?pId=" + itemId,
+					method: "DELETE",
+					success: function (data) {
+						$.ajax({
+							url: "/kindRoom/index",
+							method: "GET",
+							success: function (data) {
+								var newData = $('<tbody>').html(data).find('#table-body-kind-room').html();
+								$('#table-body-kind-room').html(newData);
 
-							var newPaginated = $('<div>').html(data).find('#paginated').html();
-							$('#paginated').html(newPaginated);
+								var newPaginated = $('<div>').html(data).find('#paginated').html();
+								$('#paginated').html(newPaginated);
 
-							resetButtonClick();
-						},
-					});
-					toastr.success('Xoá loại phòng thành công!', 'Thông báo');
-				},
-				error: function (xhr, textStatus, errorThrown) {
-					toastr.error('Xoá loại phòng thất bại!', 'Thông báo');
-				}
+								resetEvent();
+							},
+						});
+						toastr.success('Xoá loại phòng thành công!', 'Thông báo');
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Xoá loại phòng thất bại!', 'Thông báo');
+					}
+				});
 			});
 		});
+
+		$(document).ready(function () {
+			$('.pagination a').on('click', function (e) {
+				e.preventDefault();
+				var page = $(this).data('page');
+				paginatedResult(page);
+			});
+		});
+
+		function paginatedResult(page) {
+			$.ajax({
+				url: `/kindRoom/index?page=${page}`,
+				method: 'GET',
+				success: function (data) {
+					var newData = $('<tbody>').html(data).find('#table-body-kind-room').html();
+					$('#table-body-kind-room').html(newData);
+
+					updatePagination(page);
+				},
+			});
+		}
+
+		function updatePagination(activePage) {
+			$('.pageCurrent').removeClass('active');
+			$('.pagination a[data-page="' + activePage + '"]').addClass('active').closest('.pageCurrent').addClass('active');
+		}
+	}
+	resetEvent();
+</script>
+
+@* Tìm kiếm và lọc *@
+<script>
+	var searchTimer;
+
+	$(document).ready(function () {
+		$('#searchInput').on('input', function () {
+			clearTimeout(searchTimer);
+
+			searchTimer = setTimeout(function () {
+				performSearch();
+			}, 600);
+		});
+
+		function performSearch() {
+			var searchTerm = $('#searchInput').val();
+
+			$.ajax({
+				url: '/kindRoom/index',
+				method: 'GET',
+				data: {
+					search: searchTerm,
+					page: 1,
+					sorts: null,
+				},
+				contentType: 'application/json; charset=utf-8',
+				success: function (data) {
+					var newData = $('<tbody>').html(data).find('#table-body-kind-room').html();
+					$('#table-body-kind-room').html(newData);
+
+					var newPaginated = $('<div>').html(data).find('#paginated').html();
+					$('#paginated').html(newPaginated);
+					resetEvent();
+				},
+				error: function (xhr, textStatus, errorThrown) {
+					toastr.error('Lỗi khi thực hiện tìm kiếm!', 'Thông báo');
+				}
+			});
+		}
 	});
 </script>

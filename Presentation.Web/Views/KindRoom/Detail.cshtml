@@ -72,7 +72,12 @@
 			<div class="form-group">
 				<label class="font-weight-bold mb-2">Hình ảnh</label>
 				<input type="file" id="imageInput" accept="image/*">
-				<div id="imageContainer"></div>
+				<div id="imageContainer">
+					@foreach (var img in kindRoom.Images)
+					{
+						<img src="@img" alt="Hình ảnh mô tả loại phòng">
+					}
+				</div>
 				<span class="text-danger" id="imagesError"></span>
 			</div>
 		</div>
@@ -131,7 +136,6 @@
 
 	var internalCodeInput = $('input[name="internalCode"]');
 	var nameInput = $('input[name="name"]');
-	//var imagesInput = $('input[name="images"]');
 	var priceInput = $('input[name="price"]');
 	var maximumPeopleInput = $('input[name="maximumPeople"]');
 
@@ -141,7 +145,6 @@
 
 		internalCodeInput.removeClass("border-danger");
 		nameInput.removeClass("border-danger");
-		//dateOfBirthInput.removeClass("border-danger");
 		priceInput.removeClass("border-danger");
 		maximumPeopleInput.removeClass("border-danger");
 	}
@@ -171,6 +174,12 @@
 			isValid = false;
 		}
 
+		// Validate images
+		if (pRequest.images.length === 0) {
+			$("#imagesError").text("Hình ảnh loại phòng không được để trống");
+			isValid = false;
+		}
+
 		// Validate price
 		if (!pRequest.price || pRequest.price < 0) {
 			$("#priceError").text("Giá là bắt buộc và ít nhất phải bằng 0đ");
@@ -195,9 +204,13 @@
 			name: document.querySelector('input[name="name"]').value,
 			price: document.querySelector('input[name="price"]').value,
 			maximumPeople: document.querySelector('input[name="maximumPeople"]').value,
-			images: null,
+			images: [],
 			describe: _describeEditor.getData(),
 		}
+		var images = document.getElementById('imageContainer').querySelectorAll('img');
+		images.forEach(function (image) {
+			data.images.push(image.src);
+		});
 		return data;
 	}
 
@@ -222,8 +235,6 @@
 				contentType: false,
 				processData: false,
 				success: function (data) {
-					console.log(data)
-					console.log(data.data.path)
 					var imageUrl = data.data.path;
 
 					var image = document.createElement("img");
@@ -253,7 +264,6 @@
 			isValid = validateForm(pRequest);
 
 			if(isValid) {
-				console.log(JSON.stringify(pRequest));
 				$.ajax({
 					url: "create",
 					method: "POST",

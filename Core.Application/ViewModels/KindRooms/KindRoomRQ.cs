@@ -12,8 +12,8 @@ namespace Core.Application.ViewModels.KindRooms
 		[StringLength(100, ErrorMessage = "Tên loại phòng không vượt quá 100 ký tự.")]
 		public string? Name { get; set; }
 
-		//[Required(ErrorMessage = "Hình ảnh là trường bắt buộc.")]
-		[RegularExpression(@"^[^.]+\.(jpg|jpeg|png|gif)$", ErrorMessage = "Định dạng hình ảnh không hợp lệ.")]
+		[Required(ErrorMessage = "Hình ảnh là trường bắt buộc.")]
+		//[RegularExpression(@"^[^.]+\.(jpg|jpeg|png|gif)$", ErrorMessage = "Định dạng hình ảnh không hợp lệ.")]
 		public List<string>? Images { get; set; }
 
 		[Required(ErrorMessage = "Giá là trường bắt buộc.")]

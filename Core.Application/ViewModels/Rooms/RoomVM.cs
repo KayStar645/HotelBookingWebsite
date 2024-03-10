@@ -11,7 +11,7 @@ namespace Core.Application.ViewModels.Rooms
 
 		public int? KindRoomId { get; set; }
 
-		public KindRoomVM? KindRoomVM { get; set; }
+		public KindRoomVM? KindRoom { get; set; }
 
 		public bool? IsDeleted { get; set; }
 	}

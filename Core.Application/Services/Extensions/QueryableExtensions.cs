@@ -89,12 +89,45 @@ namespace Core.Application.Services.Extensions
 
 			var parameter = Expression.Parameter(entityType, "entity");
 			var property = Expression.Property(parameter, propertyInfo);
-			var value = Convert.ChangeType(propertyValue, propertyInfo.PropertyType);
-			var equals = Expression.Equal(property, Expression.Constant(value));
 
-			var lambda = Expression.Lambda<Func<T, bool>>(equals, parameter);
-
-			return query.Where(lambda);
+			// Thêm xử lý kiểu dữ liệu int?
+			if (propertyInfo.PropertyType == typeof(int?))
+			{
+				if (int.TryParse(propertyValue, out var intValue))
+				{
+					var value = Expression.Constant(intValue, typeof(int?));
+					var equals = Expression.Equal(property, value);
+					var lambda = Expression.Lambda<Func<T, bool>>(equals, parameter);
+					return query.Where(lambda);
+				}
+				else
+				{
+					throw new ArgumentException($"Invalid value for property '{propertyName}'. Expected integer.");
+				}
+			}
+			else if (propertyInfo.PropertyType == typeof(int))
+			{
+				// Xử lý kiểu dữ liệu int
+				if (int.TryParse(propertyValue, out var intValue))
+				{
+					var value = Expression.Constant(intValue);
+					var equals = Expression.Equal(property, value);
+					var lambda = Expression.Lambda<Func<T, bool>>(equals, parameter);
+					return query.Where(lambda);
+				}
+				else
+				{
+					throw new ArgumentException($"Invalid value for property '{propertyName}'. Expected integer.");
+				}
+			}
+			else
+			{
+				// Xử lý kiểu dữ liệu khác
+				var value = Convert.ChangeType(propertyValue, propertyInfo.PropertyType);
+				var equals = Expression.Equal(property, Expression.Constant(value));
+				var lambda = Expression.Lambda<Func<T, bool>>(equals, parameter);
+				return query.Where(lambda);
+			}
 		}
 	}
 }

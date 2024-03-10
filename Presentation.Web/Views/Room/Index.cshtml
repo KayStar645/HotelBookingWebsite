@@ -1,7 +1,26 @@
 ﻿@using Core.Application.Responses
 @using Core.Application.ViewModels.Rooms
+@using Core.Application.ViewModels.KindRooms
 @{
 	var rooms = ViewBag.list as PaginatedResult<RoomVM>;
+	var kindRooms = ViewBag.KindRooms as PaginatedResult<KindRoomVM>;
+
+	string StatusName(string? status)
+	{
+		switch (status)
+		{
+			case "E":
+				return "Trống";
+			case "B":
+				return "Đã được đặt";
+			case "L":
+				return "Khách đang ở";
+			case "C":
+				return "Đang dọn dẹp";
+			default:
+				return "";
+		}
+	}
 }
 
 @section TitleHeader
@@ -18,14 +37,35 @@
 						<input type="search" class="form-control" id="searchInput" placeholder="Tìm kiếm..." />
 					</div>
 				</div>
+				<div class="col-sm-3">
+					<label class="font-weight-bold mb-1">Loại phòng</label>
+					<div class="form-outline p-0">
+						<select id="filterKindRoom" class="form-control" name="filterKindRoom">
+							<option value="" selected>Tất cả</option>
+							@foreach (var kindRoom in kindRooms.Data)
+							{
+								<option value="@kindRoom.Id">@kindRoom.InternalCode - @kindRoom.Name</option>
+							}
+						</select>
+					</div>
+				</div>
 				<div class="col-sm-2">
+					<label class="font-weight-bold mb-1">Trạng thái</label>
+					<div class="form-outline p-0">
+						<select id="filterStatus" class="form-control" name="filterStatus">
+							<option value="">Tất cả</option>
+							<option value="E">Trống</option>
+							<option value="B">Đã được đặt</option>
+							<option value="L">Khách đang ở</option>
+							<option value="C">Đang dọn dẹp</option>
+						</select>
+					</div>
 				</div>
-				<div class="col-sm-4">
-				</div>
+				<div class="col-sm-1"></div>
 				<div class="col-sm-2">
 					<div class="text-right">
-						<button type="button" id="createStaff" class="btn btn-primary"
-								data-toggle="modal" data-target="#openPopupCreate">
+						<button type="button" id="create" class="btn btn-primary"
+								data-toggle="modal" data-target="#openPopup">
 							Thêm mới
 						</button>
 					</div>
@@ -47,27 +87,29 @@
 					<th class="th-sm text-center"></th>
 				</tr>
 			</thead>
-			<tbody id="table-body-kind-room">
+			<tbody id="table-body-room">
 				@if (rooms != null)
 				{
 					@foreach (var room in rooms.Data)
 					{
 						<tr>
 							<td class="text-center">
-								<i class=" updatesStaff fa-regular fa-pen-to-square pe-3"
+								<i class=" updates fa-regular fa-pen-to-square pe-3"
 								   style="color:blue;cursor: pointer;"
-								   data-toggle="modal" data-target="#openPopupCreate"></i>
-								<i class="deletesStaff fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
+								   data-toggle="modal" data-target="#openPopup"></i>
+								<i class="deletes fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
 							</td>
 							<td class="text-center d-none" data-id="@room?.Id">@room?.Id</td>
 							<td class="text-nowrap">
 								<div>@room?.InternalCode</div>
 							</td>
-							<td class="text-nowrap">
-								@room?.KindRoomVM?.Name
-							</td>
+							<td class="text-center d-none" data-id="@room?.KindRoom?.Id">@room?.KindRoom?.Id</td>
 							<td class="text-center">
-								@room?.Status
+								@room?.KindRoom?.InternalCode - @room?.KindRoom?.Name
+							</td>
+							<td class="text-center d-none" data-id="@room?.Status">@room?.Status</td>
+							<td class="text-center">
+								@StatusName(room?.Status)
 							</td>
 							<td class="text-center">
 
@@ -101,6 +143,68 @@
 	</nav>
 </div>
 
+@* Modal *@
+<div class="modal fade" id="openPopup" tabindex="-1" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header bg-success">
+				<h1 class="modal-title text-white font-weight-bold" id="modalTitle"></h1>
+				<button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">×</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-12 d-none">
+						<div class="form-group">
+							<input type="text" name="id" value="" />
+						</div>
+					</div>
+
+					<div class="col-12">
+						<div class="form-group">
+							<label class="font-weight-bold mb-2">Mã phòng</label>
+							<input class="form-control" type="text" name="internalCode" />
+							<span class="text-danger" id="internalCodeError"></span>
+						</div>
+					</div>
+
+					<div class="col-12">
+						<div class="form-group">
+							<label class="font-weight-bold mb-2">Loại phòng</label>
+							<select class="form-control" name="kindRoomId">
+								@foreach (var kindRoom in kindRooms.Data)
+								{
+									<option value="@kindRoom.Id" selected>@kindRoom.InternalCode - @kindRoom.Name</option>
+								}
+							</select>
+							<span class="text-danger" id="kindRoomIdError"></span>
+						</div>
+					</div>
+
+					<div class="col-12">
+						<div class="form-group">
+							<label class="font-weight-bold mb-2">Trạng thái</label>
+							<select class="form-control" name="status">
+								<option value="E">Trống</option>
+								<option value="B">Đã được đặt</option>
+								<option value="L">Khách đang ở</option>
+								<option value="C">Đang dọn dẹp</option>
+							</select>
+							<span class="text-danger" id="statusError"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+				<button type="button" id="createButton" class="btn btn-primary">Tạo mới</button>
+				<button type="button" id="updateButton" class="btn btn-primary">Cập nhật</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 @* Đây là JS nè *@
 <script>
 	$("#room-service").addClass("active");
@@ -117,4 +221,316 @@
 
 		$(this).closest(".link-parent").addClass("active");
 	});
+</script>
+
+@* Khởi tạo biến *@
+<script>
+	var createOpen = document.getElementById("create");
+	var updateOpens = document.querySelectorAll(".updates");
+
+
+	var internalCodeInput = $('input[name="internalCode"]');
+	var kindRoomInput = $('input[name=" kindRoom"]');
+	var statusInput = $('input[name="status"]');
+	
+	var searchTimer;
+	var sorted_asc = true;
+</script>
+
+@* Tìm kiếm và lọc *@
+<script>
+	$(document).ready(function () {
+		$('#searchInput').on('input', function () {
+			clearTimeout(searchTimer);
+
+			searchTimer = setTimeout(function () {
+				performSearch();
+			}, 600);
+		});
+
+		$('#filterKindRoom').change(function () {
+			performSearch();
+		});
+
+		$('#filterStatus').change(function () {
+			performSearch();
+		});
+
+		function performSearch() {
+			var searchTerm = $('#searchInput').val();
+			var selectedKindRoom = $('#filterKindRoom').val();
+			var selectedStatus = $('#filterStatus').val();
+
+			$.ajax({
+				url: '/room/index',
+				method: 'GET',
+				data: {
+					search: searchTerm,
+					page: 1,
+					sorts: null,
+					filters: `KindRoomId:${selectedKindRoom},status:${selectedStatus}`
+				},
+				contentType: 'application/json; charset=utf-8',
+				success: function (data) {
+					var newData = $('<tbody>').html(data).find('#table-body-room').html();
+					$('#table-body-room').html(newData);
+
+					var newPaginated = $('<div>').html(data).find('#paginated').html();
+					$('#paginated').html(newPaginated);
+					resetEvent();
+				},
+				error: function (xhr, textStatus, errorThrown) {
+					toastr.error('Lỗi khi thực hiện tìm kiếm!', 'Thông báo');
+				}
+			});
+		}
+	});
+</script>
+
+@* Lắng nghe sự kiện + load giao diện và dữ liệu *@
+<script>
+	function resetEvent() {
+		createOpen.addEventListener("click", function (event) {
+			var rowData = {
+				id: 0,
+				internalCode: "",
+				status: "E",
+				kindRoomId: "1",
+			};
+
+			document.getElementById("modalTitle").innerText = "Thêm phòng mới";
+			document.getElementById("createButton").style.display = "inline-block";
+			document.getElementById("updateButton").style.display = "none";
+
+			loadData(rowData);
+		});
+
+		updateOpens = document.querySelectorAll(".updates");
+		updateOpens.forEach(function (button) {
+			button.addEventListener("click", function () {
+				var parentRow = button.closest("tr");
+				var rowData = {
+					id: parentRow.querySelector("td:nth-child(2)").textContent.trim(),
+					internalCode: parentRow.querySelector("td:nth-child(3)").textContent.trim(),
+					kindRoomId: parentRow.querySelector("td:nth-child(4)").textContent.trim(),
+					status: parentRow.querySelector("td:nth-child(6)").textContent.trim(),
+				};
+				document.getElementById("modalTitle").innerText = "Cập nhật thông tin phòng";
+				document.getElementById("createButton").style.display = "none";
+				document.getElementById("updateButton").style.display = "inline-block";
+
+				loadData(rowData);
+			});
+		});
+
+		$(document).ready(function () {
+			$(".deletes").on("click", function () {
+				var itemId = $(this).closest("tr").find("td[data-id]").data("id");
+
+				$.ajax({
+					url: "/room/delete?pId=" + itemId,
+					method: "DELETE",
+					success: function (data) {
+						$.ajax({
+							url: "/room/index",
+							method: "GET",
+							success: function (data) {
+								var newData = $('<tbody>').html(data).find('#table-body-room').html();
+								$('#table-body-room').html(newData);
+
+								var newPaginated = $('<div>').html(data).find('#paginated').html();
+								$('#paginated').html(newPaginated);
+
+								resetEvent();
+							},
+						});
+						toastr.success('Xoá nhân viên thành công!', 'Thông báo');
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Xoá nhân viên thất bại!', 'Thông báo');
+					}
+				});
+			});
+		});
+
+
+		$(document).ready(function () {
+			$('.pagination a').on('click', function (e) {
+				e.preventDefault();
+				var page = $(this).data('page');
+				paginatedResult(page);
+			});
+		});
+
+		function paginatedResult(page) {
+			$.ajax({
+				url: `/room/index?page=${page}`,
+				method: 'GET',
+				success: function (data) {
+					var newData = $('<tbody>').html(data).find('#table-body-room').html();
+					$('#table-body-room').html(newData);
+
+					updatePagination(page);
+				},
+			});
+		}
+
+		function updatePagination(activePage) {
+			$('.pageCurrent').removeClass('active');
+			$('.pagination a[data-page="' + activePage + '"]').addClass('active').closest('.pageCurrent').addClass('active');
+		}
+	}
+
+
+
+	function loadData(data) {
+		document.querySelector('input[name="id"]').value = data.id;
+		document.querySelector('input[name="internalCode"]').value = data.internalCode;
+		document.querySelector('select[name="kindRoomId"]').value = data.kindRoomId;
+		document.querySelector('select[name="status"]').value = data.status;
+
+		removeValidator();
+	}
+
+	function removeValidator() {
+		$(".text-danger").text("");
+
+		internalCodeInput.removeClass("border-danger");
+		kindRoomInput.removeClass("border-danger");
+		statusInput.removeClass("border-danger");
+	}
+
+	resetEvent();
+</script>
+
+@* Gọi controller xử lý *@
+<script>
+	$(document).ready(function () {
+		$("#createButton").on("click", function (e) {
+			e.preventDefault();
+
+			removeValidator();
+
+			var pRequest = getData();
+			pRequest.id = 0;
+
+			var isValid = validateForm(pRequest);
+
+			if (isValid) {
+				$.ajax({
+					url: "/room/create",
+					method: "POST",
+					data: JSON.stringify(pRequest),
+					contentType: "application/json; charset=utf-8",
+					success: function (data) {
+						if (data.success) {
+							$.ajax({
+								url: "/room/index",
+								method: "GET",
+								data: { page: 1 },
+								contentType: "application/json; charset=utf-8",
+								success: function (data) {
+									var newData = $('<tbody>').html(data).find('#table-body-room').html();
+									$('#table-body-room').html(newData);
+
+									var newPaginated = $('<div>').html(data).find('#paginated').html();
+									$('#paginated').html(newPaginated);
+
+									$('.btn-secondary[data-dismiss="modal"]').click();
+
+									resetEvent();
+								},
+							});
+							toastr.success('Thêm mới phòng thành công!', 'Thông báo');
+						} else {
+							toastr.error(data.errors[0], 'Thông báo');
+						}
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Thêm mới phòng thất bại!', 'Thông báo');
+					}
+				});
+			}
+		});
+
+		$("#updateButton").on("click", function (e) {
+			e.preventDefault();
+
+			removeValidator();
+
+			var pRequest = getData();
+
+			var isValid = validateForm(pRequest);
+
+			if (isValid) {
+				$.ajax({
+					url: "/room/update",
+					method: "PUT",
+					data: JSON.stringify(pRequest),
+					contentType: "application/json; charset=utf-8",
+					success: function (data) {
+						$.ajax({
+							url: "/room/index",
+							method: "GET",
+							data: { page: 1 },
+							contentType: "application/json; charset=utf-8",
+							success: function (data) {
+								var newData = $('<tbody>').html(data).find('#table-body-room').html();
+								$('#table-body-room').html(newData);
+
+								$('.btn-secondary[data-dismiss="modal"]').click();
+
+								resetEvent();
+							},
+						});
+						toastr.success('Cập nhật thông tin phòng thành công!', 'Thông báo');
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Cập nhật thông tin phòng thất bại!', 'Thông báo');
+					}
+				});
+			}
+		});
+	});
+
+	function getData() {
+		var formData = {
+			id: $('input[name="id"]').val() || null,
+			internalCode: $('input[name="internalCode"]').val() || null,
+			kindRoomId: $('select[name="kindRoomId"]').val() || null,
+			status: $('select[name="status"]').val() || null
+		};
+		return formData;
+	}
+
+	function validateForm(data) {
+		var isValid = true;
+
+		// Validate internalCode
+		if (!data.internalCode) {
+			$("#internalCodeError").text("Mã phòng không được để trống");
+			$('input[name="internalCode"]').addClass("border-danger");
+			isValid = false;
+		} else if (data.internalCode.length > 100) {
+			$("#internalCodeError").text("Mã phòng không được vượt quá 100 ký tự.");
+			$('input[name="internalCode"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		// Validate KindRoomdId
+		if (!data.kindRoomId) {
+			$("#kindRoomIdError").text("Loại phòng không được để trống");
+			$('select[name="kindRoomId"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		// Validate status
+		if (!data.status) {
+			$("#statusError").text("Trạng thái không được để trống");
+			$('select[name="status"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		return isValid;
+	}
 </script>

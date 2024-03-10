@@ -9,16 +9,24 @@ namespace Presentation.Web.Controllers.Admin
 	public class RoomController : Controller
 	{
 		private readonly IRoomService _roomService;
+		private readonly IKindRoomService _kindRoomService;
 
-		public RoomController(IRoomService pRoomService)
+		public RoomController(IRoomService pRoomService, IKindRoomService pKindRoomService)
 		{
 			_roomService = pRoomService;
+			_kindRoomService = pKindRoomService;
 		}
 
 		[HttpGet()]
 		public async Task<IActionResult> Index([FromQuery] BaseListRQ pRequest)
 		{
 			ViewBag.List = await _roomService.List(pRequest);
+			var kindRoomRQ = new BaseListRQ
+			{
+				Page = 1,
+				PageSize = -1,
+			};
+			ViewBag.KindRooms = await _kindRoomService.List(kindRoomRQ);
 
 			return View();
 		}
