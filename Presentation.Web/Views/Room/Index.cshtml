@@ -37,10 +37,31 @@
 						<input type="search" class="form-control" id="searchInput" placeholder="Tìm kiếm..." />
 					</div>
 				</div>
+				<div class="col-sm-3">
+					<label class="font-weight-bold mb-1">Loại phòng</label>
+					<div class="form-outline p-0">
+						<select id="filterKindRoom" class="form-control" name="filterKindRoom">
+							<option value="" selected>Tất cả</option>
+							@foreach (var kindRoom in kindRooms.Data)
+							{
+								<option value="@kindRoom.Id">@kindRoom.InternalCode - @kindRoom.Name</option>
+							}
+						</select>
+					</div>
+				</div>
 				<div class="col-sm-2">
+					<label class="font-weight-bold mb-1">Trạng thái</label>
+					<div class="form-outline p-0">
+						<select id="filterStatus" class="form-control" name="filterStatus">
+							<option value="">Tất cả</option>
+							<option value="E">Trống</option>
+							<option value="B">Đã được đặt</option>
+							<option value="L">Khách đang ở</option>
+							<option value="C">Đang dọn dẹp</option>
+						</select>
+					</div>
 				</div>
-				<div class="col-sm-4">
-				</div>
+				<div class="col-sm-1"></div>
 				<div class="col-sm-2">
 					<div class="text-right">
 						<button type="button" id="create" class="btn btn-primary"
@@ -227,8 +248,18 @@
 			}, 600);
 		});
 
+		$('#filterKindRoom').change(function () {
+			performSearch();
+		});
+
+		$('#filterStatus').change(function () {
+			performSearch();
+		});
+
 		function performSearch() {
 			var searchTerm = $('#searchInput').val();
+			var selectedKindRoom = $('#filterKindRoom').val();
+			var selectedStatus = $('#filterStatus').val();
 
 			$.ajax({
 				url: '/room/index',
@@ -237,6 +268,7 @@
 					search: searchTerm,
 					page: 1,
 					sorts: null,
+					filters: `KindRoomId:${selectedKindRoom},status:${selectedStatus}`
 				},
 				contentType: 'application/json; charset=utf-8',
 				success: function (data) {

@@ -26,7 +26,7 @@ namespace Presentation.Web.Controllers.Admin
 				Page = 1,
 				PageSize = -1,
 			};
-			ViewBag.KindRooms = await _kindRoomService.List(pRequest);
+			ViewBag.KindRooms = await _kindRoomService.List(kindRoomRQ);
 
 			return View();
 		}

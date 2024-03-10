@@ -19,6 +19,7 @@ namespace Core.Application.Services
 		{
 			query = query.Where(x =>
 				x.InternalCode.ToLower().Contains(keyword) ||
+				x.KindRoom.InternalCode.ToLower().Contains(keyword) ||
 				x.KindRoom.Name.ToLower().Contains(keyword));
 
 			return query.AsQueryable();
