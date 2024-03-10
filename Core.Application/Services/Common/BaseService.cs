@@ -45,15 +45,32 @@ namespace Core.Application.Services.Common
 				query = QueryableExtensions.ApplySorting(query, pRequest.Sorts);
 			}
 
+			query = Query(query);
+
 			var totalItems = await query.CountAsync();
-			var entityResult = await query
+
+			if (pRequest.PageSize == -1)
+			{
+				var entityResult = await query.ToListAsync();
+
+				var viewModels = _mapper.Map<List<TViewModel>>(entityResult);
+				return new PaginatedResult<TViewModel>(viewModels, totalItems, pRequest.Page, pRequest.PageSize);
+			}
+			else
+			{
+				var entityResult = await query
 						.Skip(((int)pRequest.Page - 1) * (int)pRequest.PageSize)
 						.Take((int)pRequest.PageSize)
 						.ToListAsync();
 
-			var viewModels = _mapper.Map<List<TViewModel>>(entityResult);
+				var viewModels = _mapper.Map<List<TViewModel>>(entityResult);
+				return new PaginatedResult<TViewModel>(viewModels, totalItems, pRequest.Page, pRequest.PageSize);
+			}
+		}
 
-			return new PaginatedResult<TViewModel>(viewModels, totalItems, pRequest.Page, pRequest.PageSize);
+		protected virtual IQueryable<TEntity> Query(IQueryable<TEntity> query)
+		{
+			return query.AsQueryable();
 		}
 
 		protected virtual IQueryable<TEntity> ApplySearch(IQueryable<TEntity> query, string keyword)

@@ -5,6 +5,7 @@ using Core.Application.Services.Common;
 using Core.Application.ViewModels.Common;
 using Core.Application.ViewModels.Rooms;
 using Core.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Core.Application.Services
 {
@@ -21,6 +22,13 @@ namespace Core.Application.Services
 				x.KindRoom.Name.ToLower().Contains(keyword));
 
 			return query.AsQueryable();
+		}
+
+		protected override IQueryable<Room> Query(IQueryable<Room> query)
+		{
+			query = query.Include(x => x.KindRoom);
+
+			return base.Query(query);
 		}
 	}
 

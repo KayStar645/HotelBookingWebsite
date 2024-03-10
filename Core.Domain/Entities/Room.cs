@@ -24,5 +24,22 @@ namespace Core.Domain.Entities
 
 		[ForeignKey("KindRoomId")]
 		public KindRoom? KindRoom { get; set; }
+
+		public static string GetStatusName(string status)
+		{
+			switch (status)
+			{
+				case STATUS_EMPTY:
+					return "Trống";
+				case STATUS_BOOKED:
+					return "Đã được đặt";
+				case STATUS_LIVE:
+					return "Khách đang ở";
+				case STATUS_CLEANING:
+					return "Đang dọn dẹp";
+				default:
+					return "Không xác định";
+			}
+		}
 	}
 }
