@@ -124,7 +124,6 @@
 	</nav>
 </div>
 
-
 <!-- Modal -->
 <div class="modal fade" id="openPopupCreate" tabindex="-1" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -296,35 +295,6 @@
 	});
 </script>
 
-@* Phân trang *@
-<script>
-	$(document).ready(function () {
-		$('.pagination a').on('click', function (e) {
-			e.preventDefault();
-			var page = $(this).data('page');
-			paginatedResult(page);
-		});
-	});
-
-	function paginatedResult(page) {
-		$.ajax({
-			url: `/staff/index?page=${page}`,
-			method: 'GET',
-			success: function (data) {
-				var newData = $('<tbody>').html(data).find('#table-body-staff').html();
-				$('#table-body-staff').html(newData);
-
-				updatePagination(page);
-			},
-		});
-	}
-
-	function updatePagination(activePage) {
-		$('.pageCurrent').removeClass('active');
-		$('.pagination a[data-page="' + activePage + '"]').addClass('active').closest('.pageCurrent').addClass('active');
-	}
-</script>
-
 @* Lắng nghe sự kiện + load giao diện và dữ liệu *@
 <script>
 	function resetButtonClick() {
@@ -397,6 +367,33 @@
 				});
 			});
 		});
+
+
+		$(document).ready(function () {
+			$('.pagination a').on('click', function (e) {
+				e.preventDefault();
+				var page = $(this).data('page');
+				paginatedResult(page);
+			});
+		});
+
+		function paginatedResult(page) {
+			$.ajax({
+				url: `/staff/index?page=${page}`,
+				method: 'GET',
+				success: function (data) {
+					var newData = $('<tbody>').html(data).find('#table-body-staff').html();
+					$('#table-body-staff').html(newData);
+
+					updatePagination(page);
+				},
+			});
+		}
+
+		function updatePagination(activePage) {
+			$('.pageCurrent').removeClass('active');
+			$('.pagination a[data-page="' + activePage + '"]').addClass('active').closest('.pageCurrent').addClass('active');
+		}
 	}
 
 

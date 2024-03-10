@@ -24,8 +24,8 @@
 				</div>
 				<div class="col-sm-2">
 					<div class="text-right">
-						<button type="button" id="createStaff" class="btn btn-primary"
-								data-toggle="modal" data-target="#openPopupCreate">
+						<button type="button" id="create" class="btn btn-primary"
+								data-toggle="modal" data-target="#openPopup">
 							Thêm mới
 						</button>
 					</div>
@@ -54,10 +54,10 @@
 					{
 						<tr>
 							<td class="text-center">
-								<i class=" updatesStaff fa-regular fa-pen-to-square pe-3"
+								<i class=" updates fa-regular fa-pen-to-square pe-3"
 								   style="color:blue;cursor: pointer;"
 								   data-toggle="modal" data-target="#openPopupCreate"></i>
-								<i class="deletesStaff fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
+								<i class="deletes fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
 							</td>
 							<td class="text-center d-none" data-id="@room?.Id">@room?.Id</td>
 							<td class="text-nowrap">
@@ -99,6 +99,32 @@
 			}
 		</ul>
 	</nav>
+</div>
+
+@* Modal *@
+<div class="modal fade" id="openPopup" tabindex="-1" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header bg-success">
+				<h1 class="modal-title text-white font-weight-bold" id="modalTitle">Thêm phòng mới</h1>
+				<button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">×</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-lg-12">
+						
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+				<button type="button" id="createButton" class="btn btn-primary">Tạo mới</button>
+				<button type="button" id="updateButton" class="btn btn-primary">Cập nhật</button>
+			</div>
+		</div>
+	</div>
 </div>
 
 @* Đây là JS nè *@
