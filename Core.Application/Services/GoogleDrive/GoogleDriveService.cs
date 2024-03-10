@@ -10,7 +10,7 @@ namespace Core.Application.Services.GoogleDrive
 	public class GoogleDriveService : IGoogleDriveService
 	{
 		private const string _credentialsPath = "../Core.Application/Services/GoogleDrive/client_secret.json";
-		private const string _folderId = "1T12wTE6cGjqOBJ2pTGo3vxGfXT3mELdq";
+		private const string _folderId = "13XaluYzIoP00trCTgItR6n3tCZvGY8Sd";
 		private const string _path = "https://drive.google.com/uc?id=";
 
 
@@ -71,7 +71,18 @@ namespace Core.Application.Services.GoogleDrive
 
 				if (existingFiles != null && existingFiles.Count > 0)
 				{
-					throw new BadRequestException($"File có tên '{pRequest.FileName + fileExtension}' đã tồn tại!");
+					// File đã tồn tại, xử lý tương ứng
+					var existingFile = existingFiles.FirstOrDefault();
+
+					var result = new UploadVM
+					{
+						Name = fileName,
+						Path = $"{_path}{existingFile.Id}",
+						Type = existingFile.MimeType,
+						SizeInBytes = existingFile.Size
+					};
+
+					return result;
 				}
 				else
 				{
@@ -101,7 +112,6 @@ namespace Core.Application.Services.GoogleDrive
 
 						return result;
 					}
-
 				}
 			}
 		}

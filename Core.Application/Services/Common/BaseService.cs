@@ -106,8 +106,9 @@ namespace Core.Application.Services.Common
 			{
 				throw new BadRequestException($"Id = {pRequest.Id} không tồn tại!");
 			}
+			var newEntity = _mapper.Map<TEntity>(pRequest);
 
-			entity.CopyPropertiesFrom(pRequest);
+			entity.CopyPropertiesFrom(newEntity);
 
 			var updatedEntity = _context.Set<TEntity>().Update(entity);
 			await _context.SaveChangesAsync(default(CancellationToken));
