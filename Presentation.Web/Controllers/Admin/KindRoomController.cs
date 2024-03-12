@@ -37,6 +37,15 @@ namespace Presentation.Web.Controllers.Admin
 		{
 			try
 			{
+				var modelStateErrors = ModelState.Values
+					.SelectMany(v => v.Errors)
+					.Select(e => e.ErrorMessage)
+					.ToList();
+				if (modelStateErrors.Any())
+				{
+					return Json(new { success = false, errors = modelStateErrors });
+				}
+
 				await _kindRoomService.Create(pRequest);
 				return Json(new { success = true });
 			}
@@ -56,6 +65,15 @@ namespace Presentation.Web.Controllers.Admin
 		{
 			try
 			{
+				var modelStateErrors = ModelState.Values
+					.SelectMany(v => v.Errors)
+					.Select(e => e.ErrorMessage)
+					.ToList();
+				if (modelStateErrors.Any())
+				{
+					return Json(new { success = false, errors = modelStateErrors });
+				}
+
 				await _kindRoomService.Update(pRequest);
 				return Json(new { success = true });
 			}

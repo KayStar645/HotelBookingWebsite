@@ -1,9 +1,10 @@
 ﻿using Core.Domain.Common;
+using Core.Domain.Common.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core.Domain.Entities
 {
-	public class Room : AuditableEntity
+	public class Room : AuditableEntity, IInternalCode
 	{
 		[NotMapped]
 		public const string STATUS_EMPTY = "E";

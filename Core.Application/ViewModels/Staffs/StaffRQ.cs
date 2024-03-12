@@ -1,11 +1,14 @@
 ﻿using Core.Application.ViewModels.Common;
+using Core.Application.ViewModels.Common.ValidationAttributes;
+using Core.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
 
 namespace Core.Application.ViewModels.Staffs
 {
-    public class StaffRQ : BaseRQ
+	public class StaffRQ : BaseRQ
 	{
 		[Required(ErrorMessage = "Mã nhân viên là trường bắt buộc.")]
+		[InternalCode<Staff, StaffRQ>(ErrorMessage = "Mã nhân viên đã tồn tại.")]
 		public string? InternalCode { get; set; }
 
 		[Required(ErrorMessage = "Tên nhân viên là trường bắt buộc.")]

@@ -269,8 +269,13 @@
 					method: "POST",
 					data: JSON.stringify(pRequest),
 					contentType: "application/json; charset=utf-8",
-					success: function(data) {
-						window.location.href = "/kindroom"
+					success: function (data) {
+						if (data.success) {
+							window.location.href = "/kindroom"
+						}
+						else {
+							toastr.error(data.errors[0], 'Thông báo');
+						}
 					},
 					error: function (xhr, textStatus, errorThrown) {
 						toastr.error('Thêm mới loại phòng thất bại!', 'Thông báo');
@@ -295,7 +300,12 @@
 					data: JSON.stringify(pRequest),
 					contentType: "application/json; charset=utf-8",
 					success: function (data) {
-						window.location.href = "/kindroom"
+						if (data.success) {
+							window.location.href = "/kindroom"
+						}
+						else {
+							toastr.error(data.errors[0], 'Thông báo');
+						}
 					},
 					error: function (xhr, textStatus, errorThrown) {
 						toastr.error('Cập nhật loại phòng thất bại!', 'Thông báo');

@@ -1,4 +1,5 @@
 ﻿using Core.Application.ViewModels.Common;
+using Core.Application.ViewModels.Common.ValidationAttributes;
 using Core.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
 
@@ -7,6 +8,7 @@ namespace Core.Application.ViewModels.Rooms
 	public class RoomRQ : BaseRQ
 	{
 		[Required(ErrorMessage = "Mã phòng là trường bắt buộc.")]
+		[InternalCode<Room, RoomRQ>(ErrorMessage = "Mã phòng đã tồn tại.")]
 		public string? InternalCode { get; set; }
 
 		[Required(ErrorMessage = "Loại phòng là trường bắt buộc.")]
