@@ -1,4 +1,5 @@
-﻿using Core.Domain.Entities;
+﻿using Core.Domain.Auth;
+using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Core.Application.Interfaces.Common
@@ -9,7 +10,15 @@ namespace Core.Application.Interfaces.Common
         DbSet<KindRoom> KindRooms { get; }
         DbSet<Room> Rooms { get; }
 
-        DbSet<TEntity> Set<TEntity>() where TEntity : class;
+		DbSet<User> Users { get; }
+		DbSet<Role> Roles { get; }
+		DbSet<Permission> Permissions { get; }
+		DbSet<UserRole> UserRoles { get; }
+		DbSet<RolePermission> RolePermissions { get; }
+		DbSet<UserPermission> UserPermissions { get; }
+
+
+		DbSet<TEntity> Set<TEntity>() where TEntity : class;
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }

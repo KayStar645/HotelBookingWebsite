@@ -1,4 +1,5 @@
-﻿using Core.Domain.Common;
+﻿using Core.Domain.Auth;
+using Core.Domain.Common;
 using Core.Domain.Common.Interfaces;
 
 namespace Core.Domain.Entities
@@ -16,5 +17,7 @@ namespace Core.Domain.Entities
         public string? Address { get; set; }
 
         public string? Phone { get; set; }
+
+        public User? User { get; set; }
     }
 }

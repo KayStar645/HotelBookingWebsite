@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Presentation.Web.Controllers.Admin
+namespace Presentation.Web.Controllers.Auth
 {
-	public class AdminController : Controller
+	public class AccountController : Controller
 	{
 		public IActionResult Login()
 		{

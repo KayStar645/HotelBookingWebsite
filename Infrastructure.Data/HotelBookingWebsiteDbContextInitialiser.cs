@@ -1,8 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Data
 {
-    public class HotelBookingWebsiteDbContextInitialiser
+	public class HotelBookingWebsiteDbContextInitialiser
     {
         private readonly ILogger<HotelBookingWebsiteDbContextInitialiser> _logger;
         private readonly HotelBookingWebsiteDbContext _context;
@@ -17,7 +18,7 @@ namespace Infrastructure.Data
         {
             try
             {
-                //await _context.Database.MigrateAsync();
+                await _context.Database.MigrateAsync();
             }
             catch (Exception ex)
             {
