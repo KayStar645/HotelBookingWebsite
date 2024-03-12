@@ -73,9 +73,12 @@
 				<label class="font-weight-bold mb-2">Hình ảnh</label>
 				<input type="file" id="imageInput" accept="image/*">
 				<div id="imageContainer">
-					@foreach (var img in kindRoom.Images)
+					@if(kindRoom != null)
 					{
-						<img src="@img" alt="Hình ảnh mô tả loại phòng">
+						@foreach (var img in kindRoom.Images)
+						{
+							<img src="@img" alt="Hình ảnh mô tả loại phòng">
+						}
 					}
 				</div>
 				<span class="text-danger" id="imagesError"></span>
