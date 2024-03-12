@@ -20,9 +20,10 @@ namespace Infrastructure.Data
         public DbSet<Staff> Staffs => Set<Staff>();
 		public DbSet<KindRoom> KindRooms => Set<KindRoom>();
 		public DbSet<Room> Rooms => Set<Room>();
+        public DbSet<Service> Services => Set<Service>();
 
 
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
