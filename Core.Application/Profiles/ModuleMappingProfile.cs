@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Core.Application.ViewModels.KindRooms;
 using Core.Application.ViewModels.Rooms;
+using Core.Application.ViewModels.Services;
 using Core.Application.ViewModels.Staffs;
 using Core.Domain.Entities;
 
@@ -18,6 +19,9 @@ namespace Core.Application.Profiles
 
 			CreateMap<Room, RoomRQ>().ReverseMap();
 			CreateMap<Room, RoomVM>().ReverseMap();
-		}
+
+            CreateMap<Service, ServiceRQ>().ReverseMap();
+            CreateMap<Service, ServiceVM>().ReverseMap();
+        }
     }
 }

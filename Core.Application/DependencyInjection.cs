@@ -23,6 +23,7 @@ namespace Core.Application
 			services.AddScoped<IStaffService, StaffService>();
 			services.AddScoped<IKindRoomService, KindRoomService>();
 			services.AddScoped<IRoomService, RoomService>();
+			services.AddScoped<IServiceService, ServiceService>();
 
 			return services;
 		}

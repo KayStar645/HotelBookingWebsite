@@ -8,6 +8,7 @@ namespace Core.Application.Interfaces.Common
         DbSet<Staff> Staffs { get; }
         DbSet<KindRoom> KindRooms { get; }
         DbSet<Room> Rooms { get; }
+        DbSet<Service> Services { get; }
 
         DbSet<TEntity> Set<TEntity>() where TEntity : class;
 
