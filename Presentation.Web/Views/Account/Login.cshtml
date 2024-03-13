@@ -115,7 +115,6 @@
 						data: JSON.stringify(pRequest),
 						contentType: "application/json; charset=utf-8",
 						success: function (data) {
-							console.log(data);
 							if (data.success) {
 								if (data.data.type == "admin" || data.data.type == "super admin") {
 									window.location.href = "/dashboard";

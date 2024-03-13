@@ -1,10 +1,40 @@
-using Core.Application;
+﻿using Core.Application;
 using Infrastructure.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
 using Presentation.Web;
+using Presentation.Web.Middleware;
+using System.Reflection;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = builder.Configuration.GetValue<string>("JwtSettings:Issuer"),
+                        ValidAudience = builder.Configuration.GetValue<string>("JwtSettings:Audience"),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]))
+                    };
+                });
+builder.Services.AddSingleton<IAuthorizationHandler, PermissionRequirementHandler>();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPermissionPoliciesFromAttributes(Assembly.GetExecutingAssembly());
+});
+
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddTransient<ExceptionMiddleware>();
 
 // Add services to the container.
 
@@ -31,10 +61,15 @@ if (app.Environment.IsDevelopment())
 	await initializer.SeedAsync();
 }
 
+app.UseAuthentication();
+
 app.UseHttpsRedirection();
+
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseAuthorization();
 

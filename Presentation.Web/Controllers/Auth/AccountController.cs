@@ -2,6 +2,7 @@
 using Core.Application.Exceptions;
 using Core.Application.Interfaces.Auth;
 using Core.Application.ViewModels.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Web.Controllers.Auth
@@ -16,12 +17,14 @@ namespace Presentation.Web.Controllers.Auth
 		}
 
 		[HttpGet]
+		[AllowAnonymous]
 		public IActionResult Login()
 		{
 			return View();
 		}
 
 		[HttpPost]
+		[AllowAnonymous]
 		public async Task<IActionResult> Login([FromBody] LoginRQ pRequest)
 		{
 			try
@@ -37,7 +40,7 @@ namespace Presentation.Web.Controllers.Auth
 
 				var result = await _accountService.LoginAsync(pRequest);
 
-				Response.Cookies.Append("Token", result.Token, new CookieOptions
+				Response.Cookies.Append("Token", "Bearer " + result.Token, new CookieOptions
 				{
 					Expires = DateTime.Now.AddDays(100),
 					Secure = true,
