@@ -61,8 +61,8 @@ if (app.Environment.IsDevelopment())
 	using var scope = app.Services.CreateScope();
 	var initializer = scope.ServiceProvider.GetRequiredService<HotelBookingWebsiteDbContextInitialiser>();
 	await initializer.InitializeAsync();
-	await initializer.SeedAsync();
 	InitializePermissions(builder.Services.BuildServiceProvider()).GetAwaiter().GetResult();
+	await initializer.SeedAsync();
 }
 
 app.UseAuthentication();
