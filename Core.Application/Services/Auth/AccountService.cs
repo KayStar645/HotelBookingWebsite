@@ -79,6 +79,7 @@ namespace Core.Application.Services.Auth
 				{
 					Id = user.Id,
 					Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
+					Type = user.Type
 				};
 
 				return auth;

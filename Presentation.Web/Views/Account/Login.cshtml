@@ -19,6 +19,9 @@
 	<link rel="stylesheet" type="text/css" href="~/vendor/daterangepicker/daterangepicker.css">
 	<link rel="stylesheet" type="text/css" href="~/css/util.css">
 	<link rel="stylesheet" type="text/css" href="~/css/login.css">
+	<link rel="stylesheet" href="~/css/toastr.min.css">
+	<script src="~/assets/js/jquery-3.5.1.min.js"></script>
+	<script src="~/js/toastr.min.js"></script>
 </head>
 <body style="background-color: #666666;">
 
@@ -31,20 +34,22 @@
 					</span>
 
 
-					<div class="wrap-input100 validate-input" data-validate="Tài khoản là bắt buộc">
+					<div class="wrap-input100 validate-input">
 						<input class="input100" type="text" name="userName">
 						<span class="focus-input100"></span>
 						<span class="label-input100">Tài khoản</span>
+						<span class="text-danger" id="userNameError"></span>
 					</div>
 
 
-					<div class="wrap-input100 validate-input" data-validate="Mật khẩu là bắt buộc">
-						<input class="input100" type="password" name="pass">
+					<div class="wrap-input100 validate-input mt-5">
+						<input class="input100" type="password" name="password">
 						<span class="focus-input100"></span>
 						<span class="label-input100">Mật khẩu</span>
+						<span class="text-danger" id="passwordError"></span>
 					</div>
 
-					<div class="flex-sb-m w-full p-t-3 p-b-32">
+					<div class="flex-sb-m w-full p-t-3 p-b-32 mt-5">
 						<div class="contact100-form-checkbox">
 							<input class="input-checkbox100" id="ckb1" type="checkbox" name="remember-me">
 							<label class="label-checkbox100" for="ckb1">
@@ -53,7 +58,7 @@
 						</div>
 
 						<div>
-							<a href="/" class="txt1">
+							<a href="~/" class="txt1">
 								Quên mật khẩu?
 							</a>
 						</div>
@@ -61,7 +66,7 @@
 
 
 					<div class="container-login100-form-btn">
-						<button class="login100-form-btn">
+						<button id="login" class="login100-form-btn">
 							Đăng nhập
 						</button>
 					</div>
@@ -73,15 +78,92 @@
 		</div>
 	</div>
 
-	<script src="~/vendor/jquery/jquery-3.2.1.min.js"></script>
-	<script src="~/vendor/animsition/js/animsition.min.js"></script>
-	<script src="~/vendor/bootstrap/js/popper.js"></script>
-	<script src="~/vendor/bootstrap/js/bootstrap.min.js"></script>
-	<script src="~/vendor/select2/select2.min.js"></script>
-	<script src="~/vendor/daterangepicker/moment.min.js"></script>
-	<script src="~/vendor/daterangepicker/daterangepicker.js"></script>
-	<script src="~/vendor/countdowntime/countdowntime.js"></script>
+	<script src="/vendor/jquery/jquery-3.2.1.min.js"></script>
+	<script src="/vendor/animsition/js/animsition.min.js"></script>
+	<script src="/vendor/bootstrap/js/popper.js"></script>
+	<script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+	<script src="/vendor/select2/select2.min.js"></script>
+	<script src="/vendor/daterangepicker/moment.min.js"></script>
+	<script src="/vendor/daterangepicker/daterangepicker.js"></script>
+	<script src="/vendor/countdowntime/countdowntime.js"></script>
 	<script src="~/js/login.js"></script>
+
+	@* Gọi Controller xử lý *@
+	<script>
+		$(document).ready(function () {
+			$('input[name="userName"]').on("focus", function () {
+				var pRequest = getData();
+				validateForm(pRequest);
+				$("#userNameError").text("");
+			});
+
+			$('input[name="password"]').on("focus", function () {
+				var pRequest = getData();
+				validateForm(pRequest);
+				$("#passwordError").text("");
+			});
+
+			$("#login").on("click", function (e) {
+				e.preventDefault();
+
+				var pRequest = getData();
+
+				if (validateForm(pRequest)) {
+					$.ajax({
+						url: "/account/login",
+						method: "POST",
+						data: JSON.stringify(pRequest),
+						contentType: "application/json; charset=utf-8",
+						success: function (data) {
+							console.log(data);
+							if (data.success) {
+								if (data.data.type == "admin" || data.data.type == "super admin") {
+									console.log("a");
+									window.location.href = "/dashboard";
+								}
+								else {
+									console.log("b");
+									//window.location.href = "/";
+								}
+							} else {
+								toastr.error(data.errors[0], 'Thông báo');
+							}
+						},
+						error: function (xhr, textStatus, errorThrown) {
+							toastr.error('Đăng nhập thất bại!', 'Thông báo');
+						}
+					});
+				}
+			});
+		});
+
+		function getData() {
+			$("#userNameError").text("");
+			$("#passwordError").text("");
+
+			var data = {
+				userName: document.querySelector('input[name="userName"]').value ?? null,
+				password: document.querySelector('input[name="password"]').value ?? null
+			}
+			return data;
+		}
+
+		function validateForm(data) {
+			var isValid = true;
+			
+			if (data.userName == "") {
+				isValid = false;
+				$("#userNameError").text("Trường tài khoản là bắt buộc");
+			}
+			
+			if (data.password == "") {
+				isValid = false;
+				$("#passwordError").text("Trường mật khẩu là bắt buộc");
+			}
+
+			return isValid;
+		}
+	</script>
 
 </body>
 </html>
