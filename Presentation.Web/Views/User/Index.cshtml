@@ -1,0 +1,104 @@
+﻿@using Core.Application.Responses
+@using Core.Application.ViewModels.Auth
+@{
+    var users = ViewBag.list as PaginatedResult<UserVM>;
+}
+
+@section TitleHeader
+{
+	<div class="row">
+		<div class="col-sm-12 mt-3">
+			<h3 class="page-title mt-3">
+				Danh sách người dùng
+			</h3>
+			<div class="row mt-3">
+				<div class="col-sm-4">
+					<label class="font-weight-bold mb-1">Tìm kiếm</label>
+					<div class="form-outline p-0" data-mdb-input-init>
+						<input type="search" class="form-control" id="searchInput" placeholder="Tìm kiếm..." />
+					</div>
+				</div>
+				<div class="col-sm-2">
+					
+				</div>
+				<div class="col-sm-4">
+				</div>
+				<div class="col-sm-2">
+					<div class="text-right">
+						<button type="button" id="create" class="btn btn-primary"
+								data-toggle="modal" data-target="#openPopup">
+							Thêm mới
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+<div class="card-body">
+	<div class="table-responsive" style="overflow-y: auto;">
+		<table class="table table-hover table-center table-striped table-bordered">
+			<thead>
+				<tr>
+					<th class="min-vw-10"></th>
+					<th class="th-sm text-nowrap">Tên đăng nhập</th>
+					<th class="th-sm text-right">Email</th>
+					<th class="th-sm text-right">Số điện thoại</th>
+					<th class="th-sm text-nowrap">Vai trò</th>
+					<th class="th-sm text-nowrap">Quyền</th>
+					<th class="th-sm text-center">Loại</th>
+				</tr>
+			</thead>
+			<tbody id="table-body-room">
+				@if (users != null)
+				{
+					@foreach (var user in users.Data)
+					{
+						<tr>
+							<td class="text-center">
+								<i class=" updates fa-regular fa-pen-to-square pe-3"
+								   style="color:blue;cursor: pointer;"
+								   data-toggle="modal" data-target="#openPopup"></i>
+								<i class="deletes fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
+							</td>
+							<td class="text-center d-none" data-id="@user?.Id">@user?.Id</td>
+							<td class="text-nowrap">
+								@user?.UserName
+							</td>
+							<td class="text-right">
+								@user?.Email
+							</td>
+							<td class="text-right">
+								@user?.PhoneNumber
+							</td>
+							<td class="text-nowrap">
+								@string.Join(",", user?.Roles)
+							</td>
+							<td class="text-nowrap">
+								@string.Join(",", user?.Permissions)
+							</td>
+							<td class="text-center">
+								<div>@user?.Type</div>
+							</td>
+						</tr>
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+@* Phân trang *@
+<div id="paginated" class="d-flex justify-content-end mt-4">
+	<nav aria-label="Page navigation example">
+		<ul class="pagination">
+			@for (int i = 1; i <= users.Extra.TotalPages; i++)
+			{
+				<li class="page-item pageCurrent @(users.Extra.CurrentPage == i ? "active" : "")">
+					<a class="page-link" data-page="@i">@i</a>
+				</li>
+			}
+		</ul>
+	</nav>
+</div>

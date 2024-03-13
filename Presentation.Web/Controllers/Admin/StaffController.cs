@@ -2,6 +2,7 @@
 using Core.Application.Interfaces;
 using Core.Application.ViewModels.Common;
 using Core.Application.ViewModels.Staffs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Web.Middleware;
 
@@ -18,7 +19,8 @@ namespace Presentation.Web.Controllers.Admin
 
 		[HttpGet]
 		[Permission("staff-view")]
-		public async Task<IActionResult> Index([FromQuery] BaseListRQ pRequest)
+        [AllowAnonymous]
+        public async Task<IActionResult> Index([FromQuery] BaseListRQ pRequest)
         {
 			ViewBag.List = await _staffService.List(pRequest);
 

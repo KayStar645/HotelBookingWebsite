@@ -23,6 +23,12 @@ namespace Core.Application.Profiles
 
 			CreateMap<Permission, PermissionRQ>().ReverseMap();
 			CreateMap<Permission, PermissionVM>().ReverseMap();
-		}
+
+            CreateMap<User, UserVM>()
+            .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.UserRoles.Select(ur => ur.Role)))
+            .ForMember(dest => dest.Permissions, opt => opt.MapFrom(src => src.UserPermissions.Select(up => up.Permission)))
+            .ForMember(dest => dest.Staff, opt => opt.MapFrom(src => src.Staff))
+            .ReverseMap();
+        }
     }
 }

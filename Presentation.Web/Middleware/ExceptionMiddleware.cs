@@ -14,8 +14,6 @@ namespace Presentation.Web.Middleware
         {
             try
             {
-                await next(httpContext);
-                return;
                 do
                 {
 					var endpoint = httpContext.GetEndpoint();
