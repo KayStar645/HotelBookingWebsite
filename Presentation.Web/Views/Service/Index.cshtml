@@ -2,182 +2,250 @@
 @using Core.Application.ViewModels.Services
 @using System.Globalization
 @{
-	var services = ViewBag.List as PaginatedResult<ServiceVM>;
+    var services = ViewBag.List as PaginatedResult<ServiceVM>;
 
 }
 
 @section TitleHeader
 {
-	<div class="row">
-		<div class="col-sm-12 mt-3">
-			<h3 class="page-title mt-3">
-				Danh sách dịch vụ
-			</h3>
-			<div class="row mt-3">
-				<div class="col-sm-4">
-					<label class="font-weight-bold mb-1">Tìm kiếm</label>
-					<div class="form-outline p-0" data-mdb-input-init>
-						<input type="search" class="form-control" id="searchInput" placeholder="Tìm kiếm..." />
-					</div>
-				</div>
-				@* <div class="col-sm-2">
-					<label class="font-weight-bold mb-1">Giới tính</label>
-					<div class="form-outline p-0">
-						<select id="filterGender" class="form-control" name="filterGender">
-							<option value="">Tất cả</option>
-							<option value="Nam">Nam</option>
-							<option value="Nữ">Nữ</option>
-							<option value="Khác">Khác</option>
-						</select>
-					</div>
-				</div> *@
-				<div class="col-sm-6">
-				</div>
-				<div class="col-sm-2">
-					<div class="text-right">
-						<button type="button" id="createStaff" class="btn btn-primary"
-								data-toggle="modal" data-target="#openPopupCreate">
-							Thêm mới
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+    <div class="row">
+        <div class="col-sm-12 mt-3">
+            <h3 class="page-title mt-3">
+                Danh sách dịch vụ
+            </h3>
+            <div class="row mt-3">
+                <div class="col-sm-4">
+                    <label class="font-weight-bold mb-1">Tìm kiếm</label>
+                    <div class="form-outline p-0" data-mdb-input-init>
+                        <input type="search" class="form-control" id="searchInput" placeholder="Tìm kiếm..." />
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                </div>
+                <div class="col-sm-2">
+                    <div class="text-right">
+                        <button type="button" id="create" class="btn btn-primary"
+                                data-toggle="modal" data-target="#openPopupCreate">
+                            Thêm mới
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
 <div class="card-body">
-	<div class="table-responsive" style="overflow-y: auto;">
-		<table class="table table-hover table-center table-striped table-bordered">
-			<thead>
-				<tr>
-					<th class="min-vw-10"></th>
-					<th class="th-sm text-center">Mã Dịch Vụ</th>
-					<th class="th-sm text-center">Tên Dịch vụ</th>
-					<th class="th-sm text-center">Mô tả</th>
-					<th class="th-sm text-center">Giá</th>
-					<th class="th-sm text-center"></th>
-				</tr>
-			</thead>
-			<tbody id="table-body-room">
-				@if (services != null)
-				{
-					@foreach (var service in services.Data)
-					{
-						<tr>
-							<td class="text-center">
-								<i class=" updates fa-regular fa-pen-to-square pe-3"
-								   style="color:blue;cursor: pointer;"
-								   data-toggle="modal" data-target="#openPopup"></i>
-								<i class="deletes fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
-							</td>
-							<td class="text-center d-none" data-id="@service?.Id">@service?.Id</td>
-							<td class="text-nowrap text-center">
-								<div>@service?.InternalCode</div>
-							</td>
-							<td class="text-center">
-								@service?.Name
-							</td>
-							<td class="text-center describe-multiline">
-								@service?.Describe
-							</td>
-							<td class="text-center">
-								@(service?.Price != null ? service.Price.Value.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " đ" : "Không xác định")
-							</td>
-							<td class="text-center">
+    <div class="table-responsive" style="overflow-y: auto;">
+        <table class="table table-hover table-center table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th class="min-vw-10"></th>
+                    <th class="th-sm text-center">Mã Dịch Vụ</th>
+                    <th class="th-sm text-center">Tên Dịch vụ</th>
+                    <th class="th-sm text-center">Mô tả</th>
+                    <th class="th-sm text-center">Giá</th>
+                    <th class="th-sm text-center"></th>
+                </tr>
+            </thead>
+            <tbody id="table-body-service">
+                @if (services != null)
+                {
+                    @foreach (var service in services.Data)
+                    {
+                        <tr>
+                            <td class="text-center">
+                                <i class=" updates fa-regular fa-pen-to-square pe-3"
+                                   style="color:blue;cursor: pointer;"
+                                   data-toggle="modal" data-target="#openPopup"></i>
+                                <i class="deletes fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
+                            </td>
+                            <td class="text-center d-none" data-id="@service?.Id">@service?.Id</td>
+                            <td class="text-nowrap text-center">
+                                <div>@service?.InternalCode</div>
+                            </td>
+                            <td class="text-center">
+                                @service?.Name
+                            </td>
+                            <td class="text-center describe-multiline">
+                                @service?.Describe
+                            </td>
+                            <td class="text-center">
+                                @(service?.Price != null ? service.Price.Value.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " đ" : "")
+                            </td>
+                            <td class="text-center">
 
-								@{
-									var statusText = service.IsDeleted == true
-									? "<span class='badge badge-pill bg-danger inv-badge'>Đã xoá</span>"
-									: "<span class='badge badge-pill bg-success inv-badge'>Hoạt động</span>";
-								}
+                                @{
+                                    var statusText = service.IsDeleted == true
+                                    ? "<span class='badge badge-pill bg-danger inv-badge'>Đã xoá</span>"
+                                    : "<span class='badge badge-pill bg-success inv-badge'>Hoạt động</span>";
+                                }
 
-								@Html.Raw(statusText)
-							</td>
-						</tr>
-					}
-				}
-			</tbody>
-		</table>
-	</div>
+                                @Html.Raw(statusText)
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
 
 @* Phân trang *@
 <div id="paginated" class="d-flex justify-content-end mt-4">
-	<nav aria-label="Page navigation example">
-		<ul class="pagination">
-			@for (int i = 1; i <= services.Extra.TotalPages; i++)
-			{
-				<li class="page-item pageCurrent @(services.Extra.CurrentPage == i ? "active" : "")">
-					<a class="page-link" data-page="@i">@i</a>
-				</li>
-			}
-		</ul>
-	</nav>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            @for (int i = 1; i <= services.Extra.TotalPages; i++)
+            {
+                <li class="page-item pageCurrent @(services.Extra.CurrentPage == i ? "active" : "")">
+                    <a class="page-link" data-page="@i">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
 </div>
 
 <!-- Modal -->
 <div class="modal fade" id="openPopupCreate" tabindex="-1" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
-	<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-		<div class="modal-content">
-			<div class="modal-header bg-success">
-				<h1 class="modal-title text-white font-weight-bold" id="modalTitle">Thêm dịch vụ mới</h1>
-				<button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">×</span>
-				</button>
-			</div>
-			<div class="modal-body">
-				<div class="row">
-					<div class="col-lg-12">
-						<form>
-							<div class="row formtype">
-								<div class="col-md-6 d-none">
-									<div class="form-group">
-										<input type="text" name="id" value="" />
-									</div>
-								</div>
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success">
+                <h1 class="modal-title text-white font-weight-bold" id="modalTitle">Thêm dịch vụ mới</h1>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <form>
+                            <div class="row formtype">
+                                <div class="col-md-6 d-none">
+                                    <div class="form-group">
+                                        <input type="text" name="id" value="" />
+                                    </div>
+                                </div>
 
-								<div class="col-md-6">
-									<div class="form-group">
-										<label class="font-weight-bold mb-2">Mã dịch vụ</label>
-										<input class="form-control" type="text" name="internalCode" />
-										<span class="text-danger" id="internalCodeError"></span>
-									</div>
-								</div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold mb-2">Mã dịch vụ</label>
+                                        <input class="form-control" type="text" name="internalCode" />
+                                        <span class="text-danger" id="internalCodeError"></span>
+                                    </div>
+                                </div>
 
-								<div class="col-md-6">
-									<div class="form-group">
-										<label class="font-weight-bold mb-2">Tên dịch vụ</label>
-										<input class="form-control" type="text" name="name" />
-										<span class="text-danger" id="nameError"></span>
-									</div>
-								</div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold mb-2">Tên dịch vụ</label>
+                                        <input class="form-control" type="text" name="name" />
+                                        <span class="text-danger" id="nameError"></span>
+                                    </div>
+                                </div>
 
-								<div class="col-md-12">
-									<div class="form-group">
-										<label class="font-weight-bold mb-2">Mô tả</label>
-										<input class="form-control" type="text" name="describe" />
-										<span class="text-danger" id="describeError"></span>
-									</div>
-								</div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold mb-2">Mô tả</label>
+                                        <input class="form-control" type="text" name="describe" />
+                                        <span class="text-danger" id="describeError"></span>
+                                    </div>
+                                </div>
 
-								<div class="col-md-12">
-									<div class="form-group">
-										<label class="font-weight-bold mb-2">Giá tiền</label>
-										<input class="form-control" type="number" name="price" />
-										<span class="text-danger" id="priceError"></span>
-									</div>
-								</div>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
-				<button type="button" id="createButton" class="btn btn-primary">Tạo mới</button>
-				<button type="button" id="updateButton" class="btn btn-primary">Cập nhật</button>
-			</div>
-		</div>
-	</div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold mb-2">Giá tiền</label>
+                                        <input class="form-control" type="number" name="price" />
+                                        <span class="text-danger" id="priceError"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="button" id="createButton" class="btn btn-primary">Tạo mới</button>
+                <button type="button" id="updateButton" class="btn btn-primary">Cập nhật</button>
+            </div>
+        </div>
+    </div>
 </div>
+
+@* Đây là JS nè *@
+<script>
+    $("#room-service").addClass("active");
+    $("#room-service").next("ul").addClass("d-block");
+    $("#room-service-service").addClass("active");
+
+    $(".link-parent").on("click", function (e) {
+        e.preventDefault();
+
+        $(".nav-childs").removeClass("active");
+        $(".link-parent").removeClass("active");
+
+        $(".link-parent").next("ul").not($(this).next("ul")).removeClass("d-block");
+
+        $(this).closest(".link-parent").addClass("active");
+    });
+</script>
+
+@* Khởi tạo biến *@
+<script>
+    var createOpen = document.getElementById("create");
+    var updateOpens = document.querySelectorAll(".updates");
+
+
+    var internalCodeInput = $('input[name="internalCode"]');
+    var nameInput = $('input[name=" name"]');
+    var describeInput = $('input[name="describe"]');
+    var priceInput = $('input[name="price"]');
+
+    var searchTimer;
+    var sorted_asc = true;
+</script>
+
+@* Tìm kiếm và lọc *@
+<script>
+    $(document).ready(function () {
+        $('#searchInput').on('input', function () {
+            clearTimeout(searchTimer);
+
+            searchTimer = setTimeout(function () {
+                performSearch();
+            }, 600);
+        });
+
+        // $('#filterKindRoom').change(function () {
+        //     performSearch();
+        // });
+
+        function performSearch() {
+            var searchTerm = $('#searchInput').val();
+            // var selectedKindRoom = $('#filterKindRoom').val();
+            // var selectedStatus = $('#filterStatus').val();
+
+            $.ajax({
+                url: '/service/index',
+                method: 'GET',
+                data: {
+                    search: searchTerm,
+                    page: 1,
+                    sorts: null,
+                    // filters: `KindRoomId:${selectedKindRoom},status:${selectedStatus}`
+                },
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    var newData = $('<tbody>').html(data).find('#table-body-service').html();
+                    $('#table-body-service').html(newData);
+
+                    var newPaginated = $('<div>').html(data).find('#paginated').html();
+                    $('#paginated').html(newPaginated);
+                    resetEvent();
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    toastr.error('Lỗi khi thực hiện tìm kiếm!', 'Thông báo');
+                }
+            });
+        }
+    });
+</script>
