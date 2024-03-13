@@ -18,7 +18,7 @@ namespace Core.Application.Services.Auth
             _mapper = pMapper;
         }
 
-        public async Task<List<PermissionVM>> Create(List<PermissionRQ> pRequest)
+        public async Task<List<PermissionVM>> Create(List<string> pRequest)
         {
             try
             {
@@ -27,11 +27,11 @@ namespace Core.Application.Services.Auth
                 foreach (var permission in pRequest)
                 {
                     var per = await _context.Permissions
-                        .FirstOrDefaultAsync(x => x.Name == permission.Name);
+                        .FirstOrDefaultAsync(x => x.Name == permission);
 
                     if (per == null)
                     {
-                        var newPer = _mapper.Map<Permission>(permission);
+                        var newPer = new Permission { Name = permission };
                         var newPermission = await _context.Permissions.AddAsync(newPer);
                         await _context.SaveChangesAsync(default(CancellationToken));
                         result.Add(_mapper.Map<PermissionVM>(newPermission.Entity));
@@ -52,7 +52,7 @@ namespace Core.Application.Services.Auth
 
             var result = _mapper.Map<List<PermissionVM>>(permissions);
 
-            return result;
+            return result ?? new List<PermissionVM>();
         }
-    }
+	}
 }

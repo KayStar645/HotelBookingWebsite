@@ -3,6 +3,7 @@ using Core.Application.Interfaces;
 using Core.Application.ViewModels.Common;
 using Core.Application.ViewModels.KindRooms;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Web.Middleware;
 
 namespace Presentation.Web.Controllers.Admin
 {
@@ -16,6 +17,7 @@ namespace Presentation.Web.Controllers.Admin
 		}
 
 		[HttpGet]
+		[Permission("kindroom-view")]
 		public async Task<IActionResult> Index([FromQuery] BaseListRQ pRequest)
 		{
 			ViewBag.List = await _kindRoomService.List(pRequest);
@@ -24,6 +26,7 @@ namespace Presentation.Web.Controllers.Admin
 		}
 
 		[HttpGet("/kindroom/detail")]
+		[Permission("kindroom-view")]
 		public async Task<IActionResult> Detail([FromQuery] int pId)
 		{
 			ViewBag.Detail = await _kindRoomService.Detail(pId);
@@ -33,6 +36,7 @@ namespace Presentation.Web.Controllers.Admin
 
 
 		[HttpPost]
+		[Permission("kindroom-create")]
 		public async Task<IActionResult> Create([FromBody] KindRoomRQ pRequest)
 		{
 			try
@@ -61,6 +65,7 @@ namespace Presentation.Web.Controllers.Admin
 
 
 		[HttpPut]
+		[Permission("kindroom-update")]
 		public async Task<IActionResult> Update([FromBody] KindRoomRQ pRequest)
 		{
 			try
@@ -88,6 +93,7 @@ namespace Presentation.Web.Controllers.Admin
 		}
 
 		[HttpDelete]
+		[Permission("kindroom-delete")]
 		public async Task<IActionResult> Delete([FromQuery] int pId)
 		{
 			try

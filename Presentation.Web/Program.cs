@@ -1,4 +1,7 @@
-﻿using Core.Application;
+﻿using AutoMapper;
+using Core.Application;
+using Core.Application.Interfaces.Auth;
+using Core.Application.ViewModels.Auth;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -59,6 +62,7 @@ if (app.Environment.IsDevelopment())
 	var initializer = scope.ServiceProvider.GetRequiredService<HotelBookingWebsiteDbContextInitialiser>();
 	await initializer.InitializeAsync();
 	await initializer.SeedAsync();
+	InitializePermissions(builder.Services.BuildServiceProvider()).GetAwaiter().GetResult();
 }
 
 app.UseAuthentication();
@@ -78,3 +82,13 @@ app.MapControllerRoute(
     pattern: "{controller=home}/{action=index}/{id?}");
 
 app.Run();
+
+
+async Task InitializePermissions(IServiceProvider serviceProvider)
+{
+	var permissionService = serviceProvider.GetRequiredService<IPermissionService>();
+
+    List<string> permissions = AuthorizationExtensions
+            .GetPermissionPoliciesFromAttributes(Assembly.GetExecutingAssembly());
+	await permissionService.Create(permissions);
+}

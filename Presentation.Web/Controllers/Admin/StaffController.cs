@@ -26,6 +26,7 @@ namespace Presentation.Web.Controllers.Admin
         }
 
 		[HttpPost]
+		[Permission("staff-create")]
 		public async Task<IActionResult> Create([FromBody] StaffRQ pRequest)
 		{
 			try
@@ -54,6 +55,7 @@ namespace Presentation.Web.Controllers.Admin
 
 
 		[HttpPut]
+		[Permission("staff-update")]
 		public async Task<IActionResult> Update([FromBody]StaffRQ pRequest)
 		{
 			try
@@ -81,7 +83,8 @@ namespace Presentation.Web.Controllers.Admin
 		}
 
 		[HttpDelete]
-        public async Task<IActionResult> Delete([FromQuery] int pId)
+		[Permission("staff-delete")]
+		public async Task<IActionResult> Delete([FromQuery] int pId)
 		{
             try
             {
