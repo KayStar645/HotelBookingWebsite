@@ -30,8 +30,11 @@ namespace Core.Application
 			services.AddScoped<IKindRoomService, KindRoomService>();
 			services.AddScoped<IRoomService, RoomService>();
 			services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<IPermissionService, PermissionService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IRoleService, RoleService>();
 
-			return services;
+            return services;
 		}
 
 	}
