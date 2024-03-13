@@ -1,9 +1,11 @@
-﻿using Core.Domain.Common;
+﻿using Core.Domain.Auth;
+using Core.Domain.Common;
+using Core.Domain.Common.Interfaces;
 
 namespace Core.Domain.Entities
 {
-    public class Staff : AuditableEntity
-    {
+    public class Staff : AuditableEntity, IInternalCode
+	{
         public string? InternalCode { get; set; }
 
         public string? Name { get; set; }
@@ -15,5 +17,7 @@ namespace Core.Domain.Entities
         public string? Address { get; set; }
 
         public string? Phone { get; set; }
+
+        public User? User { get; set; }
     }
 }

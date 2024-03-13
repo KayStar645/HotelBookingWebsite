@@ -1,5 +1,6 @@
 ﻿using Core.Application.Exceptions;
 using Core.Application.Interfaces;
+using Core.Application.Services.Extensions;
 using Core.Application.ViewModels.Common;
 using Core.Application.ViewModels.Staffs;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +29,15 @@ namespace Presentation.Web.Controllers.Admin
 		{
 			try
 			{
+				var modelStateErrors = ModelState.Values
+					.SelectMany(v => v.Errors)
+					.Select(e => e.ErrorMessage)
+					.ToList();
+				if (modelStateErrors.Any())
+				{
+					return Json(new { success = false, errors = modelStateErrors });
+				}
+
 				await _staffService.Create(pRequest);
 				return Json(new { success = true });
 			}
@@ -47,6 +57,15 @@ namespace Presentation.Web.Controllers.Admin
 		{
 			try
 			{
+				var modelStateErrors = ModelState.Values
+					.SelectMany(v => v.Errors)
+					.Select(e => e.ErrorMessage)
+					.ToList();
+				if (modelStateErrors.Any())
+				{
+					return Json(new { success = false, errors = modelStateErrors });
+				}
+
 				await _staffService.Update(pRequest);
 				return Json(new { success = true });
 			}

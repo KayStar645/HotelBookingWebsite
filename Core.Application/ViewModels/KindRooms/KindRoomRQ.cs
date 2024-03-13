@@ -1,4 +1,6 @@
 ﻿using Core.Application.ViewModels.Common;
+using Core.Application.ViewModels.Common.ValidationAttributes;
+using Core.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
 
 namespace Core.Application.ViewModels.KindRooms
@@ -6,10 +8,12 @@ namespace Core.Application.ViewModels.KindRooms
 	public class KindRoomRQ : BaseRQ
 	{
 		[Required(ErrorMessage = "Mã loại phòng là trường bắt buộc.")]
+		[InternalCode<KindRoom, KindRoomRQ>(ErrorMessage = "Mã loại phòng đã tồn tại.")]
 		public string? InternalCode { get; set; }
 
 		[Required(ErrorMessage = "Tên loại phòng là trường bắt buộc.")]
 		[StringLength(100, ErrorMessage = "Tên loại phòng không vượt quá 100 ký tự.")]
+		[Name<KindRoom, KindRoomRQ>(ErrorMessage = "Tên loại phòng đã tồn tại.")]
 		public string? Name { get; set; }
 
 		[Required(ErrorMessage = "Hình ảnh là trường bắt buộc.")]

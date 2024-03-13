@@ -88,15 +88,7 @@ namespace Core.Application.Services.Common
 		}
 
 		public virtual async Task<TViewModel> Create(TRequest pRequest)
-		{
-			var validationResults = ValidateExtensions.ValidateModel(pRequest);
-
-			if (validationResults.Any())
-			{
-				var errorMessage = validationResults.Select(result => result.ErrorMessage).ToList();
-				throw new ValidationCustomException(errorMessage);
-			}
-
+		{ 
 			var entity = _mapper.Map<TEntity>(pRequest);
 
 			var createEntity = await _context.Set<TEntity>().AddAsync(entity);
@@ -109,14 +101,6 @@ namespace Core.Application.Services.Common
 
 		public virtual async Task<TViewModel> Update(TRequest pRequest)
 		{
-			var validationResults = ValidateExtensions.ValidateModel(pRequest);
-
-			if (validationResults.Any())
-			{
-				var errorMessage = validationResults.Select(result => result.ErrorMessage).ToList();
-				throw new ValidationCustomException(errorMessage);
-			}
-
 			var entity = await _context.Set<TEntity>().FindAsync(pRequest.Id);
 
 			if (entity == null)

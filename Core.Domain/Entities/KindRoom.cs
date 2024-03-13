@@ -1,8 +1,9 @@
 ﻿using Core.Domain.Common;
+using Core.Domain.Common.Interfaces;
 
 namespace Core.Domain.Entities
 {
-	public class KindRoom : AuditableEntity
+	public class KindRoom : AuditableEntity, IInternalCode, IName
 	{
 		public string? InternalCode { get; set; }
 

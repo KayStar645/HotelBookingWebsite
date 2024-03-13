@@ -1,4 +1,5 @@
 ﻿using Core.Application.Interfaces.Common;
+using Core.Domain.Auth;
 using Core.Domain.Entities;
 using Infrastructure.Data.Interceptors;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,13 @@ namespace Infrastructure.Data
 		public DbSet<KindRoom> KindRooms => Set<KindRoom>();
 		public DbSet<Room> Rooms => Set<Room>();
         public DbSet<Service> Services => Set<Service>();
+
+		public DbSet<User> Users => Set<User>();
+		public DbSet<Role> Roles => Set<Role>();
+		public DbSet<Permission> Permissions => Set<Permission>();
+		public DbSet<UserRole> UserRoles => Set<UserRole>();
+		public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
+		public DbSet<UserPermission> UserPermissions => Set<UserPermission>();
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

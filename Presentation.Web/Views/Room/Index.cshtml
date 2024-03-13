@@ -331,20 +331,25 @@
 					url: "/room/delete?pId=" + itemId,
 					method: "DELETE",
 					success: function (data) {
-						$.ajax({
-							url: "/room/index",
-							method: "GET",
-							success: function (data) {
-								var newData = $('<tbody>').html(data).find('#table-body-room').html();
-								$('#table-body-room').html(newData);
+						if (data.success) {
+							$.ajax({
+								url: "/room/index",
+								method: "GET",
+								success: function (data) {
+									var newData = $('<tbody>').html(data).find('#table-body-room').html();
+									$('#table-body-room').html(newData);
 
-								var newPaginated = $('<div>').html(data).find('#paginated').html();
-								$('#paginated').html(newPaginated);
+									var newPaginated = $('<div>').html(data).find('#paginated').html();
+									$('#paginated').html(newPaginated);
 
-								resetEvent();
-							},
-						});
-						toastr.success('Xoá nhân viên thành công!', 'Thông báo');
+									resetEvent();
+								},
+							});
+							toastr.success('Xoá nhân viên thành công!', 'Thông báo');
+						}
+						else {
+							toastr.error(data.errors[0], 'Thông báo');
+						}
 					},
 					error: function (xhr, textStatus, errorThrown) {
 						toastr.error('Xoá nhân viên thất bại!', 'Thông báo');
@@ -469,21 +474,26 @@
 					data: JSON.stringify(pRequest),
 					contentType: "application/json; charset=utf-8",
 					success: function (data) {
-						$.ajax({
-							url: "/room/index",
-							method: "GET",
-							data: { page: 1 },
-							contentType: "application/json; charset=utf-8",
-							success: function (data) {
-								var newData = $('<tbody>').html(data).find('#table-body-room').html();
-								$('#table-body-room').html(newData);
+						if (data.success) {
+							$.ajax({
+								url: "/room/index",
+								method: "GET",
+								data: { page: 1 },
+								contentType: "application/json; charset=utf-8",
+								success: function (data) {
+									var newData = $('<tbody>').html(data).find('#table-body-room').html();
+									$('#table-body-room').html(newData);
 
-								$('.btn-secondary[data-dismiss="modal"]').click();
+									$('.btn-secondary[data-dismiss="modal"]').click();
 
-								resetEvent();
-							},
-						});
-						toastr.success('Cập nhật thông tin phòng thành công!', 'Thông báo');
+									resetEvent();
+								},
+							});
+							toastr.success('Cập nhật thông tin phòng thành công!', 'Thông báo');
+						}
+						else {
+							toastr.error(data.errors[0], 'Thông báo');
+						}
 					},
 					error: function (xhr, textStatus, errorThrown) {
 						toastr.error('Cập nhật thông tin phòng thất bại!', 'Thông báo');
