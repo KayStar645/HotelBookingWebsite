@@ -118,12 +118,10 @@
 							console.log(data);
 							if (data.success) {
 								if (data.data.type == "admin" || data.data.type == "super admin") {
-									console.log("a");
 									window.location.href = "/dashboard";
 								}
 								else {
-									console.log("b");
-									//window.location.href = "/";
+									window.location.href = "/";
 								}
 							} else {
 								toastr.error(data.errors[0], 'Thông báo');

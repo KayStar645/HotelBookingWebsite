@@ -36,6 +36,14 @@ namespace Presentation.Web.Controllers.Auth
 				}
 
 				var result = await _accountService.LoginAsync(pRequest);
+
+				Response.Cookies.Append("Token", result.Token, new CookieOptions
+				{
+					Expires = DateTime.Now.AddDays(100),
+					Secure = true,
+					HttpOnly = true,
+				});
+
 				return Json(new { success = true , data = result});
 			}
 			catch (ValidationCustomException ex)
@@ -47,5 +55,14 @@ namespace Presentation.Web.Controllers.Auth
 				return Json(new { success = false, error = "Lỗi server: " + ex.Message });
 			}
 		}
+
+		[HttpGet]
+		public IActionResult Logout()
+		{
+			Response.Cookies.Delete("Token");
+
+			return RedirectToAction("Login");
+		}
+
 	}
 }
