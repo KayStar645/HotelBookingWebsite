@@ -28,7 +28,16 @@ namespace Presentation.Web.Controllers.Admin
 		{
 			try
 			{
-				await _serviceService.Create(pRequest);
+                var modelStateErrors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+                if (modelStateErrors.Any())
+                {
+                    return Json(new { success = false, errors = modelStateErrors });
+                }
+
+                await _serviceService.Create(pRequest);
 				return Json(new { success = true });
 			}
 			catch (ValidationCustomException ex)
@@ -47,7 +56,16 @@ namespace Presentation.Web.Controllers.Admin
 		{
 			try
 			{
-				await _serviceService.Update(pRequest);
+                var modelStateErrors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+                if (modelStateErrors.Any())
+                {
+                    return Json(new { success = false, errors = modelStateErrors });
+                }
+
+                await _serviceService.Update(pRequest);
 				return Json(new { success = true });
 			}
 			catch (ValidationCustomException ex)
