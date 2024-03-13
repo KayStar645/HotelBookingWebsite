@@ -57,8 +57,11 @@
                             <td class="text-center">
                                 <i class=" updates fa-regular fa-pen-to-square pe-3"
                                    style="color:blue;cursor: pointer;"
-                                   data-toggle="modal" data-target="#openPopup"></i>
-                                <i class="deletes fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
+                                   data-toggle="modal" data-target="#openPopupCreate"></i>
+                                @if (service.IsDeleted != true)
+                                {
+                                    <i class="deletes fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
+                                }
                             </td>
                             <td class="text-center d-none" data-id="@service?.Id">@service?.Id</td>
                             <td class="text-nowrap text-center">
@@ -71,7 +74,7 @@
                                 @service?.Describe
                             </td>
                             <td class="text-center">
-                                @(service?.Price != null ? service.Price.Value.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " đ" : "")
+                                @service?.Price
                             </td>
                             <td class="text-center">
 
@@ -196,7 +199,7 @@
 
 
     var internalCodeInput = $('input[name="internalCode"]');
-    var nameInput = $('input[name=" name"]');
+    var nameInput = $('input[name="name"]');
     var describeInput = $('input[name="describe"]');
     var priceInput = $('input[name="price"]');
 
@@ -248,4 +251,279 @@
             });
         }
     });
+</script>
+
+@* Lắng nghe sự kiện + load giao diện và dữ liệu *@
+<script>
+    function resetEvent() {
+        createOpen.addEventListener("click", function (event) {
+            var rowData = {
+                id: 0,
+                internalCode: "",
+                name: "",
+                describe: "",
+                price: 0,
+            };
+
+            document.getElementById("modalTitle").innerText = "Thêm dịch vụ mới";
+            document.getElementById("createButton").style.display = "inline-block";
+            document.getElementById("updateButton").style.display = "none";
+
+            loadData(rowData);
+        });
+
+        updateOpens = document.querySelectorAll(".updates");
+        updateOpens.forEach(function (button) {
+            button.addEventListener("click", function () {
+                var parentRow = button.closest("tr");
+                var rowData = {
+                    id: parentRow.querySelector("td:nth-child(2)").textContent.trim(),
+                    internalCode: parentRow.querySelector("td:nth-child(3)").textContent.trim(),
+                    name: parentRow.querySelector("td:nth-child(4)").textContent.trim(),
+                    describe: parentRow.querySelector("td:nth-child(5)").textContent.trim(),
+                    price: parentRow.querySelector("td:nth-child(6)").textContent.trim(),
+                };
+                document.getElementById("modalTitle").innerText = "Cập nhật dịch vụ phòng";
+                document.getElementById("createButton").style.display = "none";
+                document.getElementById("updateButton").style.display = "inline-block";
+
+                loadData(rowData);
+            });
+        });
+
+        $(document).ready(function () {
+            $(".deletes").on("click", function () {
+                var itemId = $(this).closest("tr").find("td[data-id]").data("id");
+
+                $.ajax({
+                    url: "/service/delete?pId=" + itemId,
+                    method: "DELETE",
+                    success: function (data) {
+                        if (data.success) {
+                            $.ajax({
+                                url: "/service/index",
+                                method: "GET",
+                                success: function (data) {
+                                    var newData = $('<tbody>').html(data).find('#table-body-service').html();
+                                    $('#table-body-service').html(newData);
+
+                                    var newPaginated = $('<div>').html(data).find('#paginated').html();
+                                    $('#paginated').html(newPaginated);
+
+                                    resetEvent();
+                                },
+                            });
+                            toastr.success('Xoá dịch vụ thành công!', 'Thông báo');
+                        }
+                        else {
+                            toastr.error(data.errors[0], 'Thông báo');
+                        }
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        toastr.error('Xoá dịch vụ thất bại!', 'Thông báo');
+                    }
+                });
+            });
+        });
+
+
+        $(document).ready(function () {
+            $('.pagination a').on('click', function (e) {
+                e.preventDefault();
+                var page = $(this).data('page');
+                paginatedResult(page);
+            });
+        });
+
+        function paginatedResult(page) {
+            $.ajax({
+                url: `/service/index?page=${page}`,
+                method: 'GET',
+                success: function (data) {
+                    var newData = $('<tbody>').html(data).find('#table-body-service').html();
+                    $('#table-body-service').html(newData);
+
+                    updatePagination(page);
+                },
+            });
+        }
+
+        function updatePagination(activePage) {
+            $('.pageCurrent').removeClass('active');
+            $('.pagination a[data-page="' + activePage + '"]').addClass('active').closest('.pageCurrent').addClass('active');
+        }
+    }
+
+
+
+    function loadData(data) {
+        document.querySelector('input[name="id"]').value = data.id;
+        document.querySelector('input[name="internalCode"]').value = data.internalCode;
+        document.querySelector('input[name="name"]').value = data.name;
+        document.querySelector('input[name="describe"]').value = data.describe;
+        document.querySelector('input[name="price"]').value = data.price;
+
+        removeValidator();
+    }
+
+    function removeValidator() {
+        $(".text-danger").text("");
+
+        internalCodeInput.removeClass("border-danger");
+        nameInput.removeClass("border-danger");
+        describeInput.removeClass("border-danger");
+        priceInput.removeClass("border-danger");
+    }
+
+    resetEvent();
+</script>
+
+@* Gọi controller xử lý *@
+<script>
+    $(document).ready(function () {
+        $("#createButton").on("click", function (e) {
+            e.preventDefault();
+
+            removeValidator();
+
+            var pRequest = getData();
+            pRequest.id = 0;
+
+            var isValid = validateForm(pRequest);
+
+            if (isValid) {
+                $.ajax({
+                    url: "/service/create",
+                    method: "POST",
+                    data: JSON.stringify(pRequest),
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        if (data.success) {
+                            $.ajax({
+                                url: "/service/index",
+                                method: "GET",
+                                data: { page: 1 },
+                                contentType: "application/json; charset=utf-8",
+                                success: function (data) {
+                                    var newData = $('<tbody>').html(data).find('#table-body-service').html();
+                                    $('#table-body-service').html(newData);
+
+                                    var newPaginated = $('<div>').html(data).find('#paginated').html();
+                                    $('#paginated').html(newPaginated);
+
+                                    $('.btn-secondary[data-dismiss="modal"]').click();
+
+                                    resetEvent();
+                                },
+                            });
+                            toastr.success('Thêm dịch vụ mới thành công!', 'Thông báo');
+                        } else {
+                            toastr.error(data.errors[0], 'Thông báo');
+                        }
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        toastr.error('Thêm dịch vụ mới thất bại!', 'Thông báo');
+                    }
+                });
+            }
+        });
+
+        $("#updateButton").on("click", function (e) {
+            e.preventDefault();
+
+            removeValidator();
+
+            var pRequest = getData();
+
+            var isValid = validateForm(pRequest);
+
+            if (isValid) {
+                $.ajax({
+                    url: "/service/update",
+                    method: "PUT",
+                    data: JSON.stringify(pRequest),
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        if (data.success) {
+                            $.ajax({
+                                url: "/service/index",
+                                method: "GET",
+                                data: { page: 1 },
+                                contentType: "application/json; charset=utf-8",
+                                success: function (data) {
+                                    var newData = $('<tbody>').html(data).find('#table-body-service').html();
+                                    $('#table-body-service').html(newData);
+
+                                    $('.btn-secondary[data-dismiss="modal"]').click();
+
+                                    resetEvent();
+                                },
+                            });
+                            toastr.success('Cập nhật thông tin dịch vụ thành công!', 'Thông báo');
+                        }
+                        else {
+                            toastr.error(data.errors[0], 'Thông báo');
+                        }
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        toastr.error('Cập nhật thông tin dịch vụ thất bại!', 'Thông báo');
+                    }
+                });
+            }
+        });
+    });
+
+    function getData() {
+        var formData = {
+            id: $('input[name="id"]').val() || null,
+            internalCode: $('input[name="internalCode"]').val() || null,
+            name: $('input[name="name"]').val() || null,
+            describe: $('input[name="describe"]').val() || null,
+            price: $('input[name="price"]').val() || null,
+        };
+        return formData;
+    }
+
+    function validateForm(data) {
+        var isValid = true;
+
+        // Validate internalCode
+        if (!data.internalCode) {
+            $("#internalCodeError").text("Mã dịch vụ không được để trống");
+            $('input[name="internalCode"]').addClass("border-danger");
+            isValid = false;
+        } else if (data.internalCode.length > 100) {
+            $("#internalCodeError").text("Mã dịch vụ không được vượt quá 100 ký tự.");
+            $('input[name="internalCode"]').addClass("border-danger");
+            isValid = false;
+        }
+
+        // Validate name
+        if (!data.name) {
+            $("#nameError").text("Tên dịch vụ không được để trống");
+            $('select[name="name"]').addClass("border-danger");
+            isValid = false;
+        }
+
+        // // Validate describe
+        // if (!data.describe) {
+        //     $("#describeError").text("Loại phòng không được để trống");
+        //     $('select[name="kindRoomId"]').addClass("border-danger");
+        //     isValid = false;
+        // }
+
+        // Validate price
+        if (!data.price) {
+            $("#priceError").text("Giá dịch vụ không được để trống");
+            $('select[name="price"]').addClass("border-danger");
+            isValid = false;
+        } else if (data.price < 0) {
+            $("#priceError").text("Giá dịch vụ không thể nhỏ hơn 0");
+            $('select[name="price"]').addClass("border-danger");
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
 </script>
