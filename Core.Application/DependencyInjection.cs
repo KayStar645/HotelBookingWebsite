@@ -31,6 +31,7 @@ namespace Core.Application
 			services.AddScoped<IRoomService, RoomService>();
 			services.AddScoped<IAccountService, AccountService>();
 			services.AddScoped<IServiceService, ServiceService>();
+			services.AddScoped<ICustomerService, CustomerService>();
       
 			return services;
 		}

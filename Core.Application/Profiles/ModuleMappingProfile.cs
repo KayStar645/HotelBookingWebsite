@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Core.Application.ViewModels.Customers;
 using Core.Application.ViewModels.KindRooms;
 using Core.Application.ViewModels.Rooms;
 using Core.Application.ViewModels.Services;
@@ -7,7 +8,7 @@ using Core.Domain.Entities;
 
 namespace Core.Application.Profiles
 {
-	public class ModuleMappingProfile : Profile
+    public class ModuleMappingProfile : Profile
     {
         public ModuleMappingProfile() 
         {
@@ -22,6 +23,9 @@ namespace Core.Application.Profiles
 
             CreateMap<Service, ServiceRQ>().ReverseMap();
             CreateMap<Service, ServiceVM>().ReverseMap();
+
+            CreateMap<Customer, CustomerRQ>().ReverseMap();
+            CreateMap<Customer, CustomerVM>().ReverseMap();
         }
     }
 }
