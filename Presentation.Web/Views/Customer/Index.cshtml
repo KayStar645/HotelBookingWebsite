@@ -1,9 +1,21 @@
 ﻿@using Core.Application.Responses
-@using Core.Application.ViewModels.Services
 @using System.Globalization
-@{
-    var services = ViewBag.List as PaginatedResult<ServiceVM>;
+@using Core.Application.ViewModels.Customers
 
+@{
+    var customers = ViewBag.List as PaginatedResult<CustomerVM>;
+    string TypeName(string? status)
+    {
+        switch (status)
+        {
+            case "L":
+                return "Khách hàng thân thiết";
+            case "V":
+                return "Khách hàng vãng lai";
+            default:
+                return "";
+        }
+    }
 }
 
 @section TitleHeader
@@ -11,7 +23,7 @@
     <div class="row">
         <div class="col-sm-12 mt-3">
             <h3 class="page-title mt-3">
-                Danh sách dịch vụ
+                Danh sách khách hàng
             </h3>
             <div class="row mt-3">
                 <div class="col-sm-4">
@@ -20,7 +32,17 @@
                         <input type="search" class="form-control" id="searchInput" placeholder="Tìm kiếm..." />
                     </div>
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-2">
+                    <label class="font-weight-bold mb-1">Phân loại</label>
+                    <div class="form-outline p-0">
+                        <select id="filterType" class="form-control" name="filterType">
+                            <option value="">Tất cả</option>
+                            <option value="L">Khách hàng thân thiết</option>
+                            <option value="V">Khách hàng vãng lai</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-4">
                 </div>
                 <div class="col-sm-2">
                     <div class="text-right">
@@ -41,21 +63,22 @@
             <thead>
                 <tr>
                     <th class="min-vw-10"></th>
-                    <th class="th-sm text-center">Mã Dịch Vụ</th>
-                    <th class="th-sm text-center">Tên Dịch vụ</th>
-                    <th class="th-sm text-center d-none">Mô tả</th>
-                    <th class="th-sm text-center">Giá</th>
+                    <th class="th-sm text-center">Tên khách hàng</th>
+                    <th class="th-sm text-center">Số điện thoại</th>
+                    <th class="th-sm text-center">Email</th>
+                    <th class="th-sm text-center">Phân loại</th>
+                    <th class="th-sm text-center">Địa chỉ</th>
                     <th class="th-sm text-center"></th>
                 </tr>
             </thead>
-            <tbody id="table-body-service">
-                @if (services != null)
+            <tbody id="table-body-customer">
+                @if (customers != null)
                 {
-                    @foreach (var service in services.Data)
+                    @foreach (var customer in customers.Data)
                     {
                         <tr>
                             <td class="text-center">
-                                @if (service.IsDeleted != true)
+                                @if (customer.IsDeleted != true)
                                 {
                                     <i class=" updates fa-regular fa-pen-to-square pe-3"
                                        style="color:blue;cursor: pointer;"
@@ -63,27 +86,31 @@
                                     <i class="deletes fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
                                 }
                             </td>
-                            <td class="text-center d-none" data-id="@service?.Id">@service?.Id</td>
+                            <td class="text-center d-none" data-id="@customer?.Id">@customer?.Id</td>
                             <td class="text-nowrap text-center">
-                                <div>@service?.InternalCode</div>
+                                <div>@customer?.Name</div>
                             </td>
                             <td class="text-center">
-                                @service?.Name
+                                @customer?.Phone
+                            </td>
+                            <td class="text-center">
+                                @customer?.Email
                             </td>
                             <td class="text-center d-none">
-                                @Html.Raw(service?.Describe)
+                                @customer?.Type
                             </td>
                             <td class="text-center">
-                                @service?.Price
+                                @TypeName(customer?.Type)
                             </td>
                             <td class="text-center">
-
+                                @customer?.Address
+                            </td>
+                            <td class="text-center">
                                 @{
-                                    var statusText = service.IsDeleted == true
+                                    var statusText = customer.IsDeleted == true
                                     ? "<span class='badge badge-pill bg-danger inv-badge'>Đã xoá</span>"
                                     : "<span class='badge badge-pill bg-success inv-badge'>Hoạt động</span>";
                                 }
-
                                 @Html.Raw(statusText)
                             </td>
                         </tr>
@@ -98,9 +125,9 @@
 <div id="paginated" class="d-flex justify-content-end mt-4">
     <nav aria-label="Page navigation example">
         <ul class="pagination">
-            @for (int i = 1; i <= services.Extra.TotalPages; i++)
+            @for (int i = 1; i <= customers.Extra.TotalPages; i++)
             {
-                <li class="page-item pageCurrent @(services.Extra.CurrentPage == i ? "active" : "")">
+                <li class="page-item pageCurrent @(customers.Extra.CurrentPage == i ? "active" : "")">
                     <a class="page-link" data-page="@i">@i</a>
                 </li>
             }
@@ -113,7 +140,7 @@
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header bg-success">
-                <h1 class="modal-title text-white font-weight-bold" id="modalTitle">Thêm dịch vụ mới</h1>
+                <h1 class="modal-title text-white font-weight-bold" id="modalTitle">Thêm khách hàng mới</h1>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
@@ -131,32 +158,44 @@
 
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="font-weight-bold mb-2">Mã dịch vụ</label>
-                                        <input class="form-control" type="text" name="internalCode" />
-                                        <span class="text-danger" id="internalCodeError"></span>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="font-weight-bold mb-2">Tên dịch vụ</label>
+                                        <label class="font-weight-bold mb-2">Tên khách hàng</label>
                                         <input class="form-control" type="text" name="name" />
                                         <span class="text-danger" id="nameError"></span>
                                     </div>
                                 </div>
 
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="font-weight-bold mb-2">Mô tả</label>
-                                        <div id="describeEditor" />
+                                        <label class="font-weight-bold mb-2">Số điện thoại</label>
+                                        <input class="form-control" type="text" name="phone" />
+                                        <span class="text-danger" id="phoneError"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold mb-2">Email</label>
+                                        <input class="form-control" type="text" name="email" />
+                                        <span class="text-danger" id="emailError"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold mb-2">Phân loại</label>
+                                        <select class="form-control" name="type">
+                                            <option value="L">Khách hàng thân thiết</option>
+                                            <option value="V">Khách hàng vãng lai</option>
+                                        </select>
+                                        <span class="text-danger" id="typeError"></span>
                                     </div>
                                 </div>
 
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label class="font-weight-bold mb-2">Giá tiền</label>
-                                        <input class="form-control" type="number" name="price" />
-                                        <span class="text-danger" id="priceError"></span>
+                                        <label class="font-weight-bold mb-2">Địa chỉ</label>
+                                        <input class="form-control" type="text" name="address" />
+                                        <span class="text-danger" id="addressError"></span>
                                     </div>
                                 </div>
                             </div>
@@ -173,19 +212,11 @@
     </div>
 </div>
 
-
-@* Style*@
-<style>
-    .ck.ck-content.ck-editor__editable.ck-rounded-corners.ck-editor__editable_inline {
-        min-height: 300px;
-    }
-</style>
-
 @* Đây là JS nè *@
 <script>
-    $("#room-service").addClass("active");
-    $("#room-service").next("ul").addClass("d-block");
-    $("#room-service-service").addClass("active");
+    $("#master-data").addClass("active");
+    $("#master-data").next("ul").addClass("d-block");
+    $("#master-data-customer").addClass("active");
 
     $(".link-parent").on("click", function (e) {
         e.preventDefault();
@@ -199,30 +230,17 @@
     });
 </script>
 
-@* Ckeditor *@
-<script>
-    var _describeEditor;
-
-    ClassicEditor
-        .create(document.querySelector('#describeEditor'))
-        .then(editor => {
-            _describeEditor = editor;
-        })
-        .catch(error => {
-            console.error('There was a problem initializing the editor.', error);
-        });
-</script>
-
 @* Khởi tạo biến *@
 <script>
     var createOpen = document.getElementById("create");
     var updateOpens = document.querySelectorAll(".updates");
 
 
-    var internalCodeInput = $('input[name="internalCode"]');
     var nameInput = $('input[name="name"]');
-    var describeInput = $('input[name="describe"]');
-    var priceInput = $('input[name="price"]');
+    var phoneInput = $('input[name="phone"]');
+    var emailInput = $('input[name="email"]');
+    var typeInput = $('select[name="type"]');
+    var addressInput = $('input[name="address"]');
 
     var searchTimer;
     var sorted_asc = true;
@@ -239,28 +257,27 @@
             }, 600);
         });
 
-        // $('#filterKindRoom').change(function () {
-        //     performSearch();
-        // });
+        $('#filterType').change(function () {
+            performSearch();
+        });
 
         function performSearch() {
             var searchTerm = $('#searchInput').val();
-            // var selectedKindRoom = $('#filterKindRoom').val();
-            // var selectedStatus = $('#filterStatus').val();
+            var selectedType = $('#filterType').val();
 
             $.ajax({
-                url: '/service/index',
+                url: '/customer/index',
                 method: 'GET',
                 data: {
                     search: searchTerm,
                     page: 1,
                     sorts: null,
-                    // filters: `KindRoomId:${selectedKindRoom},status:${selectedStatus}`
+                    filters: `type:${selectedType}`
                 },
                 contentType: 'application/json; charset=utf-8',
                 success: function (data) {
-                    var newData = $('<tbody>').html(data).find('#table-body-service').html();
-                    $('#table-body-service').html(newData);
+                    var newData = $('<tbody>').html(data).find('#table-body-customer').html();
+                    $('#table-body-customer').html(newData);
 
                     var newPaginated = $('<div>').html(data).find('#paginated').html();
                     $('#paginated').html(newPaginated);
@@ -280,13 +297,14 @@
         createOpen.addEventListener("click", function (event) {
             var rowData = {
                 id: 0,
-                internalCode: "",
                 name: "",
-                describe: "",
-                price: 0,
+                phone: "",
+                email: "",
+                type: "L",
+                address: "",
             };
 
-            document.getElementById("modalTitle").innerText = "Thêm dịch vụ mới";
+            document.getElementById("modalTitle").innerText = "Thêm khách hàng mới";
             document.getElementById("createButton").style.display = "inline-block";
             document.getElementById("updateButton").style.display = "none";
 
@@ -299,12 +317,13 @@
                 var parentRow = button.closest("tr");
                 var rowData = {
                     id: parentRow.querySelector("td:nth-child(2)").textContent.trim(),
-                    internalCode: parentRow.querySelector("td:nth-child(3)").textContent.trim(),
-                    name: parentRow.querySelector("td:nth-child(4)").textContent.trim(),
-                    describe: parentRow.querySelector("td:nth-child(5)").innerHTML,
-                    price: parentRow.querySelector("td:nth-child(6)").textContent.trim(),
+                    name: parentRow.querySelector("td:nth-child(3)").textContent.trim(),
+                    phone: parentRow.querySelector("td:nth-child(4)").textContent.trim(),
+                    email: parentRow.querySelector("td:nth-child(5)").textContent.trim(),
+                    type: parentRow.querySelector("td:nth-child(6)").textContent.trim(),
+                    address: parentRow.querySelector("td:nth-child(8)").textContent.trim(),
                 };
-                document.getElementById("modalTitle").innerText = "Cập nhật dịch vụ phòng";
+                document.getElementById("modalTitle").innerText = "Cập nhật thông tin khách hàng";
                 document.getElementById("createButton").style.display = "none";
                 document.getElementById("updateButton").style.display = "inline-block";
 
@@ -317,16 +336,16 @@
                 var itemId = $(this).closest("tr").find("td[data-id]").data("id");
 
                 $.ajax({
-                    url: "/service/delete?pId=" + itemId,
+                    url: "/customer/delete?pId=" + itemId,
                     method: "DELETE",
                     success: function (data) {
                         if (data.success) {
                             $.ajax({
-                                url: "/service/index",
+                                url: "/customer/index",
                                 method: "GET",
                                 success: function (data) {
-                                    var newData = $('<tbody>').html(data).find('#table-body-service').html();
-                                    $('#table-body-service').html(newData);
+                                    var newData = $('<tbody>').html(data).find('#table-body-customer').html();
+                                    $('#table-body-customer').html(newData);
 
                                     var newPaginated = $('<div>').html(data).find('#paginated').html();
                                     $('#paginated').html(newPaginated);
@@ -334,14 +353,14 @@
                                     resetEvent();
                                 },
                             });
-                            toastr.success('Xoá dịch vụ thành công!', 'Thông báo');
+                            toastr.success('Xoá khách hàng thành công!', 'Thông báo');
                         }
                         else {
                             toastr.error(data.errors[0], 'Thông báo');
                         }
                     },
                     error: function (xhr, textStatus, errorThrown) {
-                        toastr.error('Xoá dịch vụ thất bại!', 'Thông báo');
+                        toastr.error('Xoá khách hàng thất bại!', 'Thông báo');
                     }
                 });
             });
@@ -358,11 +377,11 @@
 
         function paginatedResult(page) {
             $.ajax({
-                url: `/service/index?page=${page}`,
+                url: `/customer/index?page=${page}`,
                 method: 'GET',
                 success: function (data) {
-                    var newData = $('<tbody>').html(data).find('#table-body-service').html();
-                    $('#table-body-service').html(newData);
+                    var newData = $('<tbody>').html(data).find('#table-body-customer').html();
+                    $('#table-body-customer').html(newData);
 
                     updatePagination(page);
                 },
@@ -379,10 +398,11 @@
 
     function loadData(data) {
         document.querySelector('input[name="id"]').value = data.id;
-        document.querySelector('input[name="internalCode"]').value = data.internalCode;
         document.querySelector('input[name="name"]').value = data.name;
-        _describeEditor.setData(data.describe);
-        document.querySelector('input[name="price"]').value = data.price;
+        document.querySelector('input[name="phone"]').value = data.phone;
+        document.querySelector('input[name="email"]').value = data.email;
+        document.querySelector('select[name="type"]').value = data.type;
+        document.querySelector('input[name="address"]').value = data.address;
 
         removeValidator();
     }
@@ -390,10 +410,11 @@
     function removeValidator() {
         $(".text-danger").text("");
 
-        internalCodeInput.removeClass("border-danger");
         nameInput.removeClass("border-danger");
-        describeInput.removeClass("border-danger");
-        priceInput.removeClass("border-danger");
+        phoneInput.removeClass("border-danger");
+        emailInput.removeClass("border-danger");
+        typeInput.removeClass("border-danger");
+        addressInput.removeClass("border-danger");
     }
 
     resetEvent();
@@ -414,20 +435,20 @@
 
             if (isValid) {
                 $.ajax({
-                    url: "/service/create",
+                    url: "/customer/create",
                     method: "POST",
                     data: JSON.stringify(pRequest),
                     contentType: "application/json; charset=utf-8",
                     success: function (data) {
                         if (data.success) {
                             $.ajax({
-                                url: "/service/index",
+                                url: "/customer/index",
                                 method: "GET",
                                 data: { page: 1 },
                                 contentType: "application/json; charset=utf-8",
                                 success: function (data) {
-                                    var newData = $('<tbody>').html(data).find('#table-body-service').html();
-                                    $('#table-body-service').html(newData);
+                                    var newData = $('<tbody>').html(data).find('#table-body-customer').html();
+                                    $('#table-body-customer').html(newData);
 
                                     var newPaginated = $('<div>').html(data).find('#paginated').html();
                                     $('#paginated').html(newPaginated);
@@ -437,13 +458,13 @@
                                     resetEvent();
                                 },
                             });
-                            toastr.success('Thêm dịch vụ mới thành công!', 'Thông báo');
+                            toastr.success('Thêm khách hàng mới thành công!', 'Thông báo');
                         } else {
                             toastr.error(data.errors[0], 'Thông báo');
                         }
                     },
                     error: function (xhr, textStatus, errorThrown) {
-                        toastr.error('Thêm dịch vụ mới thất bại!', 'Thông báo');
+                        toastr.error('Thêm khách hàng mới thất bại!', 'Thông báo');
                     }
                 });
             }
@@ -460,34 +481,34 @@
 
             if (isValid) {
                 $.ajax({
-                    url: "/service/update",
+                    url: "/customer/update",
                     method: "PUT",
                     data: JSON.stringify(pRequest),
                     contentType: "application/json; charset=utf-8",
                     success: function (data) {
                         if (data.success) {
                             $.ajax({
-                                url: "/service/index",
+                                url: "/customer/index",
                                 method: "GET",
                                 data: { page: 1 },
                                 contentType: "application/json; charset=utf-8",
                                 success: function (data) {
-                                    var newData = $('<tbody>').html(data).find('#table-body-service').html();
-                                    $('#table-body-service').html(newData);
+                                    var newData = $('<tbody>').html(data).find('#table-body-customer').html();
+                                    $('#table-body-customer').html(newData);
 
                                     $('.btn-secondary[data-dismiss="modal"]').click();
 
                                     resetEvent();
                                 },
                             });
-                            toastr.success('Cập nhật thông tin dịch vụ thành công!', 'Thông báo');
+                            toastr.success('Cập nhật thông tin khách hàng thành công!', 'Thông báo');
                         }
                         else {
                             toastr.error(data.errors[0], 'Thông báo');
                         }
                     },
                     error: function (xhr, textStatus, errorThrown) {
-                        toastr.error('Cập nhật thông tin dịch vụ thất bại!', 'Thông báo');
+                        toastr.error('Cập nhật thông tin khách hàng thất bại!', 'Thông báo');
                     }
                 });
             }
@@ -497,10 +518,11 @@
     function getData() {
         var formData = {
             id: $('input[name="id"]').val() || null,
-            internalCode: $('input[name="internalCode"]').val() || null,
             name: $('input[name="name"]').val() || null,
-            describe: _describeEditor.getData(),
-            price: $('input[name="price"]').val() || null,
+            phone: $('input[name="phone"]').val() || null,
+            email: $('input[name="email"]').val() || null,
+            type: $('select[name="type"]').val() || null,
+            address: $('input[name="address"]').val(),
         };
         return formData;
     }
@@ -508,39 +530,35 @@
     function validateForm(data) {
         var isValid = true;
 
-        // Validate internalCode
-        if (!data.internalCode) {
-            $("#internalCodeError").text("Mã dịch vụ không được để trống");
-            $('input[name="internalCode"]').addClass("border-danger");
-            isValid = false;
-        } else if (data.internalCode.length > 100) {
-            $("#internalCodeError").text("Mã dịch vụ không được vượt quá 100 ký tự.");
-            $('input[name="internalCode"]').addClass("border-danger");
-            isValid = false;
-        }
-
         // Validate name
         if (!data.name) {
-            $("#nameError").text("Tên dịch vụ không được để trống");
-            $('select[name="name"]').addClass("border-danger");
+            $("#nameError").text("Tên khách hàng không được để trống");
+            $('input[name="name"]').addClass("border-danger");
+            isValid = false;
+        } else if (data.name.length > 100) {
+            $("#internalCodeError").text("Tên khách hàng không được vượt quá 100 ký tự.");
+            $('input[name="name"]').addClass("border-danger");
             isValid = false;
         }
 
-        // // Validate describe
-        // if (!data.describe) {
-        //     $("#describeError").text("Loại phòng không được để trống");
-        //     $('select[name="kindRoomId"]').addClass("border-danger");
-        //     isValid = false;
-        // }
-
-        // Validate price
-        if (!data.price) {
-            $("#priceError").text("Giá dịch vụ không được để trống");
-            $('select[name="price"]').addClass("border-danger");
+        // Validate phone
+        if (!data.phone) {
+            $("#phoneError").text("Số điện thoại không được để trống");
+            $('input[name="phone"]').addClass("border-danger");
             isValid = false;
-        } else if (data.price < 0) {
-            $("#priceError").text("Giá dịch vụ không thể nhỏ hơn 0");
-            $('select[name="price"]').addClass("border-danger");
+        }
+
+        // Validate email
+        if (!data.email) {
+            $("#emailError").text("Email không được để trống");
+            $('input[name="email"]').addClass("border-danger");
+            isValid = false;
+        }
+
+        // Validate address
+        if (data.address.length > 250) {
+            $("#addressError").text("Địa chỉ không được vượt quá 300 ký tự.");
+            $('input[name="address"]').addClass("border-danger");
             isValid = false;
         }
 
