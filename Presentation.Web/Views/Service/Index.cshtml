@@ -43,7 +43,7 @@
                     <th class="min-vw-10"></th>
                     <th class="th-sm text-center">Mã Dịch Vụ</th>
                     <th class="th-sm text-center">Tên Dịch vụ</th>
-                    <th class="th-sm text-center">Mô tả</th>
+                    <th class="th-sm text-center d-none">Mô tả</th>
                     <th class="th-sm text-center">Giá</th>
                     <th class="th-sm text-center"></th>
                 </tr>
@@ -70,8 +70,8 @@
                             <td class="text-center">
                                 @service?.Name
                             </td>
-                            <td class="text-center describe-multiline">
-                                @service?.Describe
+                            <td class="text-center d-none">
+                                @Html.Raw(service?.Describe)
                             </td>
                             <td class="text-center">
                                 @service?.Price
@@ -148,8 +148,7 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label class="font-weight-bold mb-2">Mô tả</label>
-                                        <input class="form-control" type="text" name="describe" />
-                                        <span class="text-danger" id="describeError"></span>
+                                        <div id="describeEditor"/>
                                     </div>
                                 </div>
 
@@ -174,6 +173,14 @@
     </div>
 </div>
 
+
+@* Style*@
+<style>
+    .ck.ck-content.ck-editor__editable.ck-rounded-corners.ck-editor__editable_inline {
+        min-height: 300px;
+    }
+</style>
+
 @* Đây là JS nè *@
 <script>
     $("#room-service").addClass("active");
@@ -190,6 +197,20 @@
 
         $(this).closest(".link-parent").addClass("active");
     });
+</script>
+
+@* Ckeditor *@
+<script>
+    var _describeEditor;
+
+    ClassicEditor
+        .create(document.querySelector('#describeEditor'))
+        .then(editor => {
+            _describeEditor = editor;
+        })
+        .catch(error => {
+            console.error('There was a problem initializing the editor.', error);
+        });
 </script>
 
 @* Khởi tạo biến *@
@@ -280,7 +301,7 @@
                     id: parentRow.querySelector("td:nth-child(2)").textContent.trim(),
                     internalCode: parentRow.querySelector("td:nth-child(3)").textContent.trim(),
                     name: parentRow.querySelector("td:nth-child(4)").textContent.trim(),
-                    describe: parentRow.querySelector("td:nth-child(5)").textContent.trim(),
+                    describe: parentRow.querySelector("td:nth-child(5)").innerHTML,
                     price: parentRow.querySelector("td:nth-child(6)").textContent.trim(),
                 };
                 document.getElementById("modalTitle").innerText = "Cập nhật dịch vụ phòng";
@@ -360,7 +381,7 @@
         document.querySelector('input[name="id"]').value = data.id;
         document.querySelector('input[name="internalCode"]').value = data.internalCode;
         document.querySelector('input[name="name"]').value = data.name;
-        document.querySelector('input[name="describe"]').value = data.describe;
+        _describeEditor.setData(data.describe);
         document.querySelector('input[name="price"]').value = data.price;
 
         removeValidator();
@@ -478,7 +499,7 @@
             id: $('input[name="id"]').val() || null,
             internalCode: $('input[name="internalCode"]').val() || null,
             name: $('input[name="name"]').val() || null,
-            describe: $('input[name="describe"]').val() || null,
+            describe: _describeEditor.getData() || null,
             price: $('input[name="price"]').val() || null,
         };
         return formData;
