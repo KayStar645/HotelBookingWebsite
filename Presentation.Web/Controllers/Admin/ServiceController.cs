@@ -2,7 +2,9 @@
 using Core.Application.Interfaces;
 using Core.Application.ViewModels.Common;
 using Core.Application.ViewModels.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Web.Middleware;
 
 namespace Presentation.Web.Controllers.Admin
 {
@@ -15,8 +17,9 @@ namespace Presentation.Web.Controllers.Admin
 			_serviceService = serviceService;
 		}
 
-		[HttpGet()]
-		public async Task<IActionResult> Index([FromQuery] BaseListRQ pRequest)
+		[HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> Index([FromQuery] BaseListRQ pRequest)
 		{
 			ViewBag.List = await _serviceService.List(pRequest);
 
@@ -24,7 +27,9 @@ namespace Presentation.Web.Controllers.Admin
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Create([FromBody] ServiceRQ pRequest)
+        [AllowAnonymous]
+        [Permission("service-create")]
+        public async Task<IActionResult> Create([FromBody] ServiceRQ pRequest)
 		{
 			try
 			{
@@ -52,7 +57,9 @@ namespace Presentation.Web.Controllers.Admin
 
 
 		[HttpPut]
-		public async Task<IActionResult> Update([FromBody] ServiceRQ pRequest)
+        [AllowAnonymous]
+        [Permission("service-update")]
+        public async Task<IActionResult> Update([FromBody] ServiceRQ pRequest)
 		{
 			try
 			{
@@ -79,7 +86,9 @@ namespace Presentation.Web.Controllers.Admin
 		}
 
 		[HttpDelete]
-		public async Task<IActionResult> Delete([FromQuery] int pId)
+        [AllowAnonymous]
+        [Permission("service-delete")]
+        public async Task<IActionResult> Delete([FromQuery] int pId)
 		{
 			try
 			{
