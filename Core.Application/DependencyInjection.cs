@@ -33,8 +33,9 @@ namespace Core.Application
             services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
-
-            return services;
+			services.AddScoped<IServiceService, ServiceService>();
+      
+			return services;
 		}
 
 	}
