@@ -21,6 +21,7 @@ namespace Presentation.Web.Middleware
 					if (endpoint == null)
 					{
 						httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                        break;
 					}
 
 					if (endpoint?.Metadata.GetMetadata<IAllowAnonymous>() != null)
@@ -31,7 +32,7 @@ namespace Presentation.Web.Middleware
 
 					var authorizationHeader = httpContext.Request.Headers["Authorization"].ToString();
 
-                    if ((string.IsNullOrEmpty(authorizationHeader) == false && authorizationHeader.StartsWith("Bearer ")) == false)
+					if ((string.IsNullOrEmpty(authorizationHeader) == false && authorizationHeader.StartsWith("Bearer ")) == false)
                     {
                         httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
                         break;
@@ -86,8 +87,8 @@ namespace Presentation.Web.Middleware
                 }
                 else
                 {
-                    await next(httpContext);
-                }
+					await next(httpContext);
+				}
             }
             catch (Exception ex)
             {

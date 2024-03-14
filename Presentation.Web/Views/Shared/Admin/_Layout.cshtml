@@ -156,13 +156,15 @@
                             </a>
                             <ul class="me-0">
                                 <li id="master-data-kind-room" class="nav-item d-block">
-                                    <a href="@Url.Action("index", "kindRoom")" class="nav-link d-flex align-items-center">
+                                    <a href="@Url.Action("index", "kindRoom")"
+                                       class="hd nav-link d-flex align-items-center">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p class="mb-0 ml-2">Loại phòng</p>
                                     </a>
                                 </li>
                                 <li id="master-data-customer" class="nav-item d-block">
-                                    <a href="" class="nav-link d-flex align-items-center">
+                                    <a href=""
+                                       class="hd nav-link d-flex align-items-center">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p class="mb-0 ml-2">Khách hàng</p>
                                     </a>
@@ -176,14 +178,16 @@
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul class="me-0">
-                                <li id="room-service-room" class="nav-item d-block">
-                                    <a href="@Url.Action("index", "room")" class="nav-link d-flex align-items-center">
+                                <li id="room-service-room"class="nav-item d-block">
+                                    <a href="@Url.Action("index", "room")"
+                                       class="hd nav-link d-flex align-items-center">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p class="mb-0 ml-2">Phòng</p>
                                     </a>
                                 </li>
                                 <li id="room-service-service" class="nav-item d-block">
-                                    <a href="" class="nav-link d-flex align-items-center">
+                                    <a href=""
+                                       class="hd nav-link d-flex align-items-center">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p class="mb-0 ml-2">Dịch vụ</p>
                                     </a>
@@ -198,13 +202,15 @@
                             </a>
                             <ul class="me-0">
                                 <li id="business-booking" class="nav-item d-block">
-                                    <a href="" class="nav-link d-flex align-items-center">
+                                    <a href=""
+                                       class="hd nav-link d-flex align-items-center">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p class="mb-0 ml-2">Đơn đặt phòng</p>
                                     </a>
                                 </li>
                                 <li id="business-promotion" class="nav-item d-block">
-                                    <a href="" class="nav-link d-flex align-items-center">
+                                    <a href=""
+                                       class="hd nav-link d-flex align-items-center">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p class="mb-0 ml-2">Chương trình khuyến mãi</p>
                                     </a>
@@ -219,19 +225,22 @@
                             </a>
                             <ul class="me-0">
                                 <li id="system-staff" class="nav-item d-block">
-                                    <a href="@Url.Action("index", "staff")" class="nav-link d-flex align-items-center">
+                                    <a href="@Url.Action("index", "staff")"
+                                       class="hd nav-link d-flex align-items-center">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p class="mb-0 ml-2">Nhân viên</p>
                                     </a>
                                 </li>
                                 <li id="system-role" class="nav-item d-block">
-                                    <a href="@Url.Action("index", "user")" class="nav-link d-flex align-items-center">
+                                    <a href="@Url.Action("index", "user")"
+                                       class="hd nav-link d-flex align-items-center">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p class="mb-0 ml-2">Người dùng</p>
                                     </a>
                                 </li>
                                 <li id="system-role" class="nav-item d-block">
-                                    <a href="@Url.Action("index", "role")" class="nav-link d-flex align-items-center">
+                                    <a href="@Url.Action("index", "role")"
+                                       class="hd nav-link d-flex align-items-center">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p class="mb-0 ml-2">Quyền</p>
                                     </a>
@@ -264,6 +273,46 @@
 
             $(this).closest(".link-parent").addClass("active");
         });
+    </script>
+
+    <script>
+        var token = getCookie("Token");
+
+        // $('.sidebar a.hd').on('click', function (event) {
+        //     event.preventDefault();
+        //     var token = getCookie("Token");
+        //     const url = $(this).attr('href');
+
+        //     $.ajax({
+        //         url: url,
+        //         type: 'GET',
+        //         beforeSend: function (xhr) {
+        //             xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+        //         },
+        //         success: function (data, textStatus, xhr) {
+        //             if (xhr.status >= 200 && xhr.status < 300) {
+        //                // Vẫn phải điều hướng url => gọi lại thêm lần nữa
+        //                // Vẫn phải truyền header nữa 
+        //             } else {
+        //                 console.error('Lỗi rồi', xhr.status);
+        //             }
+        //         },
+        //         error: function (xhr, textStatus, errorThrown) {
+        //             console.error('lỗi rồi', xhr.status);
+        //         }
+        //     });
+        // });
+
+        function getCookie(name) {
+            var cookieArr = document.cookie.split(';');
+            for (var i = 0; i < cookieArr.length; i++) {
+                var cookiePair = cookieArr[i].split('=');
+                if (name === cookiePair[0].trim()) {
+                    return decodeURIComponent(cookiePair[1]);
+                }
+            }
+            return null;
+        }
     </script>
 
     <script src="~/assets/js/popper.min.js"></script>

@@ -40,13 +40,6 @@ namespace Presentation.Web.Controllers.Auth
 
 				var result = await _accountService.LoginAsync(pRequest);
 
-				Response.Cookies.Append("Token", "Bearer " + result.Token, new CookieOptions
-				{
-					Expires = DateTime.Now.AddDays(100),
-					Secure = true,
-					HttpOnly = true,
-				});
-
 				return Json(new { success = true , data = result});
 			}
 			catch (ValidationCustomException ex)
