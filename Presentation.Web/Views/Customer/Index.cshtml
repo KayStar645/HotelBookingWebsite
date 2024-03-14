@@ -1,0 +1,565 @@
+﻿@using Core.Application.Responses
+@using System.Globalization
+@using Core.Application.ViewModels.Customers
+
+@{
+    var customers = ViewBag.List as PaginatedResult<CustomerVM>;
+    string TypeName(string? status)
+    {
+        switch (status)
+        {
+            case "L":
+                return "Khách hàng thân thiết";
+            case "V":
+                return "Khách hàng vãng lai";
+            default:
+                return "";
+        }
+    }
+}
+
+@section TitleHeader
+{
+    <div class="row">
+        <div class="col-sm-12 mt-3">
+            <h3 class="page-title mt-3">
+                Danh sách khách hàng
+            </h3>
+            <div class="row mt-3">
+                <div class="col-sm-4">
+                    <label class="font-weight-bold mb-1">Tìm kiếm</label>
+                    <div class="form-outline p-0" data-mdb-input-init>
+                        <input type="search" class="form-control" id="searchInput" placeholder="Tìm kiếm..." />
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <label class="font-weight-bold mb-1">Phân loại</label>
+                    <div class="form-outline p-0">
+                        <select id="filterType" class="form-control" name="filterType">
+                            <option value="">Tất cả</option>
+                            <option value="L">Khách hàng thân thiết</option>
+                            <option value="V">Khách hàng vãng lai</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                </div>
+                <div class="col-sm-2">
+                    <div class="text-right">
+                        <button type="button" id="create" class="btn btn-primary"
+                                data-toggle="modal" data-target="#openPopupCreate">
+                            Thêm mới
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="card-body">
+    <div class="table-responsive" style="overflow-y: auto;">
+        <table class="table table-hover table-center table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th class="min-vw-10"></th>
+                    <th class="th-sm text-center">Tên khách hàng</th>
+                    <th class="th-sm text-center">Số điện thoại</th>
+                    <th class="th-sm text-center">Email</th>
+                    <th class="th-sm text-center">Phân loại</th>
+                    <th class="th-sm text-center">Địa chỉ</th>
+                    <th class="th-sm text-center"></th>
+                </tr>
+            </thead>
+            <tbody id="table-body-customer">
+                @if (customers != null)
+                {
+                    @foreach (var customer in customers.Data)
+                    {
+                        <tr>
+                            <td class="text-center">
+                                <i class=" updates fa-regular fa-pen-to-square pe-3"
+                                   style="color:blue;cursor: pointer;"
+                                   data-toggle="modal" data-target="#openPopupCreate"></i>
+                                @if (customer.IsDeleted != true)
+                                {
+                                    <i class="deletes fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
+                                }
+                            </td>
+                            <td class="text-center d-none" data-id="@customer?.Id">@customer?.Id</td>
+                            <td class="text-nowrap text-center">
+                                <div>@customer?.Name</div>
+                            </td>
+                            <td class="text-center">
+                                @customer?.Phone
+                            </td>
+                            <td class="text-center">
+                                @customer?.Email
+                            </td>
+                            <td class="text-center">
+                                @TypeName(customer?.Type)
+                            </td>
+                            <td class="text-center">
+                                @customer?.Address
+                            </td>
+                            <td class="text-center">
+                                @{
+                                    var statusText = customer.IsDeleted == true
+                                    ? "<span class='badge badge-pill bg-danger inv-badge'>Đã xoá</span>"
+                                    : "<span class='badge badge-pill bg-success inv-badge'>Hoạt động</span>";
+                                }
+                                @Html.Raw(statusText)
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@* Phân trang *@
+<div id="paginated" class="d-flex justify-content-end mt-4">
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            @for (int i = 1; i <= customers.Extra.TotalPages; i++)
+            {
+                <li class="page-item pageCurrent @(customers.Extra.CurrentPage == i ? "active" : "")">
+                    <a class="page-link" data-page="@i">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="openPopupCreate" tabindex="-1" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success">
+                <h1 class="modal-title text-white font-weight-bold" id="modalTitle">Thêm khách hàng mới</h1>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <form>
+                            <div class="row formtype">
+                                <div class="col-md-6 d-none">
+                                    <div class="form-group">
+                                        <input type="text" name="id" value="" />
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold mb-2">Tên khách hàng</label>
+                                        <input class="form-control" type="text" name="name" />
+                                        <span class="text-danger" id="nameError"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold mb-2">Số điện thoại</label>
+                                        <input class="form-control" type="text" name="phone" />
+                                        <span class="text-danger" id="phoneError"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold mb-2">Email</label>
+                                        <input class="form-control" type="text" name="email" />
+                                        <span class="text-danger" id="emailError"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold mb-2">Phân loại</label>
+                                        <select class="form-control" name="type">
+                                            <option value="L">Khách hàng thân thiết</option>
+                                            <option value="V">Khách hàng vãng lai</option>
+                                        </select>
+                                        <span class="text-danger" id="typeError"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold mb-2">Địa chỉ</label>
+                                        <input class="form-control" type="text" name="address" />
+                                        <span class="text-danger" id="addressError"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="button" id="createButton" class="btn btn-primary">Tạo mới</button>
+                <button type="button" id="updateButton" class="btn btn-primary">Cập nhật</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Đây là JS nè *@
+<script>
+    $("#master-data").addClass("active");
+    $("#master-data").next("ul").addClass("d-block");
+    $("#master-data-customer").addClass("active");
+
+    $(".link-parent").on("click", function (e) {
+        e.preventDefault();
+
+        $(".nav-childs").removeClass("active");
+        $(".link-parent").removeClass("active");
+
+        $(".link-parent").next("ul").not($(this).next("ul")).removeClass("d-block");
+
+        $(this).closest(".link-parent").addClass("active");
+    });
+</script>
+
+@* Khởi tạo biến *@
+<script>
+    var createOpen = document.getElementById("create");
+    var updateOpens = document.querySelectorAll(".updates");
+
+
+    var nameInput = $('input[name="name"]');
+    var phoneInput = $('input[name="phone"]');
+    var emailInput = $('input[name="email"]');
+    var typeInput = $('select[name="type"]');
+    var addressInput = $('input[name="address"]');
+
+    var searchTimer;
+    var sorted_asc = true;
+</script>
+
+@* Tìm kiếm và lọc *@
+<script>
+    $(document).ready(function () {
+        $('#searchInput').on('input', function () {
+            clearTimeout(searchTimer);
+
+            searchTimer = setTimeout(function () {
+                performSearch();
+            }, 600);
+        });
+
+        $('#filterType').change(function () {
+            performSearch();
+        });
+
+        function performSearch() {
+            var searchTerm = $('#searchInput').val();
+            var selectedType = $('#filterType').val();
+
+            $.ajax({
+                url: '/customer/index',
+                method: 'GET',
+                data: {
+                    search: searchTerm,
+                    page: 1,
+                    sorts: null,
+                    filters: `type:${selectedType}`
+                },
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    var newData = $('<tbody>').html(data).find('#table-body-customer').html();
+                    $('#table-body-customer').html(newData);
+
+                    var newPaginated = $('<div>').html(data).find('#paginated').html();
+                    $('#paginated').html(newPaginated);
+                    resetEvent();
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    toastr.error('Lỗi khi thực hiện tìm kiếm!', 'Thông báo');
+                }
+            });
+        }
+    });
+</script>
+
+@* Lắng nghe sự kiện + load giao diện và dữ liệu *@
+<script>
+    function resetEvent() {
+        createOpen.addEventListener("click", function (event) {
+            var rowData = {
+                id: 0,
+                name: "",
+                phone: "",
+                email: "",
+                type: "L",
+                address: "",
+            };
+
+            document.getElementById("modalTitle").innerText = "Thêm khách hàng mới";
+            document.getElementById("createButton").style.display = "inline-block";
+            document.getElementById("updateButton").style.display = "none";
+
+            loadData(rowData);
+        });
+
+        updateOpens = document.querySelectorAll(".updates");
+        updateOpens.forEach(function (button) {
+            button.addEventListener("click", function () {
+                var parentRow = button.closest("tr");
+                var rowData = {
+                    id: parentRow.querySelector("td:nth-child(2)").textContent.trim(),
+                    name: parentRow.querySelector("td:nth-child(3)").textContent.trim(),
+                    phone: parentRow.querySelector("td:nth-child(4)").textContent.trim(),
+                    email: parentRow.querySelector("td:nth-child(5)").textContent.trim(),
+                    type: parentRow.querySelector("td:nth-child(6)").textContent.trim(),
+                    address: parentRow.querySelector("td:nth-child(7)").textContent.trim(),
+                };
+                document.getElementById("modalTitle").innerText = "Cập nhật thông tin khách hàng";
+                document.getElementById("createButton").style.display = "none";
+                document.getElementById("updateButton").style.display = "inline-block";
+
+                loadData(rowData);
+            });
+        });
+
+        $(document).ready(function () {
+            $(".deletes").on("click", function () {
+                var itemId = $(this).closest("tr").find("td[data-id]").data("id");
+
+                $.ajax({
+                    url: "/customer/delete?pId=" + itemId,
+                    method: "DELETE",
+                    success: function (data) {
+                        if (data.success) {
+                            $.ajax({
+                                url: "/customer/index",
+                                method: "GET",
+                                success: function (data) {
+                                    var newData = $('<tbody>').html(data).find('#table-body-customer').html();
+                                    $('#table-body-customer').html(newData);
+
+                                    var newPaginated = $('<div>').html(data).find('#paginated').html();
+                                    $('#paginated').html(newPaginated);
+
+                                    resetEvent();
+                                },
+                            });
+                            toastr.success('Xoá khách hàng thành công!', 'Thông báo');
+                        }
+                        else {
+                            toastr.error(data.errors[0], 'Thông báo');
+                        }
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        toastr.error('Xoá khách hàng thất bại!', 'Thông báo');
+                    }
+                });
+            });
+        });
+
+
+        $(document).ready(function () {
+            $('.pagination a').on('click', function (e) {
+                e.preventDefault();
+                var page = $(this).data('page');
+                paginatedResult(page);
+            });
+        });
+
+        function paginatedResult(page) {
+            $.ajax({
+                url: `/customer/index?page=${page}`,
+                method: 'GET',
+                success: function (data) {
+                    var newData = $('<tbody>').html(data).find('#table-body-customer').html();
+                    $('#table-body-customer').html(newData);
+
+                    updatePagination(page);
+                },
+            });
+        }
+
+        function updatePagination(activePage) {
+            $('.pageCurrent').removeClass('active');
+            $('.pagination a[data-page="' + activePage + '"]').addClass('active').closest('.pageCurrent').addClass('active');
+        }
+    }
+
+
+
+    function loadData(data) {
+        document.querySelector('input[name="id"]').value = data.id;
+        document.querySelector('input[name="name"]').value = data.name;
+        document.querySelector('input[name="phone"]').value = data.phone;
+        document.querySelector('input[name="email"]').value = data.email;
+        document.querySelector('select[name="type"]').value = data.type;
+        document.querySelector('input[name="address"]').value = data.address;
+
+        removeValidator();
+    }
+
+    function removeValidator() {
+        $(".text-danger").text("");
+
+        nameInput.removeClass("border-danger");
+        phoneInput.removeClass("border-danger");
+        emailInput.removeClass("border-danger");
+        typeInput.removeClass("border-danger");
+        addressInput.removeClass("border-danger");
+    }
+
+    resetEvent();
+</script>
+
+@* Gọi controller xử lý *@
+<script>
+    $(document).ready(function () {
+        $("#createButton").on("click", function (e) {
+            e.preventDefault();
+
+            removeValidator();
+
+            var pRequest = getData();
+            pRequest.id = 0;
+
+            var isValid = validateForm(pRequest);
+
+            if (isValid) {
+                $.ajax({
+                    url: "/customer/create",
+                    method: "POST",
+                    data: JSON.stringify(pRequest),
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        if (data.success) {
+                            $.ajax({
+                                url: "/customer/index",
+                                method: "GET",
+                                data: { page: 1 },
+                                contentType: "application/json; charset=utf-8",
+                                success: function (data) {
+                                    var newData = $('<tbody>').html(data).find('#table-body-customer').html();
+                                    $('#table-body-customer').html(newData);
+
+                                    var newPaginated = $('<div>').html(data).find('#paginated').html();
+                                    $('#paginated').html(newPaginated);
+
+                                    $('.btn-secondary[data-dismiss="modal"]').click();
+
+                                    resetEvent();
+                                },
+                            });
+                            toastr.success('Thêm khách hàng mới thành công!', 'Thông báo');
+                        } else {
+                            toastr.error(data.errors[0], 'Thông báo');
+                        }
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        toastr.error('Thêm khách hàng mới thất bại!', 'Thông báo');
+                    }
+                });
+            }
+        });
+
+        $("#updateButton").on("click", function (e) {
+            e.preventDefault();
+
+            removeValidator();
+
+            var pRequest = getData();
+
+            var isValid = validateForm(pRequest);
+
+            if (isValid) {
+                $.ajax({
+                    url: "/customer/update",
+                    method: "PUT",
+                    data: JSON.stringify(pRequest),
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        if (data.success) {
+                            $.ajax({
+                                url: "/customer/index",
+                                method: "GET",
+                                data: { page: 1 },
+                                contentType: "application/json; charset=utf-8",
+                                success: function (data) {
+                                    var newData = $('<tbody>').html(data).find('#table-body-customer').html();
+                                    $('#table-body-customer').html(newData);
+
+                                    $('.btn-secondary[data-dismiss="modal"]').click();
+
+                                    resetEvent();
+                                },
+                            });
+                            toastr.success('Cập nhật thông tin khách hàng thành công!', 'Thông báo');
+                        }
+                        else {
+                            toastr.error(data.errors[0], 'Thông báo');
+                        }
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        toastr.error('Cập nhật thông tin khách hàng thất bại!', 'Thông báo');
+                    }
+                });
+            }
+        });
+    });
+
+    function getData() {
+        var formData = {
+            id: $('input[name="id"]').val() || null,
+            name: $('input[name="name"]').val() || null,
+            phone: $('input[name="phone"]').val() || null,
+            email: $('input[name="email"]').val() || null,
+            type: $('select[name="type"]').val() || null,
+            address: $('input[name="address"]').val() || null,
+        };
+        return formData;
+    }
+
+    function validateForm(data) {
+        var isValid = true;
+
+        // Validate name
+        if (!data.name) {
+            $("#nameError").text("Tên khách hàng không được để trống");
+            $('input[name="name"]').addClass("border-danger");
+            isValid = false;
+        } else if (data.name.length > 100) {
+            $("#internalCodeError").text("Tên khách hàng không được vượt quá 100 ký tự.");
+            $('input[name="name"]').addClass("border-danger");
+            isValid = false;
+        }
+
+        // Validate phone
+        if (!data.phone) {
+            $("#phoneError").text("Số điện thoại không được để trống");
+            $('input[name="phone"]').addClass("border-danger");
+            isValid = false;
+        }
+
+        // Validate email
+        if (!data.email) {
+            $("#emailError").text("Email không được để trống");
+            $('input[name="email"]').addClass("border-danger");
+            isValid = false;
+        }
+
+        // Validate address
+        if (data.address.length > 250) {
+            $("#addressError").text("Địa chỉ không được vượt quá 300 ký tự.");
+            $('input[name="address"]').addClass("border-danger");
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+</script>

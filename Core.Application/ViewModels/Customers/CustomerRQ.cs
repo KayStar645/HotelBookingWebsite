@@ -21,13 +21,13 @@ namespace Core.Application.ViewModels.Customers
         [EmailAddress(ErrorMessage = "Email cần phải đúng định dạng.")]
         public string? Email { get; set; }
 
-        [Display(Name = "Địa chỉ khách hàng")]
-        [StringLength(250, ErrorMessage = "Địa chỉ khách hàng không vượt quá 250 ký tự.")]
-        public string? Address { get; set; }
-
         [Required(ErrorMessage = "Phân loại khách hàng là bắt buộc.")]
         [RegularExpression($"^({Customer.TYPE_LOYAL}|{Customer.TYPE_VISITOR})$",
             ErrorMessage = "Giá trị không hợp lệ cho phân loại khách hàng.")]
         public string? Type { get; set; }
+
+        [Display(Name = "Địa chỉ khách hàng")]
+        [StringLength(250, ErrorMessage = "Địa chỉ khách hàng không vượt quá 250 ký tự.")]
+        public string? Address { get; set; }
     }
 }
