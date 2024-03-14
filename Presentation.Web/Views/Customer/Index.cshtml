@@ -78,11 +78,11 @@
                     {
                         <tr>
                             <td class="text-center">
-                                <i class=" updates fa-regular fa-pen-to-square pe-3"
-                                   style="color:blue;cursor: pointer;"
-                                   data-toggle="modal" data-target="#openPopupCreate"></i>
                                 @if (customer.IsDeleted != true)
                                 {
+                                    <i class=" updates fa-regular fa-pen-to-square pe-3"
+                                       style="color:blue;cursor: pointer;"
+                                       data-toggle="modal" data-target="#openPopupCreate"></i>
                                     <i class="deletes fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
                                 }
                             </td>
@@ -95,6 +95,9 @@
                             </td>
                             <td class="text-center">
                                 @customer?.Email
+                            </td>
+                            <td class="text-center d-none">
+                                @customer?.Type
                             </td>
                             <td class="text-center">
                                 @TypeName(customer?.Type)
@@ -318,7 +321,7 @@
                     phone: parentRow.querySelector("td:nth-child(4)").textContent.trim(),
                     email: parentRow.querySelector("td:nth-child(5)").textContent.trim(),
                     type: parentRow.querySelector("td:nth-child(6)").textContent.trim(),
-                    address: parentRow.querySelector("td:nth-child(7)").textContent.trim(),
+                    address: parentRow.querySelector("td:nth-child(8)").textContent.trim(),
                 };
                 document.getElementById("modalTitle").innerText = "Cập nhật thông tin khách hàng";
                 document.getElementById("createButton").style.display = "none";
@@ -519,7 +522,7 @@
             phone: $('input[name="phone"]').val() || null,
             email: $('input[name="email"]').val() || null,
             type: $('select[name="type"]').val() || null,
-            address: $('input[name="address"]').val() || null,
+            address: $('input[name="address"]').val(),
         };
         return formData;
     }

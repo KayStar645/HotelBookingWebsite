@@ -55,11 +55,11 @@
                     {
                         <tr>
                             <td class="text-center">
-                                <i class=" updates fa-regular fa-pen-to-square pe-3"
-                                   style="color:blue;cursor: pointer;"
-                                   data-toggle="modal" data-target="#openPopupCreate"></i>
                                 @if (service.IsDeleted != true)
                                 {
+                                    <i class=" updates fa-regular fa-pen-to-square pe-3"
+                                       style="color:blue;cursor: pointer;"
+                                       data-toggle="modal" data-target="#openPopupCreate"></i>
                                     <i class="deletes fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
                                 }
                             </td>
@@ -148,7 +148,7 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label class="font-weight-bold mb-2">Mô tả</label>
-                                        <div id="describeEditor"/>
+                                        <div id="describeEditor" />
                                     </div>
                                 </div>
 
@@ -499,7 +499,7 @@
             id: $('input[name="id"]').val() || null,
             internalCode: $('input[name="internalCode"]').val() || null,
             name: $('input[name="name"]').val() || null,
-            describe: _describeEditor.getData() || null,
+            describe: _describeEditor.getData(),
             price: $('input[name="price"]').val() || null,
         };
         return formData;
