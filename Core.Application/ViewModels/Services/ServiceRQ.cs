@@ -14,7 +14,6 @@ namespace Core.Application.ViewModels.Services
         public string? Name { get; set; }
 
         [Display(Name = "Mô tả dịch vụ")]
-        [StringLength(300, ErrorMessage = "Mô tả không vượt quá 300 ký tự.")]
         public string? Describe { get; set; }
 
         [Display(Name = "Giá dịch vụ")]
