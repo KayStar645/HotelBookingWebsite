@@ -1,4 +1,6 @@
 ﻿using Core.Application.ViewModels.Common;
+using Core.Application.ViewModels.Common.ValidationAttributes;
+using Core.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
 
 namespace Core.Application.ViewModels.Services
@@ -6,6 +8,7 @@ namespace Core.Application.ViewModels.Services
     public class ServiceRQ : BaseRQ
 	{
         [Required(ErrorMessage = "Mã dịch vụ là trường bắt buộc.")]
+        [InternalCode<Service, ServiceRQ>(ErrorMessage = "Mã dịch vụ đã tồn tại.")]
         public string? InternalCode { get; set; }
 
         [Display(Name = "Tên dịch vụ")]
@@ -14,7 +17,6 @@ namespace Core.Application.ViewModels.Services
         public string? Name { get; set; }
 
         [Display(Name = "Mô tả dịch vụ")]
-        [StringLength(300, ErrorMessage = "Mô tả không vượt quá 300 ký tự.")]
         public string? Describe { get; set; }
 
         [Display(Name = "Giá dịch vụ")]
