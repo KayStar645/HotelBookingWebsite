@@ -1,13 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Presentation.Web.Controllers.Customer
+namespace Presentation.Web.Controllers.Auth
 {
-    public class HomeController : Controller
+    public class RoleController : Controller
     {
-
-		[AllowAnonymous]
-		public IActionResult Index()
+        public IActionResult Index()
         {
             return View();
         }

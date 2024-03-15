@@ -1,9 +1,10 @@
 ﻿using Core.Application.Exceptions;
 using Core.Application.Interfaces;
-using Core.Application.Services.Extensions;
 using Core.Application.ViewModels.Common;
 using Core.Application.ViewModels.Staffs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Web.Middleware;
 
 namespace Presentation.Web.Controllers.Admin
 {
@@ -16,7 +17,8 @@ namespace Presentation.Web.Controllers.Admin
             _staffService = pStaffService;
         }
 
-		[HttpGet()]
+		[HttpGet]
+		[Permission("staff-view")]
         public async Task<IActionResult> Index([FromQuery] BaseListRQ pRequest)
         {
 			ViewBag.List = await _staffService.List(pRequest);
@@ -25,6 +27,7 @@ namespace Presentation.Web.Controllers.Admin
         }
 
 		[HttpPost]
+		[Permission("staff-create")]
 		public async Task<IActionResult> Create([FromBody] StaffRQ pRequest)
 		{
 			try
@@ -53,6 +56,7 @@ namespace Presentation.Web.Controllers.Admin
 
 
 		[HttpPut]
+		[Permission("staff-update")]
 		public async Task<IActionResult> Update([FromBody]StaffRQ pRequest)
 		{
 			try
@@ -80,7 +84,8 @@ namespace Presentation.Web.Controllers.Admin
 		}
 
 		[HttpDelete]
-        public async Task<IActionResult> Delete([FromQuery] int pId)
+		[Permission("staff-delete")]
+		public async Task<IActionResult> Delete([FromQuery] int pId)
 		{
             try
             {

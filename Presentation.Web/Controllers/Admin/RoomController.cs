@@ -3,6 +3,7 @@ using Core.Application.Interfaces;
 using Core.Application.ViewModels.Common;
 using Core.Application.ViewModels.Rooms;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Web.Middleware;
 
 namespace Presentation.Web.Controllers.Admin
 {
@@ -17,7 +18,8 @@ namespace Presentation.Web.Controllers.Admin
 			_kindRoomService = pKindRoomService;
 		}
 
-		[HttpGet()]
+		[HttpGet]
+		[Permission("room-view")]
 		public async Task<IActionResult> Index([FromQuery] BaseListRQ pRequest)
 		{
 			ViewBag.List = await _roomService.List(pRequest);
@@ -32,6 +34,7 @@ namespace Presentation.Web.Controllers.Admin
 		}
 
 		[HttpPost]
+		[Permission("room-create")]
 		public async Task<IActionResult> Create([FromBody] RoomRQ pRequest)
 		{
 			try
@@ -60,6 +63,7 @@ namespace Presentation.Web.Controllers.Admin
 
 
 		[HttpPut]
+		[Permission("room-update")]
 		public async Task<IActionResult> Update([FromBody] RoomRQ pRequest)
 		{
 			try
@@ -87,6 +91,7 @@ namespace Presentation.Web.Controllers.Admin
 		}
 
 		[HttpDelete]
+		[Permission("room-delete")]
 		public async Task<IActionResult> Delete([FromQuery] int pId)
 		{
 			try
