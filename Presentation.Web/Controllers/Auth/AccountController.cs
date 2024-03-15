@@ -4,6 +4,8 @@ using Core.Application.Interfaces.Auth;
 using Core.Application.ViewModels.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Presentation.Web.Controllers.Auth
 {
@@ -39,6 +41,16 @@ namespace Presentation.Web.Controllers.Auth
 				}
 
 				var result = await _accountService.LoginAsync(pRequest);
+
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var jwtToken = tokenHandler.ReadToken(result.Token) as JwtSecurityToken;
+
+                Response.Cookies.Append("Token", "Bearer " + result.Token, new CookieOptions
+				{
+					Expires = jwtToken.ValidTo,
+					Secure = true,
+					HttpOnly = true
+				});
 
 				return Json(new { success = true , data = result});
 			}

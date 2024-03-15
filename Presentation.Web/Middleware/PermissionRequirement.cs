@@ -22,7 +22,7 @@ namespace Presentation.Web.Middleware
                 context.Succeed(requirement);
             }
 
-            return Task.CompletedTask;
+			return Task.CompletedTask;
         }
     }
 }

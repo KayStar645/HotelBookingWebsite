@@ -17,8 +17,6 @@ namespace Presentation.Web.Controllers.Auth
         }
 
         [HttpGet]
-        [Permission("user-view")]
-        [AllowAnonymous]
         public async Task<IActionResult> Index([FromQuery] BaseListRQ pRequest)
         {
             ViewBag.List = await _userService.List(pRequest);

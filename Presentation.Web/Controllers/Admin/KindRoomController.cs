@@ -19,7 +19,6 @@ namespace Presentation.Web.Controllers.Admin
 
 		[HttpGet]
 		[Permission("kindroom-view")]
-        [AllowAnonymous]
         public async Task<IActionResult> Index([FromQuery] BaseListRQ pRequest)
 		{
 			ViewBag.List = await _kindRoomService.List(pRequest);
@@ -29,7 +28,6 @@ namespace Presentation.Web.Controllers.Admin
 
 		[HttpGet("/kindroom/detail")]
 		[Permission("kindroom-view")]
-        [AllowAnonymous]
         public async Task<IActionResult> Detail([FromQuery] int pId)
 		{
 			ViewBag.Detail = await _kindRoomService.Detail(pId);

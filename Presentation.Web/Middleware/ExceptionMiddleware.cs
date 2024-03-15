@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using System.Security.Claims;
 
 namespace Presentation.Web.Middleware
 {
@@ -30,6 +31,8 @@ namespace Presentation.Web.Middleware
 						return;
 					}
 
+                    httpContext.Request.Headers["Authorization"] = httpContext.Request.Cookies["Token"];
+
 					var authorizationHeader = httpContext.Request.Headers["Authorization"].ToString();
 
 					if ((string.IsNullOrEmpty(authorizationHeader) == false && authorizationHeader.StartsWith("Bearer ")) == false)
@@ -47,8 +50,14 @@ namespace Presentation.Web.Middleware
                         break;
                     }
 
-                    // Lấy danh sách quyền của người dùng từ token
-                    var permissions = jwtToken.Claims
+					var claims = jwtToken.Claims;
+					var identity = new ClaimsIdentity(claims, "jwt");
+					var principal = new ClaimsPrincipal(identity);
+					httpContext.User = principal;
+
+
+					// Lấy danh sách quyền của người dùng từ token
+					var permissions = jwtToken.Claims
                                             .Where(c => c.Type == ClaimCommon.Permission)
                                             .Select(c => c.Value).ToList();
 
@@ -59,7 +68,7 @@ namespace Presentation.Web.Middleware
                         break;
                     }
 
-                    var requiredRoles = authorizeAttributes
+                      var requiredRoles = authorizeAttributes
                                             .SelectMany(attr => (attr.Policy ?? "").Split(','))
                                             .Where(role => !string.IsNullOrEmpty(role))
                                             .Distinct().ToList();

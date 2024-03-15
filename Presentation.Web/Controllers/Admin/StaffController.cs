@@ -19,7 +19,6 @@ namespace Presentation.Web.Controllers.Admin
 
 		[HttpGet]
 		[Permission("staff-view")]
-        [AllowAnonymous]
         public async Task<IActionResult> Index([FromQuery] BaseListRQ pRequest)
         {
 			ViewBag.List = await _staffService.List(pRequest);

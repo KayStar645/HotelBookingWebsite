@@ -18,7 +18,7 @@ namespace Presentation.Web.Controllers.Admin
 		}
 
 		[HttpGet]
-        [AllowAnonymous]
+        [Permission("service-view")]
         public async Task<IActionResult> Index([FromQuery] BaseListRQ pRequest)
 		{
 			ViewBag.List = await _serviceService.List(pRequest);
@@ -27,7 +27,6 @@ namespace Presentation.Web.Controllers.Admin
 		}
 
 		[HttpPost]
-        [AllowAnonymous]
         [Permission("service-create")]
         public async Task<IActionResult> Create([FromBody] ServiceRQ pRequest)
 		{
@@ -57,7 +56,6 @@ namespace Presentation.Web.Controllers.Admin
 
 
 		[HttpPut]
-        [AllowAnonymous]
         [Permission("service-update")]
         public async Task<IActionResult> Update([FromBody] ServiceRQ pRequest)
 		{
@@ -86,7 +84,6 @@ namespace Presentation.Web.Controllers.Admin
 		}
 
 		[HttpDelete]
-        [AllowAnonymous]
         [Permission("service-delete")]
         public async Task<IActionResult> Delete([FromQuery] int pId)
 		{

@@ -5,7 +5,6 @@ namespace Presentation.Web.Controllers.Auth
 {
     public class RoleController : Controller
     {
-        [AllowAnonymous]
         public IActionResult Index()
         {
             return View();
