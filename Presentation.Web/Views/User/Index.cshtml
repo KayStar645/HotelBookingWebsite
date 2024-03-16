@@ -36,69 +36,138 @@
 	</div>
 }
 
-<div class="card-body">
-	<div class="table-responsive" style="overflow-y: auto;">
-		<table class="table table-hover table-center table-striped table-bordered">
-			<thead>
-				<tr>
-					<th class="min-vw-10"></th>
-					<th class="th-sm text-nowrap">Tên đăng nhập</th>
-					<th class="th-sm text-right">Email</th>
-					<th class="th-sm text-right">Số điện thoại</th>
-					<th class="th-sm text-nowrap">Vai trò</th>
-					<th class="th-sm text-nowrap">Quyền</th>
-					<th class="th-sm text-center">Loại</th>
-				</tr>
-			</thead>
-			<tbody id="table-body-room">
-				@if (users != null)
-				{
-					@foreach (var user in users.Data)
-					{
+<div class="row">
+	<div class="col-8">
+		<div class="card">
+			<div class="table-responsive" style="overflow-y: auto;">
+				<table class="table table-hover table-center table-striped table-bordered">
+					<thead>
 						<tr>
-							<td class="text-center">
-								<i class=" updates fa-regular fa-pen-to-square pe-3"
-								   style="color:blue;cursor: pointer;"
-								   data-toggle="modal" data-target="#openPopup"></i>
-								<i class="deletes fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
-							</td>
-							<td class="text-center d-none" data-id="@user?.Id">@user?.Id</td>
-							<td class="text-nowrap">
-								@user?.UserName
-							</td>
-							<td class="text-right">
-								@user?.Email
-							</td>
-							<td class="text-right">
-								@user?.PhoneNumber
-							</td>
-							<td class="text-nowrap">
-								@string.Join(",", user?.Roles)
-							</td>
-							<td class="text-nowrap">
-								@string.Join(",", user?.Permissions)
-							</td>
-							<td class="text-center">
-								<div>@user?.Type</div>
-							</td>
+							<th class="min-vw-10"></th>
+							<th class="th-sm text-nowrap">Tên đăng nhập</th>
+							<th class="th-sm text-right">Email</th>
+							<th class="th-sm text-right">Số điện thoại</th>
+							<th class="th-sm text-nowrap">Vai trò</th>
+							<th class="th-sm text-center">Loại TK</th>
 						</tr>
+					</thead>
+					<tbody id="table-body-user">
+						@if (users != null)
+						{
+							@foreach (var user in users.Data)
+							{
+								<tr>
+									<td class="text-center">
+										<i class=" updates fa-regular fa-pen-to-square pe-3"
+										   style="color:blue;cursor: pointer;"
+										   data-toggle="modal" data-target="#openPopup"></i>
+										<i class="deletes fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
+									</td>
+									<td class="text-center d-none" data-id="@user?.Id">@user?.Id</td>
+									<td class="text-nowrap">
+										@user?.UserName
+									</td>
+									<td class="text-right">
+										@user?.Email
+									</td>
+									<td class="text-right">
+										@user?.PhoneNumber
+									</td>
+									<td class="text-nowrap">
+										@string.Join(",", user?.Roles.Select(x => x.Name))
+									</td>
+									<td class="text-center">
+										<div>@user?.Type</div>
+									</td>
+								</tr>
+							}
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+		@* Phân trang *@
+		<div id="paginated" class="d-flex justify-content-end mt-4">
+			<nav aria-label="Page navigation example">
+				<ul class="pagination">
+					@for (int i = 1; i <= users.Extra.TotalPages; i++)
+					{
+						<li class="page-item pageCurrent @(users.Extra.CurrentPage == i ? "active" : "")">
+							<a class="page-link" data-page="@i">@i</a>
+						</li>
 					}
-				}
-			</tbody>
-		</table>
+				</ul>
+			</nav>
+		</div>
+	</div>
+	<div class="col-4">
+		<div class="card">
+			<h5 class="page-title p-2 text-bold text-center">
+				Liên kết với nhân viên
+			</h5>
+			<div class="row px-4">
+				<div class="col-12">
+					<div class="form-group">
+						<label class="font-weight-bold mb-2">Mã nhân viên</label>
+						<input class="form-control" type="text" name="internalCode" />
+					</div>
+				</div>
+			</div>
+
+			<div class="row px-4">
+				<div class="col-12">
+					<div class="form-group">
+						<label class="font-weight-bold mb-2">Họ tên</label>
+						<input class="form-control" type="text" name="name" readonly />
+					</div>
+				</div>
+			</div>
+
+			<div class="row px-4">
+				<div class="col-12">
+					<div class="form-group">
+						<label class="font-weight-bold mb-2">Giới tính</label>
+						<input class="form-control" type="text" name="gender" readonly />
+					</div>
+				</div>
+			</div>
+
+			<div class="row px-4">
+				<div class="col-12">
+					<div class="form-group">
+						<label class="font-weight-bold mb-2">Ngày sinh</label>
+						<input class="form-control" type="text" name="dateOfBirth" readonly />
+					</div>
+				</div>
+			</div>
+			<div class="row px-4 mb-3">
+				<div class="col-12">
+					<div class="text-center">
+						<button type="button" id="saveChange" class="btn btn-primary">
+							Lưu thay đổi
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 
-@* Phân trang *@
-<div id="paginated" class="d-flex justify-content-end mt-4">
-	<nav aria-label="Page navigation example">
-		<ul class="pagination">
-			@for (int i = 1; i <= users.Extra.TotalPages; i++)
-			{
-				<li class="page-item pageCurrent @(users.Extra.CurrentPage == i ? "active" : "")">
-					<a class="page-link" data-page="@i">@i</a>
-				</li>
-			}
-		</ul>
-	</nav>
-</div>
+@* ĐÂY LÀ JS *@
+@* Active menu *@
+<script>
+	$("#system").addClass("active");
+	$("#system").next("ul").addClass("d-block");
+	$("#system-user").addClass("active");
+
+	$(".link-parent").on("click", function (e) {
+		e.preventDefault();
+
+		$(".nav-childs").removeClass("active");
+		$(".link-parent").removeClass("active");
+
+		$(".link-parent").next("ul").not($(this).next("ul")).removeClass("d-block");
+
+		$(this).closest(".link-parent").addClass("active");
+	});
+</script>

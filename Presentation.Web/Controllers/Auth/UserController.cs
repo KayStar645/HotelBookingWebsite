@@ -1,13 +1,10 @@
-﻿using Core.Application.Interfaces;
-using Core.Application.Interfaces.Auth;
+﻿using Core.Application.Interfaces.Auth;
 using Core.Application.ViewModels.Common;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Presentation.Web.Middleware;
 
 namespace Presentation.Web.Controllers.Auth
 {
-    public class UserController : Controller
+	public class UserController : Controller
     {
         private readonly IUserService _userService;
 

@@ -1,14 +1,18 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Core.Application.Interfaces.Auth;
 using Core.Application.Interfaces.Common;
+using Core.Application.Responses;
+using Core.Application.Services.Extensions;
 using Core.Application.ViewModels.Auth;
+using Core.Application.ViewModels.Common;
 using Core.Domain.Auth;
 using Microsoft.EntityFrameworkCore;
 using System.Transactions;
 
 namespace Core.Application.Services.Auth
 {
-    public class RoleService : IRoleService
+	public class RoleService : IRoleService
 	{
         private readonly IHotelBookingWebsiteDbContext _context;
 
@@ -76,7 +80,7 @@ namespace Core.Application.Services.Auth
                     foreach (string permissionName in pRequest.PermissionsName)
                     {
                         var permission = await _context.Permissions
-                                    .FirstOrDefaultAsync(x => x.Name == permissionName);
+                                    .FirstOrDefaultAsync(x => x.Name == GetModuleName(permissionName));
 
                         if (permission != null)
                         {
@@ -102,7 +106,40 @@ namespace Core.Application.Services.Auth
             }
         }
 
-        public async Task<RoleVM> UpdateAsync(RoleRQ pRequest)
+		public async Task<PaginatedResult<RoleVM>> List(BaseListRQ pRequest)
+		{
+			var query = _context.Roles.AsQueryable();
+
+			if (pRequest.Search != null)
+			{
+				var keyword = ValidateExtensions.RemoveDiacritics(pRequest.Search.ToLower());
+				query = query.Where(x => x.Name.ToLower().Contains(keyword));
+			}
+
+			if (pRequest.Filters != null)
+			{
+				query = QueryableExtensions.ApplyFilters(query, pRequest.Filters);
+			}
+
+			if (pRequest.Sorts != null)
+			{
+				query = QueryableExtensions.ApplySorting(query, pRequest.Sorts);
+			}
+			var totalItems = await query.CountAsync();
+
+			query = query.Include(x => x.RolePermissions).ThenInclude(x => x.Permission);
+
+			var entityResult = await query
+						.ProjectTo<RoleVM>(_mapper.ConfigurationProvider)
+						.Skip(((int)pRequest.Page - 1) * (int)pRequest.PageSize)
+						.Take((int)pRequest.PageSize)
+						.ToListAsync();
+			var viewModels = _mapper.Map<List<RoleVM>>(entityResult);
+
+			return new PaginatedResult<RoleVM>(viewModels, totalItems, pRequest.Page, pRequest.PageSize);
+		}
+
+		public async Task<RoleVM> UpdateAsync(RoleRQ pRequest)
         {
             using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
@@ -172,5 +209,52 @@ namespace Core.Application.Services.Auth
                 }
             }
         }
-    }
+
+		private string GetModuleName(string key)
+		{
+            string module = key.Split("-").First();
+			string action = key.Split("-").Last();
+			switch (module)
+			{
+				case "Khách hàng":
+					module = "customer";
+					break;
+				case "Thống kê":
+					module = "dashboard";
+					break;
+				case "Loại phòng":
+					module = "kindroom";
+					break;
+				case "Phòng":
+					module = "room";
+					break;
+				case "Dịch vụ":
+					module = "service";
+					break;
+				case "Nhân viên":
+					module = "staff";
+					break;
+			}
+			switch (action)
+			{
+				case "Xem":
+					action = "view";
+					break;
+				case "Thêm":
+					action = "create";
+					break;
+				case "Sửa":
+					action = "update";
+					break;
+				case "Xoá":
+					action = "delete";
+					break;
+				case "Duyệt":
+					action = "approve";
+					break;
+			}
+			return module + "-" + action;
+		}
+
+	}
 }

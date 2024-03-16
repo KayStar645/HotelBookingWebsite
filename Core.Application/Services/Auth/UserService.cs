@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Core.Application.Interfaces.Auth;
 using Core.Application.Interfaces.Common;
 using Core.Application.Responses;
@@ -71,10 +72,12 @@ namespace Core.Application.Services.Auth
             var totalItems = await query.CountAsync();
 
             query = query.Include(x => x.UserRoles).ThenInclude(x => x.Role)
-                         .Include(x => x.UserPermissions).ThenInclude(x => x.Permission);
+                         .Include(x => x.UserPermissions).ThenInclude(x => x.Permission)
+						 .Include(x => x.Staff);
 
             var entityResult = await query
-                        .Skip(((int)pRequest.Page - 1) * (int)pRequest.PageSize)
+				        .ProjectTo<UserVM>(_mapper.ConfigurationProvider)
+						.Skip(((int)pRequest.Page - 1) * (int)pRequest.PageSize)
                         .Take((int)pRequest.PageSize)
                         .ToListAsync();
             var viewModels = _mapper.Map<List<UserVM>>(entityResult);

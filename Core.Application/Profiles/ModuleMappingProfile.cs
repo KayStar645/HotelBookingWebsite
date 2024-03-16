@@ -37,6 +37,9 @@ namespace Core.Application.Profiles
 
             CreateMap<Customer, CustomerRQ>().ReverseMap();
             CreateMap<Customer, CustomerVM>().ReverseMap();
-        }
+
+			CreateMap<Role, RoleRQ>().ReverseMap();
+			CreateMap<Role, RoleVM>().ReverseMap();
+		}
     }
 }
