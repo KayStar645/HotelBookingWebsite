@@ -58,8 +58,8 @@ namespace Infrastructure.Data
 			};
 			var hashedPassword = _passwordHasher.HashPassword(administrator, "123");
 			administrator.Password = hashedPassword;
-			if (!await _context.Users.AnyAsync(x => x.UserName == administrator.UserName &&
-			    x.Email == administrator.Email && x.PhoneNumber == administrator.PhoneNumber))
+			if (!await _context.Users.AnyAsync(x => x.UserName == administrator.UserName ||
+			    x.Email == administrator.Email || x.PhoneNumber == administrator.PhoneNumber))
             {
                 var entity = await _context.Users.AddAsync(administrator);
 				await _context.SaveChangesAsync(default(CancellationToken));

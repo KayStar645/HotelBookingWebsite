@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Core.Application.Common;
 using Core.Application.Interfaces.Auth;
 using Core.Application.Interfaces.Common;
 using Core.Application.Responses;
@@ -7,20 +8,24 @@ using Core.Application.Services.Extensions;
 using Core.Application.ViewModels.Auth;
 using Core.Application.ViewModels.Common;
 using Core.Domain.Auth;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using System.Data;
 
 namespace Core.Application.Services.Auth
 {
-    public class UserService : IUserService
+	public class UserService : IUserService
     {
         private readonly IHotelBookingWebsiteDbContext _context;
         private readonly IMapper _mapper;
+		private readonly IPasswordHasher<User> _passwordHasher;
 
-        public UserService(IHotelBookingWebsiteDbContext pContext, IMapper pMapper)
+		public UserService(IHotelBookingWebsiteDbContext pContext, IMapper pMapper,
+            IPasswordHasher<User> pPasswordHasher)
         {
             _context = pContext;
             _mapper = pMapper;
+            _passwordHasher = pPasswordHasher;
         }
 
         public async Task<List<string>> AssignPermissions(RevokeOrAssignPermissionRQ pRequest)
@@ -47,7 +52,38 @@ namespace Core.Application.Services.Auth
             return pRequest.Permissions;
         }
 
-        public async Task<PaginatedResult<UserVM>> List(BaseListRQ pRequest)
+		public async Task<UserVM> Create(UserRQ pRequest)
+		{
+			try
+			{
+				var user = _mapper.Map<User>(pRequest);
+				user.Password = _passwordHasher.HashPassword(user, pRequest.Password);
+				user.Type = ClaimValue.TYPE_SUPER_ADMIN;
+				var newUser = await _context.Users.AddAsync(user);
+				await _context.SaveChangesAsync(default(CancellationToken));
+
+                if(pRequest.RoleIds != null)
+                {
+					foreach (var roleId in pRequest.RoleIds)
+					{
+                        var userRole = new UserRole
+                        {
+                            UserId= user.Id,
+                            RoleId = roleId
+                        };
+						var newUserRole = await _context.UserRoles.AddAsync(userRole);
+						await _context.SaveChangesAsync(default(CancellationToken));
+					}
+				}
+                return _mapper.Map<UserVM>(user);
+            }
+			catch (Exception ex)
+			{
+				throw new Exception(ex.Message);
+			}
+		}
+
+		public async Task<PaginatedResult<UserVM>> List(BaseListRQ pRequest)
         {
             var query = _context.Users.AsQueryable();
 
@@ -100,5 +136,48 @@ namespace Core.Application.Services.Auth
             }
             await _context.SaveChangesAsync(default(CancellationToken));
         }
-    }
+
+		public async Task<UserVM> Update(UserRQ pRequest)
+		{
+			try
+			{
+				var user = _mapper.Map<User>(pRequest);
+                if(pRequest.Password.Length <= 50)
+                {
+				    user.Password = _passwordHasher.HashPassword(user, pRequest.Password);
+                }
+				var newUser = _context.Users.Update(user);
+                user.Type = ClaimValue.TYPE_SUPER_ADMIN;
+				await _context.SaveChangesAsync(default(CancellationToken));
+
+				//var roleIdsOfUser = await _context.UserRoles.Select(x => x.RoleId).ToListAsync();
+				//foreach (var roleId in roleIdsOfUser)
+				//{
+    //                var userRole = await _context.UserRoles
+    //                    .FirstOrDefaultAsync(x => x.UserId == user.Id && x.RoleId == roleId);
+
+				//	_context.UserRoles.Remove(userRole);
+				//	await _context.SaveChangesAsync(default(CancellationToken));
+				//}
+
+				//if (pRequest.RoleIds != null)
+				//{
+				//	foreach (var roleId in pRequest.RoleIds)
+				//	{
+				//		var userRole = await _context.UserRoles
+				//		.FirstOrDefaultAsync(x => x.UserId == user.Id && x.RoleId == roleId);
+
+				//		var newUserRole = await _context.UserRoles.AddAsync(userRole);
+				//		await _context.SaveChangesAsync(default(CancellationToken));
+				//	}
+				//}
+
+				return _mapper.Map<UserVM>(user);
+			}
+			catch (Exception ex)
+			{
+				throw new Exception(ex.Message);
+			}
+		}
+	}
 }
