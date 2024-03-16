@@ -23,6 +23,7 @@ namespace Infrastructure.Data
 		public DbSet<Room> Rooms => Set<Room>();
         public DbSet<Service> Services => Set<Service>();
         public DbSet<Customer> Customers => Set<Customer>();
+        public DbSet<Tour> Tours => Set<Tour>();    
 
 		public DbSet<User> Users => Set<User>();
 		public DbSet<Role> Roles => Set<Role>();

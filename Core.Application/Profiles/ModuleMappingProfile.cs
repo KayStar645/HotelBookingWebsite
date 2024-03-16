@@ -5,6 +5,7 @@ using Core.Application.ViewModels.KindRooms;
 using Core.Application.ViewModels.Rooms;
 using Core.Application.ViewModels.Services;
 using Core.Application.ViewModels.Staffs;
+using Core.Application.ViewModels.Tour;
 using Core.Domain.Auth;
 using Core.Domain.Entities;
 
@@ -37,6 +38,9 @@ namespace Core.Application.Profiles
 
             CreateMap<Customer, CustomerRQ>().ReverseMap();
             CreateMap<Customer, CustomerVM>().ReverseMap();
+
+            CreateMap<Tour, TourRQ>().ReverseMap();
+            CreateMap<Tour, TourVM>().ReverseMap();
         }
     }
 }
