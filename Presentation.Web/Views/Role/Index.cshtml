@@ -275,7 +275,8 @@
 			var rowData = {
 				id: 0,
 				name: "",
-				description: ""
+				description: "",
+				permissionsName: []
 			};
 
 			document.getElementById("modalTitle").innerText = "Thêm vai trò mới";
@@ -295,37 +296,26 @@
 				var rowData = {
 					id: parentRow.querySelector("td:nth-child(2)").textContent.trim(),
 					name: parentRow.querySelector("td:nth-child(3)").textContent.trim(),
-					description: parentRow.querySelector("td:nth-child(4)").textContent.trim()
+					description: parentRow.querySelector("td:nth-child(4)").textContent.trim(),
+					permissions: []
 				};
 
 				$.ajax({
 					url: "/role/detail?pId=" + itemId,
 					method: "GET",
 					success: function (data) {
-						var permissions = data.data;
+						rowData.permissions = data.data;
 
-						$('input[type="checkbox"]').prop('checked', false);
-
-						permissions.forEach(function (permission) {
-							var module = permission.module.replace(/\s+/g, '\\ ');
-							permission.permissions.forEach(function (child) {
-								if (child.isGranted) {
-									$('#' + module + '-' + child.name).prop('checked', true);
-								}
-							});
-						});
+						loadData(rowData);
 					},
 					error: function (xhr, textStatus, errorThrown) {
 						toastr.error('Chi tiết vai trò lỗi!', 'Thông báo');
 					}
 				});
-
 				
 				document.getElementById("modalTitle").innerText = "Cập nhật vai trò";
 				document.getElementById("createButton").style.display = "none";
 				document.getElementById("updateButton").style.display = "inline-block";
-
-				loadData(rowData);
 			});
 		});
 		
@@ -399,6 +389,18 @@
 		document.querySelector('input[name="id"]').value = data.id;
 		document.querySelector('input[name="name"]').value = data.name;
 		document.querySelector('input[name="description"]').value = data.description;
+		$('input[type="checkbox"]').prop('checked', false);
+
+		if (data.permissions != undefined) {
+			data.permissions.forEach(function (permission) {
+				var module = permission.module.replace(/\s+/g, '\\ ');
+				permission.permissions.forEach(function (child) {
+					if (child.isGranted) {
+						$('#' + module + '-' + child.name).prop('checked', true);
+					}
+				});
+			});
+		}
 
 		removeValidator();
 	}
