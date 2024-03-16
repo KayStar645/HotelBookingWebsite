@@ -9,6 +9,7 @@ using Core.Application.ViewModels.Common;
 using Core.Domain.Auth;
 using Microsoft.EntityFrameworkCore;
 using System.Transactions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Core.Application.Services.Auth
 {
@@ -141,74 +142,76 @@ namespace Core.Application.Services.Auth
 
 		public async Task<RoleVM> UpdateAsync(RoleRQ pRequest)
         {
-            using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-            {
-                try
-                {
-                    var role = _mapper.Map<Role>(pRequest);
-                    var updateRole = _context.Roles.Update(role);
-                    await _context.SaveChangesAsync(default(CancellationToken));
-                    List<string> permissions = new List<string>();
+			try
+			{
+				for (int i = 0; i < pRequest.PermissionsName.Count; i++)
+				{
+					pRequest.PermissionsName[i] = GetModuleName(pRequest.PermissionsName[i]);
+				}
+				var role = _mapper.Map<Role>(pRequest);
+				var updateRole = _context.Roles.Update(role);
+				await _context.SaveChangesAsync(default(CancellationToken));
+				List<string> permissions = new List<string>();
 
-                    // Get Permission hiện của của Role này
-                    var currentPermissionsName = await _context.RolePermissions
-                                                        .Include(x => x.Permission)
-                                                        .Where(x => x.RoleId == pRequest.Id)
-                                                        .Select(x => x.Permission.Name)
-                                                        .ToListAsync();
+				// Get Permission hiện của của Role này
+				var currentPermissionsName = await _context.RolePermissions
+													.Include(x => x.Permission)
+													.Where(x => x.RoleId == pRequest.Id)
+													.Select(x => x.Permission.Name)
+													.ToListAsync();
 
-                    if (pRequest.PermissionsName != null)
-                    {
-                        var deletePermission = currentPermissionsName.Except(pRequest.PermissionsName).ToList();
-                        var addPermission = pRequest.PermissionsName.Except(currentPermissionsName).ToList();
-                        var sharePermission = pRequest.PermissionsName.Intersect(currentPermissionsName).ToList();
+				if (pRequest.PermissionsName != null)
+				{
+					var deletePermission = currentPermissionsName.Except(pRequest.PermissionsName).ToList();
+					var addPermission = pRequest.PermissionsName.Except(currentPermissionsName).ToList();
+					var sharePermission = pRequest.PermissionsName.Intersect(currentPermissionsName).ToList();
 
-                        foreach (string permissionName in deletePermission)
-                        {
-                            var delete = await _context.RolePermissions
-                                        .Include(x => x.Permission)
-                                        .Where(x => x.RoleId == role.Id && x.Permission.Name == permissionName)
-                                        .FirstOrDefaultAsync();
-                            if (delete != null)
-                            {
-                                _context.RolePermissions.Remove(delete);
-                            }
-                        }
+					foreach (string permissionName in deletePermission)
+					{
+						var delete = await _context.RolePermissions 
+									.Include(x => x.Permission)
+									.Where(x => x.RoleId == role.Id && x.Permission.Name == permissionName)
+									.FirstOrDefaultAsync();
+						if (delete != null)
+						{
+							_context.RolePermissions.Remove(delete);
+							await _context.SaveChangesAsync(default(CancellationToken));
+						}
+					}
 
-                        foreach (string permissionName in addPermission)
-                        {
-                            var permission = await _context.Permissions
-                                                 .FirstOrDefaultAsync(x => x.Name == permissionName);
+					foreach (string permissionName in addPermission)
+					{
+						var permission = await _context.Permissions
+											 .FirstOrDefaultAsync(x => x.Name == permissionName);
 
-                            if (permission != null)
-                            {
+						if (permission != null)
+						{
 
-                                var per = new RolePermission
-                                {
-                                    RoleId = role.Id,
-                                    PermissionId = permission.Id
-                                };
-                                await _context.RolePermissions.AddAsync(per);
-                                permissions.Add(permission.Name);
-                            }
-                        }
-                        await _context.SaveChangesAsync(default(CancellationToken));
-                        permissions = permissions.Union(sharePermission).ToList();
-                    }
+							var per = new RolePermission
+							{
+								RoleId = role.Id,
+								PermissionId = permission.Id
+							};
+							await _context.RolePermissions.AddAsync(per);
+							await _context.SaveChangesAsync(default(CancellationToken));
+							permissions.Add(permission.Name);
+						}
+					}
+					permissions = permissions.Union(sharePermission).ToList();
+				}
 
-                    transaction.Complete();
+				//transaction.Complete();
 
-                    var roleResponses = _mapper.Map<RoleVM>(updateRole.Entity);
-                    roleResponses.PermissionsName = permissions;
-                    return roleResponses;
-                }
-                catch (Exception ex)
-                {
-                    transaction.Dispose();
-                    throw new Exception(ex.Message);
-                }
-            }
-        }
+				var roleResponses = _mapper.Map<RoleVM>(updateRole.Entity);
+				roleResponses.PermissionsName = permissions;
+				return roleResponses;
+			}
+			catch (Exception ex)
+			{
+				//transaction.Dispose();
+				throw new Exception(ex.Message);
+			}
+		}
 
 		private string GetModuleName(string key)
 		{
@@ -233,6 +236,9 @@ namespace Core.Application.Services.Auth
 					break;
 				case "Nhân viên":
 					module = "staff";
+					break;
+				case "Quyền":
+					module = "role";
 					break;
 			}
 			switch (action)

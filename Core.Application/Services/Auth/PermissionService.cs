@@ -120,6 +120,9 @@ namespace Core.Application.Services.Auth
 				case "staff":
 					value = "Nhân viên";
 					break;
+				case "role":
+					value = "Quyền";
+					break;
 			}
             return value;
 		}

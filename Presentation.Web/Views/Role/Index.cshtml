@@ -148,7 +148,7 @@
 		<label class="font-weight-bold my-2 page-title p-2">Quyền của vai trò</label>
 		@foreach (var permission in permissions)
 		{
-			<div class="role-permission @(permission.IsGranted == true ? "d-none" : "")">
+			<div class="role-permission">
 				<div class="role-group">@permission.Module</div>
 				<div class="role-childs d-none">
 					<div class="row">
@@ -218,14 +218,6 @@
 	var searchTimer;
 </script>
 
-<script>
-	$(document).ready(function () {
-		$('.role-group').click(function () {
-			$(this).next('.role-childs').toggleClass("d-none");
-
-		});
-	});
-</script>
 
 @* Tìm kiếm và lọc *@
 <script>
@@ -268,8 +260,14 @@
 @* Lắng nghe sự kiện + load giao diện và dữ liệu *@
 <script>
 	function resetEvent() {
+		$(document).ready(function () {
+			$('.role-group').click(function () {
+				$(this).next('.role-childs').toggleClass("d-none");
+			});
+		});
+
 		document.getElementById("close").addEventListener("click", function (event) {
-			$('#detail-role').addClass("d-none");
+			window.location.href = "/role"
 		});
 
 		createOpen.addEventListener("click", function (event) {
@@ -291,8 +289,38 @@
 		updateOpens.forEach(function (button) {
 			button.addEventListener("click", function () {
 				$('#detail-role').removeClass("d-none");
+				
+				var itemId = $(this).closest("tr").find("td[data-id]").data("id");
 				var parentRow = button.closest("tr");
-				var rowData = getData();
+				var rowData = {
+					id: parentRow.querySelector("td:nth-child(2)").textContent.trim(),
+					name: parentRow.querySelector("td:nth-child(3)").textContent.trim(),
+					description: parentRow.querySelector("td:nth-child(4)").textContent.trim()
+				};
+
+				$.ajax({
+					url: "/role/detail?pId=" + itemId,
+					method: "GET",
+					success: function (data) {
+						var permissions = data.data;
+
+						$('input[type="checkbox"]').prop('checked', false);
+
+						permissions.forEach(function (permission) {
+							var module = permission.module.replace(/\s+/g, '\\ ');
+							permission.permissions.forEach(function (child) {
+								if (child.isGranted) {
+									$('#' + module + '-' + child.name).prop('checked', true);
+								}
+							});
+						});
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Chi tiết vai trò lỗi!', 'Thông báo');
+					}
+				});
+
+				
 				document.getElementById("modalTitle").innerText = "Cập nhật vai trò";
 				document.getElementById("createButton").style.display = "none";
 				document.getElementById("updateButton").style.display = "inline-block";
@@ -418,11 +446,10 @@
 									var newPaginated = $('<div>').html(data).find('#paginated').html();
 									$('#paginated').html(newPaginated);
 
-									resetEvent();
-
 									$('#close').click();
 								},
 							});
+							resetEvent();
 							toastr.success('Thêm mới vai trò thành công!', 'Thông báo');
 						} else {
 							toastr.error(data.errors[0], 'Thông báo');
@@ -461,11 +488,11 @@
 									var newData = $('<tbody>').html(data).find('#table-body-role').html();
 									$('#table-body-role').html(newData);
 
-									resetEvent();
 
 									$('#close').click();
 								},
 							});
+							resetEvent();
 							toastr.success('Cập nhật vai trò thành công!', 'Thông báo');
 						}
 						else {
