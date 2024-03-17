@@ -251,6 +251,9 @@ namespace Core.Application.Services.Auth
 				case "Người dùng":
 					module = "user";
 					break;
+				case "Khuyến mãi":
+					module = "promotion";
+					break;
 			}
 			switch (action)
 			{

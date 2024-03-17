@@ -2,6 +2,7 @@
 using Core.Application.ViewModels.Auth;
 using Core.Application.ViewModels.Customers;
 using Core.Application.ViewModels.KindRooms;
+using Core.Application.ViewModels.Promotions;
 using Core.Application.ViewModels.Rooms;
 using Core.Application.ViewModels.Services;
 using Core.Application.ViewModels.Staffs;
@@ -41,6 +42,9 @@ namespace Core.Application.Profiles
 
 			CreateMap<Role, RoleRQ>().ReverseMap();
 			CreateMap<Role, RoleVM>().ReverseMap();
+
+            CreateMap<Promotion, PromotionVM>().ReverseMap();
+			CreateMap<Promotion, PromotionRQ>().ReverseMap();
 		}
     }
 }
