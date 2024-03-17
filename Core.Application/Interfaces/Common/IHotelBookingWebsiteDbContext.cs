@@ -10,6 +10,8 @@ namespace Core.Application.Interfaces.Common
         DbSet<KindRoom> KindRooms { get; }
         DbSet<Room> Rooms { get; }
         DbSet<Service> Services { get; }
+        DbSet<Promotion> Promotions { get; }
+        DbSet<RoomPromotion> RoomPromotions { get; }
 
 		DbSet<User> Users { get; }
 		DbSet<Role> Roles { get; }

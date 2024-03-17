@@ -1,0 +1,292 @@
+﻿@using Core.Application.Responses
+@using Core.Application.ViewModels.Promotions
+@{
+	var promotions = ViewBag.list as PaginatedResult<PromotionVM>;
+}
+
+@section TitleHeader
+{
+	<div class="row">
+		<div class="col-sm-12 mt-3">
+			<h3 class="page-title mt-3">
+				Danh sách chương trình khuyến mãi
+			</h3>
+			<div class="row mt-3">
+				<div class="col-sm-4">
+					<label class="font-weight-bold mb-1">Tìm kiếm</label>
+					<div class="form-outline p-0" data-mdb-input-init>
+						<input type="search" class="form-control" id="searchInput" placeholder="Tìm kiếm..." />
+					</div>
+				</div>
+				<div class="col-sm-2">
+					<label class="font-weight-bold mb-1">Loại</label>
+					<div class="form-outline p-0">
+						<select id="filterType" class="form-control" name="filterType">
+							<option value="">Tất cả</option>
+							<option value="D">Giảm tiền</option>
+							<option value="P">Giảm phần trăm</option>
+						</select>
+					</div>
+				</div>
+				<div class="col-sm-2">
+					<label class="font-weight-bold mb-1">Trạng thái</label>
+					<div class="form-outline p-0">
+						<select id="filterStatus" class="form-control" name="filterStatus">
+							<option value="">Tất cả</option>
+							<option value="D">Nháp</option>
+							<option value="A">Duyệt</option>
+							<option value="C">Huỷ bỏ</option>
+						</select>
+					</div>
+				</div>
+				<div class="col-sm-2">
+				</div>
+				<div class="col-sm-2">
+					<div class="text-right">
+						<a href="@Url.Action("detail", "promotion", new { pId = 0 })"  class="btn btn-primary">
+							Thêm mới
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+<div class="card-body">
+	<div class="table-responsive" style="overflow-y: auto;">
+		<table class="table table-hover table-center table-striped table-bordered">
+			<thead>
+				<tr>
+					<th class="min-vw-10"></th>
+					<th class="th-sm text-nowrap">Mã khuyến mãi</th>
+					<th class="th-sm text-nowrap">Tên chương trình</th>
+					<th class="th-sm text-right">Thời gian bắt đầu</th>
+					<th class="th-sm text-right">Thời gian kết thúc</th>
+					<th class="th-sm text-right">Giảm</th>
+					<th class="th-sm text-right">Tối đa</th>
+					<th class="th-sm text-center">Loại</th>
+					<th class="th-sm text-center">Trạng thái</th>
+					<th class="th-sm text-center"></th>
+				</tr>
+			</thead>
+			<tbody id="table-body-promotion">
+				@if (promotions != null)
+				{
+					@foreach (var promotion in promotions.Data)
+					{
+						<tr>
+							<td class="text-center">
+								<a href="@Url.Action("detail", "promotion", new { pId = promotion.Id })">
+									<i class="far fa-pen-to-square pe-3" style="color: #74C0FC; cursor: pointer;"></i>
+								</a>
+
+								<i class="deletes fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
+							</td>
+							<td class="text-center d-none" data-id="@promotion?.Id">@promotion?.Id</td>
+							<td class="text-nowrap">
+								@promotion?.InternalCode
+							</td>
+							<td class="text-nowrap">
+								@promotion?.Name
+							</td>
+							<td class="text-right">
+								@((promotion.StartTime.HasValue ?
+															promotion.StartTime.Value.ToString("dd/MM/yyyy") :
+									"---"))
+							</td>
+							<td class="text-right">
+								@((promotion.EndTime.HasValue ?
+															promotion.EndTime.Value.ToString("dd/MM/yyyy") :
+															"---"))
+							</td>
+							<td class="text-right">
+								@if (promotion.Type == "D")
+								{
+									@String.Format("{0:N0} VNĐ", promotion?.Discount)
+								}
+								else
+								{
+									@(promotion.Percent.HasValue ? $"{promotion.Percent.Value}%" : "N/A")
+								}
+							</td>
+							<td class="text-right">
+								@if (promotion.Type == "D")
+								{
+									@(promotion.PercentMax.HasValue ? $"{promotion.PercentMax.Value}%" : "N/A")
+								}
+								else
+								{
+									@String.Format("{0:N0} VNĐ", promotion?.PriceMax)
+								}
+							</td>
+							<td class="text-center">
+								@promotion?.Type
+							</td>
+							<td class="text-center">
+								@promotion?.Status
+							</td>
+							<td class="text-center">
+
+								@{
+									var statusText = promotion.IsDeleted == true
+									? "<span class='badge badge-pill bg-danger inv-badge'>Đã xoá</span>"
+									: "<span class='badge badge-pill bg-success inv-badge'>Hoạt động</span>";
+								}
+
+								@Html.Raw(statusText)
+							</td>
+						</tr>
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+@* Phân trang *@
+<div id="paginated" class="d-flex justify-content-end mt-4">
+	<nav aria-label="Page navigation example">
+		<ul class="pagination">
+			@for (int i = 1; i <= promotions.Extra.TotalPages; i++)
+			{
+				<li class="page-item pageCurrent @(promotions.Extra.CurrentPage == i ? "active" : "")">
+					<a class="page-link" data-page="@i">@i</a>
+				</li>
+			}
+		</ul>
+	</nav>
+</div>
+
+
+@* ĐÂY LÀ JS *@
+<script>
+	$("#business").addClass("active");
+	$("#business").next("ul").addClass("d-block");
+	$("#business-promotion").addClass("active");
+
+	$(".link-parent").on("click", function (e) {
+		e.preventDefault();
+
+		$(".nav-childs").removeClass("active");
+		$(".link-parent").removeClass("active");
+
+		$(".link-parent").next("ul").not($(this).next("ul")).removeClass("d-block");
+
+		$(this).closest(".link-parent").addClass("active");
+	});
+</script>
+
+@* Lắng nghe sự kiện *@
+<script>
+	function resetEvent() {
+		$(document).ready(function () {
+			$(".deletes").on("click", function () {
+				var itemId = $(this).closest("tr").find("td[data-id]").data("id");
+
+				$.ajax({
+					url: "/promotion/delete?pId=" + itemId,
+					method: "DELETE",
+					success: function (data) {
+						$.ajax({
+							url: "/promotion/index",
+							method: "GET",
+							success: function (data) {
+								var newData = $('<tbody>').html(data).find('#table-body-promotion').html();
+								$('#table-body-promotion').html(newData);
+
+								var newPaginated = $('<div>').html(data).find('#paginated').html();
+								$('#paginated').html(newPaginated);
+
+								resetEvent();
+							},
+						});
+						toastr.success('Xoá chương trình khuyến mãi thành công!', 'Thông báo');
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Xoá chương trình khuyến mãi thất bại!', 'Thông báo');
+					}
+				});
+			});
+		});
+
+		$(document).ready(function () {
+			$('.pagination a').on('click', function (e) {
+				e.preventDefault();
+				var page = $(this).data('page');
+				paginatedResult(page);
+			});
+		});
+
+		function paginatedResult(page) {
+			$.ajax({
+				url: `/promotion/index?page=${page}`,
+				method: 'GET',
+				success: function (data) {
+					var newData = $('<tbody>').html(data).find('#table-body-promotion').html();
+					$('#table-body-promotion').html(newData);
+
+					updatePagination(page);
+				},
+			});
+		}
+
+		function updatePagination(activePage) {
+			$('.pageCurrent').removeClass('active');
+			$('.pagination a[data-page="' + activePage + '"]').addClass('active').closest('.pageCurrent').addClass('active');
+		}
+	}
+	resetEvent();
+</script>
+
+@* Tìm kiếm và lọc *@
+<script>
+	var searchTimer;
+
+	$(document).ready(function () {
+		$('#searchInput').on('input', function () {
+			clearTimeout(searchTimer);
+
+			searchTimer = setTimeout(function () {
+				performSearch();
+			}, 600);
+		});
+
+		$('#filterType').change(function () {
+			performSearch();
+		});
+
+		$('#filterStatus').change(function () {
+			performSearch();
+		});
+
+		function performSearch() {
+			var searchTerm = $('#searchInput').val();
+			var selectedType = $('#filterType').val();
+			var selectedStatus = $('#filterStatus').val();
+
+			$.ajax({
+				url: '/promotion/index',
+				method: 'GET',
+				data: {
+					search: searchTerm,
+					page: 1,
+					sorts: null,
+					filters: `type:${selectedType},status:${selectedStatus}`
+				},
+				contentType: 'application/json; charset=utf-8',
+				success: function (data) {
+					var newData = $('<tbody>').html(data).find('#table-body-promotion').html();
+					$('#table-body-promotion').html(newData);
+
+					var newPaginated = $('<div>').html(data).find('#paginated').html();
+					$('#paginated').html(newPaginated);
+					resetEvent();
+				},
+				error: function (xhr, textStatus, errorThrown) {
+					toastr.error('Lỗi khi thực hiện tìm kiếm!', 'Thông báo');
+				}
+			});
+		}
+	});
+</script>

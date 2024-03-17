@@ -126,6 +126,9 @@ namespace Core.Application.Services.Auth
 				case "user":
 					value = "Người dùng";
 					break;
+				case "promotion":
+					value = "Khuyến mãi";
+					break;
 			}
             return value;
 		}
