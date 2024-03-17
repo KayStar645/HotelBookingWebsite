@@ -1,2 +1,443 @@
-﻿@{
+﻿@using Core.Application.ViewModels.Promotions
+@{
+	var promotion = ViewBag.detail as PromotionVM;
+
+	string GetStatusName(string statusCode)
+	{
+		switch (statusCode)
+		{
+			case "D":
+				return "Nháp";
+			case "A":
+				return "Duyệt";
+			case "C":
+				return "Huỷ bỏ";
+			default:
+				return "Unknown";
+		}
+	}
 }
+
+@section TitleHeader
+{
+	<div class="row">
+		<div class="col-sm-12 mt-3">
+			<div class="row mt-3">
+				<div class="col-sm-5">
+					<h3 class="page-title mb-1">
+						@(promotion == null ? "Tạo mới chương trình khuyến mãi " : "Chi tiết chương trình khuyến mãi "
+													+ promotion?.InternalCode + " - " + promotion?.Name)
+					</h3>
+				</div>
+				<div class="col-sm-2">
+				</div>
+				<div class="col-sm-3">
+				</div>
+				<div class="col-sm-2">
+					<div class="text-right">
+						<a href="" id="create"
+						   class="btn btn-primary @(promotion == null || promotion.Id == 0 ? "d-inline-block" : "d-none")">
+							Thêm mới
+						</a>
+						<a href="" id="update"
+						   class="btn btn-primary @(promotion != null && promotion.Id > 0 ? "d-inline-block" : "d-none")">
+							Cập nhật
+						</a>
+						<a href="" id="update"
+						   class="btn btn-warning @(promotion != null && promotion.Id > 0 ? "d-inline-block" : "d-none")">
+							Duyệt
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+
+<div id="detail-promotion" data-promotion-id="@promotion?.Id">
+	<div class="card p-4">
+		<div class="row">
+			<div class="col-sm-2">
+				<div class="form-group">
+					<label class="font-weight-bold mb-2">Mã chương trình</label>
+					<input class="form-control" type="text" name="internalCode"
+						   value="@(promotion == null ? "" : promotion.InternalCode)" />
+					<span class="text-danger" id="internalCodeError"></span>
+				</div>
+			</div>
+			<div class="col-sm-8">
+				<div class="form-group">
+					<label class="font-weight-bold mb-2">Tên khuyến mãi</label>
+					<input class="form-control" type="text" name="name"
+						   value="@(promotion == null ? "" : promotion.Name)" />
+					<span class="text-danger" id="nameError"></span>
+				</div>
+			</div>
+			<div class="col-sm-2">
+				<div class="form-group">
+					<label class="font-weight-bold mb-2">Trạng thái</label>
+					<input class="form-control" type="text" name="status"
+						   value="@GetStatusName(promotion?.Status ?? "D")"
+						   readonly />
+					<span class="text-danger" id="statusError"></span>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-5">
+				<div class="form-group">
+					<label class="font-weight-bold mb-2">Bắt đầu</label>
+					<input class="form-control" type="datetime-local" name="startTime"
+						   value='@(promotion == null ? "" : promotion.StartTime?.ToString("yyyy-MM-ddTHH:mm"))' />
+					<span class="text-danger" id="startTimeError"></span>
+				</div>
+			</div>
+			<div class="col-sm-5">
+				<div class="form-group">
+					<label class="font-weight-bold mb-2">Kết thúc</label>
+					<input class="form-control" type="datetime-local" name="endTime"
+						   value='@(promotion == null ? "" : promotion.EndTime?.ToString("yyyy-MM-ddTHH:mm"))' />
+					<span class="text-danger" id="endTimeError"></span>
+				</div>
+			</div>
+			<div class="col-sm-2">
+				<div class="form-group">
+					<label class="font-weight-bold mb-2">Loại</label>
+					<select class="form-control" id="type" name="type" onchange="updateSelectedType(this)">
+						@if (promotion != null && promotion.Type == "D")
+						{
+							<option value="D" selected>Giảm tiền</option>
+						}
+						else
+						{
+							<option value="D">Giảm tiền</option>
+						}
+						@if (promotion != null && promotion.Type == "P")
+						{
+							<option value="P" selected>Giảm phần trăm</option>
+						}
+						else
+						{
+							<option value="P">Giảm phần trăm</option>
+						}
+					</select>
+					<span class="text-danger" id="typeError"></span>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div id="type-discount" class="@(promotion != null && promotion.Type == "P" ? "d-none" : "d-inline-block")">
+				<div class="col-sm-3 d-inline-block">
+					<div class="form-group">
+						<label class="font-weight-bold mb-2">Tiền giảm</label>
+						<input class="form-control" type="number" name="discount"
+							   value="@(promotion == null ? "" : promotion.Discount)" />
+						<span class="text-danger" id="discountError"></span>
+					</div>
+				</div>
+				<div class="col-sm-3 d-inline-block">
+					<div class="form-group">
+						<label class="font-weight-bold mb-2">Phần trăm tối đa</label>
+						<input class="form-control" type="number" name="percentMax"
+							   value="@(promotion == null ? "" : promotion.PercentMax * 100)"
+							   min="0" max="100" />
+						<span class="text-danger" id="percentMaxError"></span>
+					</div>
+				</div>
+			</div>
+			<div id="type-percent" class="@(promotion != null && promotion.Type == "P" ? "d-inline-block" : "d-none")">
+				<div class="col-sm-3 d-inline-block">
+					<div class="form-group">
+						<label class="font-weight-bold mb-2">Phần trăm giảm</label>
+						<input class="form-control" type="number" name="percent"
+							   value="@(promotion == null ? "" : promotion.Percent * 100)"
+							   min="0" max="100" />
+						<span class="text-danger" id="percentError"></span>
+					</div>
+				</div>
+				<div class="col-sm-3 d-inline-block">
+					<div class="form-group">
+						<label class="font-weight-bold mb-2">Tiền giảm tối đa</label>
+						<input class="form-control" type="number" name="priceMax"
+							   value="@(promotion == null ? "" : promotion.PriceMax)" />
+						<span class="text-danger" id="priceMaxError"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="card p-4 @(promotion != null && promotion.Id > 0 ? "d-block" : "d-none")">
+		<div class="row">
+			<div class="col-sm-9">
+				<h4 class="font-weight-bold mb-2">Danh sách phòng áp dụng khuyến mãi</h4>
+			</div>
+			<div class="col-sm-3">
+				<div class="text-right">
+					<a href="" id="update"
+					   class="btn btn-primary">
+						Cập nhật danh sách
+					</a>
+
+				</div>
+			</div>
+
+		</div>
+		<div class="row">
+			<div class="card-body">
+				<div class="table-responsive" style="overflow-y: auto;">
+					<table class="table table-hover table-center table-striped table-bordered">
+						<thead>
+							<tr>
+								<th class="th-sm">Mã phòng</th>
+								<th class="th-sm text-center">Số người</th>
+								<th class="th-sm text-center">Hình ảnh</th>
+								<th class="th-sm text-center">Loại phòng</th>
+								<th class="th-sm text-center">Trạng thái</th>
+							</tr>
+						</thead>
+						@* <tbody id="table-body-room">
+						@if (rooms != null)
+						{
+						@foreach (var room in rooms.Data)
+						{
+						<tr>
+						<td class="text-center d-none" data-id="@room?.Id">@room?.Id</td>
+						<td class="text-nowrap">
+						<div>@room?.InternalCode</div>
+						</td>
+						<td class="text-center d-none" data-id="@room?.KindRoom?.Id">@room?.KindRoom?.Id</td>
+						<td class="text-center">
+						@room?.KindRoom?.InternalCode - @room?.KindRoom?.Name
+						</td>
+						<td class="text-center d-none" data-id="@room?.Status">@room?.Status</td>
+						<td class="text-center">
+						@StatusName(room?.Status)
+						</td>
+						</tr>
+						}
+						}
+						</tbody> *@
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+@* ĐÂY LÀ JS *@
+<script>
+	$("#business").addClass("active");
+	$("#business").next("ul").addClass("d-block");
+	$("#business-promotion").addClass("active");
+
+	$(".link-parent").on("click", function (e) {
+		e.preventDefault();
+
+		$(".nav-childs").removeClass("active");
+		$(".link-parent").removeClass("active");
+
+		$(".link-parent").next("ul").not($(this).next("ul")).removeClass("d-block");
+
+		$(this).closest(".link-parent").addClass("active");
+	});
+</script>
+
+@* Khai báo và hàm hỗ trợ *@
+<script>
+	var promotionId = document.getElementById('detail-promotion').dataset.promotionId;
+
+	var internalCodeInput = $('input[name="internalCode"]');
+	var nameInput = $('input[name="name"]');
+	var statusInput = $('input[name="status"]');
+	var startTimeInput = $('input[name="startTime"]');
+	var endTimeInput = $('input[name="endTime"]');
+	var typeInput = $('select[name="type"]');
+
+	var discountInput = $('input[name="discount"]');
+	var percentMaxInput = $('input[name="percentMax"]');
+	var percentInput = $('input[name="percent"]');
+	var priceMaxInput = $('input[name="priceMax"]');
+
+	function updateSelectedType(select) {
+		removeValidator();
+		var selectedType = select.options[select.selectedIndex].value;
+
+		var discount = document.getElementById('type-discount');
+		var percent = document.getElementById('type-percent');
+
+		if (selectedType === "D") {
+			discount.classList.add('d-inline-block');
+			discount.classList.remove('d-none');
+
+			percent.classList.add('d-none');
+			percent.classList.remove('d-inline-block');
+		} else if (selectedType === "P") {
+			percent.classList.add('d-inline-block');
+			percent.classList.remove('d-none');
+
+			discount.classList.add('d-none');
+			discount.classList.remove('d-inline-block');
+		}
+	}
+
+	function removeValidator() {
+		$(".text-danger").text("");
+
+		internalCodeInput.removeClass("border-danger");
+		nameInput.removeClass("border-danger");
+		statusInput.removeClass("border-danger");
+		startTimeInput.removeClass("border-danger");
+		endTimeInput.removeClass("border-danger");
+		typeInput.removeClass("border-danger");
+
+		discountInput.removeClass("border-danger");
+		percentMaxInput.removeClass("border-danger");
+		percentInput.removeClass("border-danger");
+		priceMaxInput.removeClass("border-danger");
+	}
+
+	function validateForm(pRequest) {
+		var isValid = true;
+
+		// Validate internalCode
+		if (!pRequest.internalCode) {
+			$("#internalCodeError").text("CTKM là là bắt buộc");
+			$('input[name="internalCode"]').addClass("border-danger");
+			isValid = false;
+		} else if (pRequest.internalCode.length > 100) {
+			$("#internalCodeError").text("Mã CTKM không được vượt quá 100 ký tự");
+			$('input[name="internalCode"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		// Validate name
+		if (!pRequest.name) {
+			$("#nameError").text("Tên chương trình khuyến mãi không được để trống");
+			$('input[name="name"]').addClass("border-danger");
+			isValid = false;
+		} else if (pRequest.name.length > 100) {
+			$("#nameError").text("Tên chương trình khuyến mãi không được vượt quá 100 ký tự");
+			$('input[name="name"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		// Validate status
+		if (pRequest.status != "D" && pRequest.status != "A" && pRequest.status != "C") {
+			$("#statusError").text("Trạng thái không phù hợp.");
+			$('input[name="status"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		// Validate startTime
+		if (!pRequest.startTime || pRequest.startTime <= new Date()) {
+			$("#startTimeError").text("Thời gian bắt đầu phải lớn hơn thời gian hiện tại.");
+			$('input[name="startTime"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		// Validate endTime
+		if (!pRequest.endTime || pRequest.endTime <= new Date() || pRequest.startTime >= pRequest.endTime) {
+			$("#endTimeError").text("Thời gian kết thúc phải lớn hơn hiện tại và bắt đầu.");
+			$('input[name="endTime"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		// Validate Type
+		if (pRequest.type != "P" && pRequest.type != "D") {
+			$("#typeError").text("Loại không phù hợp.");
+			$('select[name="type"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		if (pRequest.type == "D") {
+			// Validate Giảm tiền
+			if(pRequest.discount <= 0) {
+				$("#discountError").text("Tiền giảm không hợp lệ.");
+				$('input[name="discount"]').addClass("border-danger");
+				isValid = false;
+			}
+			if (pRequest.percentMax <= 1 || pRequest.percentMax > 100) {
+				$("#percentMaxError").text("Phần trăm tối đa phải từ 1-100%.");
+				$('input[name="percentMax"]').addClass("border-danger");
+				isValid = false;
+			}
+		}
+		else {
+			// Validate phần trăm
+			if (pRequest.percent <= 1 || pRequest.percent > 100) {
+				$("#percentError").text("Phần trăm giảm phải từ 1-100%.");
+				$('input[name="percent"]').addClass("border-danger");
+				isValid = false;
+			}
+
+			if (pRequest.priceMax <= 0) {
+				$("#priceMaxError").text("Tiền giảm tối đa không hợp lệ.");
+				$('input[name="priceMax"]').addClass("border-danger");
+				isValid = false;
+			}
+		}
+
+		return isValid;
+	}
+
+	function getData(isCreate) {
+		var data = {
+			id: isCreate == true ? 0 : promotionId,
+			internalCode: document.querySelector('input[name="internalCode"]').value,
+			name: document.querySelector('input[name="name"]').value,
+			status: "D",
+			startTime: document.querySelector('input[name="startTime"]').value,
+			endTime: document.querySelector('input[name="endTime"]').value,
+			type: document.querySelector('select[name="type"]').value,
+		}
+
+		if(data.type == "D") {
+			data.discount = document.querySelector('input[name="discount"]').value;
+			data.percentMax = document.querySelector('input[name="percentMax"]').value / 100;
+		}
+		else {
+			data.percent = document.querySelector('input[name="percent"]').value;
+			data.priceMax = document.querySelector('input[name="priceMax"]').value / 100;
+		}
+
+		return data;
+	}
+
+</script>
+
+@* Gọi Controller xử lý *@
+<script>
+	$(document).ready(function () {
+		$("#create").on("click", function (e) {
+			e.preventDefault();
+
+			removeValidator();
+
+			var pRequest = getData(true);
+
+			isValid = validateForm(pRequest);
+
+			if (isValid) {
+				$.ajax({
+					url: "create",
+					method: "POST",
+					data: JSON.stringify(pRequest),
+					contentType: "application/json; charset=utf-8",
+					success: function (data) {
+						if (data.success) {
+							window.location.href = "/promotion"
+						}
+						else {
+							toastr.error(data.errors[0], 'Thông báo');
+						}
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Thêm mới chương trình khuyến mãi thất bại!', 'Thông báo');
+					}
+				});
+			}
+		});
+	});
+</script>

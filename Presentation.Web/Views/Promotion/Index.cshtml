@@ -2,6 +2,34 @@
 @using Core.Application.ViewModels.Promotions
 @{
 	var promotions = ViewBag.list as PaginatedResult<PromotionVM>;
+
+	string GetStatusName(string pStatus)
+	{
+		switch (pStatus)
+		{
+			case "D":
+				return "Nháp";
+			case "A":
+				return "Duyệt";
+			case "C":
+				return "Huỷ bỏ";
+			default:
+				return "N/A";
+		}
+	}
+	string GetTypeName(string pType)
+	{
+		switch (pType)
+		{
+			case "D":
+				return "Giảm tiền";
+			case "P":
+				return "Giảm %";
+			default:
+				return "N/A";
+		}
+	}
+
 }
 
 @section TitleHeader
@@ -65,7 +93,7 @@
 					<th class="th-sm text-right">Thời gian kết thúc</th>
 					<th class="th-sm text-right">Giảm</th>
 					<th class="th-sm text-right">Tối đa</th>
-					<th class="th-sm text-center">Loại</th>
+					<th class="th-sm text-center">Loại giảm</th>
 					<th class="th-sm text-center">Trạng thái</th>
 					<th class="th-sm text-center"></th>
 				</tr>
@@ -107,13 +135,13 @@
 								}
 								else
 								{
-									@(promotion.Percent.HasValue ? $"{promotion.Percent.Value}%" : "N/A")
+									@(promotion.Percent.HasValue ? $"{promotion.Percent.Value * 100}%" : "N/A")
 								}
 							</td>
 							<td class="text-right">
 								@if (promotion.Type == "D")
 								{
-									@(promotion.PercentMax.HasValue ? $"{promotion.PercentMax.Value}%" : "N/A")
+									@(promotion.PercentMax.HasValue ? $"{promotion.PercentMax.Value * 100}%" : "N/A")
 								}
 								else
 								{
@@ -121,10 +149,10 @@
 								}
 							</td>
 							<td class="text-center">
-								@promotion?.Type
+								@GetTypeName(@promotion?.Type)
 							</td>
 							<td class="text-center">
-								@promotion?.Status
+								@GetStatusName(@promotion?.Status)
 							</td>
 							<td class="text-center">
 

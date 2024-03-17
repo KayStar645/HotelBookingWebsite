@@ -14,6 +14,8 @@ namespace Core.Application.ViewModels.Promotions
 
 		public string? Type { get; set; }
 
+		public string? Status { get; set; }
+
 		//
 		public double? Discount { get; set; }
 
