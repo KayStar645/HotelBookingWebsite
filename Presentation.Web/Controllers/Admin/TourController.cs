@@ -1,5 +1,6 @@
 ﻿using Core.Application.Exceptions;
 using Core.Application.Interfaces;
+using Core.Application.Services;
 using Core.Application.ViewModels.Common;
 using Core.Application.ViewModels.Tour;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +26,16 @@ namespace Presentation.Web.Controllers.Admin
         }
 
 
-        [HttpPost]
+		[HttpGet("/tour/detail")]
+		[Permission("tour-view")]
+		public async Task<IActionResult> Detail([FromQuery] int pId)
+		{
+			ViewBag.Detail = await _tourService.Detail(pId);
+
+			return View();
+		}
+
+		[HttpPost]
         [Permission("tour-create")]
         public async Task<IActionResult> Create([FromBody] TourRQ pRequest)
         {

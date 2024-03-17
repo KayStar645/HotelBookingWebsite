@@ -1,0 +1,285 @@
+﻿@using Core.Application.ViewModels.Tour
+@{
+	var tours = ViewBag.detail as TourVM;
+}
+<style>
+	.ck.ck-content.ck-editor__editable.ck-rounded-corners.ck-editor__editable_inline {
+		min-height: 300px;
+	}
+</style>
+
+@section TitleHeader
+{
+	<div class="row">
+		<div class="col-sm-12 mt-3">
+			<div class="row mt-3">
+				<div class="col-sm-4">
+					<h3 class="page-title mb-1">
+						@(tours == null ? "Thêm mới tour" : "Chi tiết tour " + tours?.InternalCode)
+					</h3>
+				</div>
+				<div class="col-sm-2">
+				</div>
+				<div class="col-sm-4">
+				</div>
+				<div class="col-sm-2">
+					<div class="text-right">
+						<a href="" id="createtour"
+						   class="btn btn-primary @(tours == null || tours.Id == 0 ? "d-inline-block" : "d-none")">
+							Thêm mới
+						</a>
+						<a href="" id="updatetour"
+						   class="btn btn-primary @(tours != null && tours.Id > 0 ? "d-inline-block" : "d-none")">
+							Cập nhật
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+<div id="detail-tour" class="card py-4 px-2" data-tour-id="@tours?.Id">
+	<div class="row col-sm-12">
+		<div class="col-sm-4">
+			<div class="form-group">
+				<label class="font-weight-bold mb-2">Mã tour</label>
+				<input class="form-control" type="text" name="internalCode"
+					   value="@(tours == null ? "" : tours.InternalCode)" />
+				<span class="text-danger" id="internalCodeError"></span>
+			</div>
+		</div>
+		<div class="col-sm-4">
+			<div class="form-group">
+				<label class="font-weight-bold mb-2">Tên tour</label>
+				<input class="form-control" type="text" name="name"
+					   value="@(tours == null ? "" : tours.Name)" />
+				<span class="text-danger" id="nameError"></span>
+			</div>
+		</div>
+		<div class="col-sm-4">
+			<div class="form-group">
+				<label class="font-weight-bold mb-2">Hướng dẫn viên</label>
+				<input class="form-control" type="text" name="tourguide"
+					   value="@(tours == null ? "" : tours.TourGuide)" />
+				<span class="text-danger" id="tourguideError"></span>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="form-group">
+				<label class="font-weight-bold mb-2">Ngày khởi hành</label>
+				<div class="">
+					<input type="date" class="form-control" placeholder="dd-mm-yyyy"
+						   min="2024-01-01" max="2030-12-31" name="datestart" />
+				</div>
+				<span class="text-danger" id="datestartError"></span>
+			</div>
+		</div>
+		<div class="col-sm-4">
+			<div class="form-group">
+				<label class="font-weight-bold mb-2">Giá tiền</label>
+				<input class="form-control" type="number" name="price"
+					   value="@(tours == null ? "0" : tours.Price)" />
+				<span class="text-danger" id="priceError"></span>
+			</div>
+		</div>
+	</div>
+	
+	<div class="col-12">
+		<label class="p-1 fw-bolder label">Mô tả tour</label> <br />
+		<div id="describe">
+			@Html.Raw(tours?.Describe)
+		</div>
+	</div>
+</div>
+
+@* JS *@
+<script>
+	$("#room-service").addClass("active"); 
+	$("#room-service").next("ul").addClass("d-block");
+	$("#room-service-tour").addClass("active");
+
+	$(".link-parent").on("click", function (e) {
+		e.preventDefault();
+
+		$(".nav-childs").removeClass("active");
+		$(".link-parent").removeClass("active");
+
+		$(".link-parent").next("ul").not($(this).next("ul")).removeClass("d-block");
+
+		$(this).closest(".link-parent").addClass("active");
+	});
+</script>
+
+@* Ckeditor *@
+<script>
+	var _describeEditor;
+
+	ClassicEditor
+		.create(document.querySelector('#describe'))
+		.then(editor => {
+			_describeEditor = editor;
+		})
+		.catch(error => {
+			console.error('There was a problem initializing the editor.', error);
+		});
+</script>
+
+@* Khai báo và hàm hỗ trợ *@
+<script>
+	var tourID = document.getElementById('detail-tour').dataset.tourID;
+
+	var internalCodeInput = $('input[name="internalCode"]');
+	var nameInput = $('input[name="name"]');
+	var tourguideInput = $('input[name="tourguide"]');
+	var datestartInput = $('input[name="datestart"]');
+	var priceInput = $('input[name="price"]');
+	var maximumPeopleInput = $('input[name="maximumPeople"]');
+
+
+	function removeValidator() {
+		$(".text-danger").text("");
+
+		internalCodeInput.removeClass("border-danger");
+		nameInput.removeClass("border-danger");
+		tourguideInput.removeClass("border-danger");
+		datestartInput.removeClass("border-danger");
+		priceInput.removeClass("border-danger");
+		maximumPeopleInput.removeClass("border-danger");
+	}
+
+	function validateForm(pRequest) {
+		var isValid = true;
+
+		// Validate internalCode
+		if (!pRequest.internalCode) {
+			$("#internalCodeError").text("Mã tour không được để trống");
+			$('input[name="internalCode"]').addClass("border-danger");
+			isValid = false;
+		} else if (pRequest.internalCode.length > 100) {
+			$("#internalCodeError").text("Mã tour không được vượt quá 100 ký tự");
+			$('input[name="internalCode"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		// Validate name
+		if (!pRequest.name) {
+			$("#nameError").text("Tên tour không được để trống");
+			$('input[name="name"]').addClass("border-danger");
+			isValid = false;
+		} else if (pRequest.name.length > 100) {
+			$("#nameError").text("Tên tour không được vượt quá 100 ký tự");
+			$('input[name="name"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		// Validate tourguide
+		if (!pRequest.tourguide) {
+			$("#tourguideError").text("Tên hướng dẫn viên không được để trống");
+			$('input[name="tourguide"]').addClass("border-danger");
+			isValid = false;
+		} else if (pRequest.tourguide.length > 100) {
+			$("#tourguideError").text("Tên hướng dẫn viên không được vượt quá 100 ký tự");
+			$('input[name="tourguide"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		// Validate datestart
+		if (!pRequest.datestart) {
+			$("#datestartError").text("Ngày khởi hành không được để trống");
+			$('input[name="datestart"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		// Validate price
+		if (!pRequest.price || pRequest.price < 0) {
+			$("#priceError").text("Giá là bắt buộc và ít nhất phải bằng 0đ");
+			$('input[name="price"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		return isValid;
+	}
+
+
+	function getData(isCreate) {
+		var data = {
+			id: isCreate ? 0 : tourID,
+			internalCode: document.querySelector('input[name="internalCode"]').value,
+			name: document.querySelector('input[name="name"]').value,
+			tourguide: document.querySelector('input[name="tourguide"]').value,
+			datestart: document.querySelector('input[name="datestart"]').value,
+			price: document.querySelector('input[name="price"]').value,
+			describe: _describeEditor.getData(),
+		};
+		return data;
+	}
+
+
+
+</script>
+
+
+@* Gọi Controller xử lý *@
+<script>
+	$(document).ready(function () {
+		$("#createtour").on("click", function (e) {
+			e.preventDefault();
+
+			removeValidator();
+
+			var pRequest = getData(true);
+
+			var isValid = validateForm(pRequest);
+
+			if (isValid) {
+				$.ajax({
+					url: "/tour/create",
+					method: "POST",
+					data: JSON.stringify(pRequest),
+					contentType: "application/json; charset=utf-8",
+					success: function (data) {
+						if (data.success) {
+							window.location.href = "/tour";
+						} else {
+							toastr.error(data.errors[0], 'Thông báo');
+						}
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Thêm mới tour thất bại!', 'Thông báo');
+					}
+				});
+			}
+		});
+
+		$("#updatetour").on("click", function (e) {
+			e.preventDefault();
+
+			removeValidator();
+
+			var pRequest = getData(false);
+
+			var isValid = validateForm(pRequest);
+
+			if (isValid) {
+				$.ajax({
+					url: "/tour/update",
+					method: "PUT",
+					data: JSON.stringify(pRequest),
+					contentType: "application/json; charset=utf-8",
+					success: function (data) {
+						if (data.success) {
+							window.location.href = "/tour";
+						} else {
+							toastr.error(data.errors[0], 'Thông báo');
+						}
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Cập nhật tour thất bại!', 'Thông báo');
+					}
+				});
+			}
+		});
+	});
+
+</script>
