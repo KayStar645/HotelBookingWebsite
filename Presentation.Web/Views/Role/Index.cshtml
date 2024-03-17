@@ -93,11 +93,9 @@
 							@foreach (var role in roles.Data)
 							{
 								<tr>
-									<td class="text-center">
+									<td class="text-center" style="width: 10px;">
 										<i class="updates fa-regular fa-pen-to-square pe-3"
-										   
-										cursor: pointer;"></i>
-										<i class="deletes fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
+										   style="color: #74C0FC; cursor: pointer;"></i>
 									</td>
 									<td class="text-center d-none" data-id="@role?.Id">@role?.Id</td>
 									<td class="text-nowrap">

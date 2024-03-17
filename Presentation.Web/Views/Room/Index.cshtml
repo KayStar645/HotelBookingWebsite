@@ -94,18 +94,20 @@
 					{
 						<tr>
 							<td class="text-center">
-								<i class=" updates fa-regular fa-pen-to-square pe-3"
-								   
-								cursor: pointer;"
-								   data-toggle="modal" data-target="#openPopup"></i>
-								<i class="deletes fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
+								@if (room.IsDeleted != true)
+								{
+									<i class=" updates fa-regular fa-pen-to-square pe-3"
+									   style="color: #74C0FC; cursor: pointer;"
+									   data-toggle="modal" data-target="#openPopup"></i>
+									<i class="deletes fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
+								}
 							</td>
 							<td class="text-center d-none" data-id="@room?.Id">@room?.Id</td>
 							<td class="text-nowrap">
 								<div>@room?.InternalCode</div>
 							</td>
 							<td class="text-center d-none" data-id="@room?.KindRoom?.Id">@room?.KindRoom?.Id</td>
-							<td class="text-center">
+							<td class="text-nowrap">
 								@room?.KindRoom?.InternalCode - @room?.KindRoom?.Name
 							</td>
 							<td class="text-center d-none" data-id="@room?.Status">@room?.Status</td>
