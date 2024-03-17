@@ -47,6 +47,7 @@
 
 <div class="row">
 	<div class="col-8">
+
 		<div class="card">
 			<div class="table-responsive" style="overflow-y: auto;">
 				<table class="table table-hover table-center table-striped table-bordered">
@@ -67,9 +68,10 @@
 							{
 								<tr>
 									<td class="text-center">
-										<i class=" updates fa-regular fa-pen-to-square pe-3"
-										   style="color:blue;cursor: pointer;"
+										<i class="updates fa-regular fa-pen-to-square pe-3"
+										   style="color: #74C0FC;cursor: pointer;"
 										   data-toggle="modal" data-target="#openPopup"></i>
+										<i class="views fa-solid fa-eye" style="color: #74C0FC;cursor: pointer;"></i>
 									</td>
 									<td class="text-center d-none" data-id="@user?.Id">@user?.Id</td>
 									<td class="text-nowrap">
@@ -113,14 +115,19 @@
 	</div>
 	<div class="col-4">
 		<div class="card">
-			<h5 class="page-title p-2 text-bold text-center">
-				Liên kết với nhân viên
+			<h5 id="titleLink" class="page-title p-2 text-bold text-center">
+				
 			</h5>
+
+			<input class="form-control d-none" type="text" name="userId" />
+			<input class="form-control d-none" type="text" name="staffId" />
+
 			<div class="row px-4">
 				<div class="col-12">
 					<div class="form-group">
 						<label class="font-weight-bold mb-2">Mã nhân viên</label>
-						<input class="form-control" type="text" name="internalCode" />
+						<input class="form-control" type="text" id="internalCodeInput" name="internalCode" />
+						<span class="text-danger" id="internalCodeError"></span>
 					</div>
 				</div>
 			</div>
@@ -243,7 +250,9 @@
 @* Khởi tạo biến *@
 <script>
 	var createOpen = document.getElementById("create");
+	var saveChange = document.getElementById("saveChange");
 	var updateOpens = document.querySelectorAll(".updates");
+	var views = document.querySelectorAll(".views");
 
 	var userNameInput = $('input[name="userName"]');
 	var passwordInput = $('input[name="password"]');
@@ -251,6 +260,7 @@
 	var phoneNumberInput = $('input[name=" phoneNumber"]');
 
 	var searchTimer;
+	var internalCodeTimer;
 </script>
 
 @* Tìm kiếm và lọc *@
@@ -262,6 +272,14 @@
 			searchTimer = setTimeout(function () {
 				performSearch();
 			}, 600);
+		});
+
+		$('#internalCodeInput').on('input', function () {
+			clearTimeout(internalCodeTimer);
+
+			internalCodeTimer = setTimeout(function () {
+				performInternalCode();
+			}, 1000);
 		});
 
 		function performSearch() {
@@ -285,6 +303,21 @@
 				},
 				error: function (xhr, textStatus, errorThrown) {
 					toastr.error('Lỗi khi thực hiện tìm kiếm!', 'Thông báo');
+				}
+			});
+		}
+
+		function performInternalCode() {
+			var searchTerm = $('#internalCodeInput').val();
+
+			$.ajax({
+				url: '/staff/detail?pInternalCode=' + searchTerm,
+				method: 'GET',
+				success: function (response) {
+					loadUserToStaff(response.data);
+				},
+				error: function (xhr, status, error) {
+					toastr.error('Lỗi khi thực hiện tìm kiếm nhân viên!', 'Thông báo');
 				}
 			});
 		}
@@ -331,6 +364,28 @@
 			});
 		});
 
+		views = document.querySelectorAll(".views");
+		views.forEach(function (button) {
+			button.addEventListener("click", function () {
+				var itemId = $(this).closest("tr").find("td[data-id]").data("id");
+				var userName = button.closest("tr").querySelector("td:nth-child(3)").textContent.trim();
+
+				document.querySelector('input[name="userId"]').value = itemId;
+				document.getElementById("titleLink").innerText = userName;
+				$.ajax({
+					url: "/user/detail?pId=" + itemId,
+					method: "GET",
+					success: function (data) {
+						updateSelectMultiple(data.data.roles);
+						loadUserToStaff(data.data.staff);
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Chi tiết vai trò lỗi!', 'Thông báo');
+					}
+				});
+			});
+		});
+
 		$(document).ready(function () {
 			$('.pagination a').on('click', function (e) {
 				e.preventDefault();
@@ -369,6 +424,41 @@
 
 		removeValidator();
 	}
+
+	function loadUserToStaff(data) {
+		document.querySelector('input[name="staffId"]').value = data != null ? data.id : "";
+		document.querySelector('input[name="internalCode"]').value = data != null ? data.internalCode : "";
+		document.querySelector('input[name="name"]').value = data != null ? data.name : "";
+	}
+
+	function updateSelectMultiple(selectedRoles) {
+		var checkboxes = $('.multiselect-container input[type="checkbox"]');
+		var selectedText = '';
+		var selectedValues = [];
+
+		checkboxes.each(function () {
+			var checkboxValue = parseInt($(this).val());
+			var isSelected = selectedRoles.some(role => role.id === checkboxValue);
+			$(this).prop('checked', isSelected);
+
+			if (isSelected) {
+				$(this).closest('li').addClass('active');
+				selectedText += $(this).closest('label').text() + ', ';
+				selectedValues.push(checkboxValue);
+			} else {
+				$(this).closest('li').removeClass('active');
+			}
+		});
+
+		selectedText = selectedText.trim().replace(/,\s*$/, '');
+		selectedText = selectedText || 'None selected';
+
+		$('.multiselect-selected-text').text(selectedText);
+
+		// Cập nhật giá trị cho $('#multiple-checkboxes').val()
+		$('#multiple-checkboxes').val(selectedValues);
+	}
+
 
 	function removeValidator() {
 		$(".text-danger").text("");
@@ -475,6 +565,51 @@
 				});
 			}
 		});
+
+		$("#saveChange").on("click", function (e) {
+			e.preventDefault();
+
+			removeValidator();
+
+			var pRequest = getDataUserToStaff();
+
+			var isValid = true;
+			if (isValid) {
+				$.ajax({
+					url: "/user/link",
+					method: "PUT",
+					data: JSON.stringify(pRequest),
+					contentType: "application/json; charset=utf-8",
+					success: function (data) {
+						if (data.success) {
+							$.ajax({
+								url: "/user/index",
+								method: "GET",
+								data: { page: 1 },
+								contentType: "application/json; charset=utf-8",
+								success: function (data) {
+									var newData = $('<tbody>').html(data).find('#table-body-user').html();
+									$('#table-body-user').html(newData);
+
+									var newPaginated = $('<div>').html(data).find('#paginated').html();
+									$('#paginated').html(newPaginated);
+
+									$('.btn-secondary[data-dismiss="modal"]').click();
+
+									resetEvent();
+								},
+							});
+							toastr.success('Liên kết thành thành công!', 'Thông báo');
+						} else {
+							toastr.error(data.errors[0], 'Thông báo');
+						}
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Liên kết thành thất bại!', 'Thông báo');
+					}
+				});
+			}
+		});
 	});
 
 	function getData() {
@@ -484,6 +619,15 @@
 			password: $('input[name="password"]').val() || null,
 			email: $('input[name="email"]').val() || null,
 			phoneNumber: $('input[name="phoneNumber"]').val() || null,
+		};
+		return formData;
+	}
+
+	function getDataUserToStaff() {
+		var formData = {
+			userId: $('input[name="userId"]').val() || null,
+			staffId: $('input[name="staffId"]').val() || null,
+			roleIds: $('#multiple-checkboxes').val() || null,
 		};
 		return formData;
 	}

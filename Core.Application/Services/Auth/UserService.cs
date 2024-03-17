@@ -83,6 +83,55 @@ namespace Core.Application.Services.Auth
 			}
 		}
 
+		public async Task<UserVM> Detail(int? pUserId)
+		{
+            var user = await _context.Users
+                .Where(x => x.Id == pUserId)
+                .Include(x => x.Staff)
+                .Include(x => x.UserRoles).ThenInclude(x => x.Role)
+                .FirstOrDefaultAsync();
+
+            return _mapper.Map<UserVM>(user);
+		}
+
+		public async Task<UserVM> LinkToStaff(LinkToStaffRQ pRequest)
+		{
+            var user = await _context.Users
+                .Where(x => x.Id == pRequest.UserId).FirstOrDefaultAsync();
+            user.StaffId = pRequest.StaffId;
+            _context.Users.Update(user);
+			await _context.SaveChangesAsync(default(CancellationToken));
+
+			var roleIdsOfUser = await _context.UserRoles
+                .Where(x => x.UserId == user.Id)
+                .Select(x => x.RoleId).ToListAsync();
+            foreach (var roleId in roleIdsOfUser)
+            {
+                var userRole = await _context.UserRoles
+                    .FirstOrDefaultAsync(x => x.UserId == user.Id && x.RoleId == roleId);
+
+                _context.UserRoles.Remove(userRole);
+                await _context.SaveChangesAsync(default(CancellationToken));
+            }
+
+            if (pRequest.RoleIds != null)
+            {
+                foreach (var roleId in pRequest.RoleIds)
+                {
+                    var userRole = new UserRole
+                    {
+                        UserId = user.Id,
+                        RoleId = roleId
+                    };
+
+                    var newUserRole = await _context.UserRoles.AddAsync(userRole);
+                    await _context.SaveChangesAsync(default(CancellationToken));
+                }
+            }
+
+            return _mapper.Map<UserVM>(user);
+        }
+
 		public async Task<PaginatedResult<UserVM>> List(BaseListRQ pRequest)
         {
             var query = _context.Users.AsQueryable();
@@ -149,28 +198,6 @@ namespace Core.Application.Services.Auth
 				var newUser = _context.Users.Update(user);
                 user.Type = ClaimValue.TYPE_SUPER_ADMIN;
 				await _context.SaveChangesAsync(default(CancellationToken));
-
-				//var roleIdsOfUser = await _context.UserRoles.Select(x => x.RoleId).ToListAsync();
-				//foreach (var roleId in roleIdsOfUser)
-				//{
-    //                var userRole = await _context.UserRoles
-    //                    .FirstOrDefaultAsync(x => x.UserId == user.Id && x.RoleId == roleId);
-
-				//	_context.UserRoles.Remove(userRole);
-				//	await _context.SaveChangesAsync(default(CancellationToken));
-				//}
-
-				//if (pRequest.RoleIds != null)
-				//{
-				//	foreach (var roleId in pRequest.RoleIds)
-				//	{
-				//		var userRole = await _context.UserRoles
-				//		.FirstOrDefaultAsync(x => x.UserId == user.Id && x.RoleId == roleId);
-
-				//		var newUserRole = await _context.UserRoles.AddAsync(userRole);
-				//		await _context.SaveChangesAsync(default(CancellationToken));
-				//	}
-				//}
 
 				return _mapper.Map<UserVM>(user);
 			}

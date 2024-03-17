@@ -8,8 +8,6 @@ using Core.Application.ViewModels.Auth;
 using Core.Application.ViewModels.Common;
 using Core.Domain.Auth;
 using Microsoft.EntityFrameworkCore;
-using System.Transactions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Core.Application.Services.Auth
 {
@@ -140,6 +138,16 @@ namespace Core.Application.Services.Auth
 			return new PaginatedResult<RoleVM>(viewModels, totalItems, pRequest.Page, pRequest.PageSize);
 		}
 
+		public async Task<List<RoleVM>> RoleByUserId(int pUserId)
+		{
+			var roles = await _context.UserRoles
+				.Where(x => x.UserId == pUserId)
+				.Include(x => x.Role)
+				.Select(x => x.Role)
+				.ToListAsync();
+			return _mapper.Map<List<RoleVM>>(roles);
+		}
+
 		public async Task<RoleVM> UpdateAsync(RoleRQ pRequest)
         {
 			try
@@ -239,6 +247,9 @@ namespace Core.Application.Services.Auth
 					break;
 				case "Quyền":
 					module = "role";
+					break;
+				case "Người dùng":
+					module = "user";
 					break;
 			}
 			switch (action)

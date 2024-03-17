@@ -10,6 +10,10 @@ namespace Core.Application.Interfaces.Auth
 
 		Task<UserVM> Create(UserRQ pRequest);
 
+		Task<UserVM> Detail(int? pUserId);
+
+		Task<UserVM> LinkToStaff(LinkToStaffRQ pRequest);
+
 		Task<UserVM> Update(UserRQ pRequest);
 
 		Task<List<string>> AssignPermissions(RevokeOrAssignPermissionRQ pRequest);

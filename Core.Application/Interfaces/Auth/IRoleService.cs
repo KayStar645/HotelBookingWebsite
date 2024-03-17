@@ -8,6 +8,8 @@ namespace Core.Application.Interfaces.Auth
 	{
 		Task<PaginatedResult<RoleVM>> List(BaseListRQ pRequest);
 
+		Task<List<RoleVM>> RoleByUserId(int pUserId);
+
 		Task<RoleVM> CreateAsync(RoleRQ pRequest);
 
         Task<RoleVM> UpdateAsync(RoleRQ pRequest);
