@@ -446,6 +446,36 @@
 			}
 		});
 
+		$("#update").on("click", function (e) {
+			e.preventDefault();
+
+			removeValidator();
+
+			var pRequest = getData(false);
+
+			isValid = validateForm(pRequest);
+
+			if (isValid) {
+				$.ajax({
+					url: "update",
+					method: "PUT",
+					data: JSON.stringify(pRequest),
+					contentType: "application/json; charset=utf-8",
+					success: function (data) {
+						if (data.success) {
+							window.location.href = "/promotion"
+						}
+						else {
+							toastr.error(data.errors[0], 'Thông báo');
+						}
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Cập nhật chương trình khuyến mãi thất bại!', 'Thông báo');
+					}
+				});
+			}
+		});
+
 		$("#approve").on("click", function (e) {
 			e.preventDefault();
 
