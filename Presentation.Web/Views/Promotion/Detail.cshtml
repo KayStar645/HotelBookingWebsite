@@ -31,21 +31,27 @@
 				</div>
 				<div class="col-sm-2">
 				</div>
-				<div class="col-sm-3">
-				</div>
-				<div class="col-sm-2">
+				<div class="col-sm-5">
 					<div class="text-right">
 						<a href="" id="create"
 						   class="btn btn-primary @(promotion == null || promotion.Id == 0 ? "d-inline-block" : "d-none")">
 							Thêm mới
 						</a>
 						<a href="" id="update"
-						   class="btn btn-primary @(promotion != null && promotion.Id > 0 ? "d-inline-block" : "d-none")">
+						   class="btn btn-primary @(promotion != null && promotion.Status != "C" ? "d-inline-block" : "d-none")">
 							Cập nhật
 						</a>
-						<a href="" id="update"
-						   class="btn btn-warning @(promotion != null && promotion.Id > 0 ? "d-inline-block" : "d-none")">
+						<a href="" id="approve"
+						   class="btn btn-warning @(promotion != null && promotion.Status == "D" ? "d-inline-block" : "d-none")">
 							Duyệt
+						</a>
+						<a href="" id="cancel"
+						   class="btn btn-danger @(promotion != null && promotion.Status == "A" ? "d-inline-block" : "d-none")">
+							Huỷ bỏ
+						</a>
+						<a href="" id="draft"
+						   class="btn btn-secondary @(promotion != null && promotion.Status == "A" ? "d-inline-block" : "d-none")">
+							Chuyển về nháp
 						</a>
 					</div>
 				</div>
@@ -174,7 +180,7 @@
 			</div>
 			<div class="col-sm-3">
 				<div class="text-right">
-					<a href="" id="update"
+					<a href="" id="addRoom"
 					   class="btn btn-primary">
 						Cập nhật danh sách
 					</a>
@@ -438,6 +444,66 @@
 					}
 				});
 			}
+		});
+
+		$("#approve").on("click", function (e) {
+			e.preventDefault();
+
+			$.ajax({
+				url: "approve?pId=" + promotionId + "&pStatus=A",
+				method: "PUT",
+				success: function (data) {
+					if (data.success) {
+						window.location.href = "/promotion/detail?pId=" + promotionId;
+					}
+					else {
+						toastr.error(data.error, 'Thông báo');
+					}
+				},
+				error: function (xhr, textStatus, errorThrown) {
+					toastr.error('Duyệt chương trình khuyến mãi thất bại!', 'Thông báo');
+				}
+			});
+		});
+
+		$("#cancel").on("click", function (e) {
+			e.preventDefault();
+
+			$.ajax({
+				url: "approve?pId=" + promotionId + "&pStatus=C",
+				method: "PUT",
+				success: function (data) {
+					if (data.success) {
+						window.location.href = "/promotion/detail?pId=" + promotionId;
+					}
+					else {
+						toastr.error(data.error, 'Thông báo');
+					}
+				},
+				error: function (xhr, textStatus, errorThrown) {
+					toastr.error('Huỷ bỏ chương trình khuyến mãi thất bại!', 'Thông báo');
+				}
+			});
+		});
+
+		$("#draft").on("click", function (e) {
+			e.preventDefault();
+
+			$.ajax({
+				url: "approve?pId=" + promotionId + "&pStatus=D",
+				method: "PUT",
+				success: function (data) {
+					if (data.success) {
+						window.location.href = "/promotion/detail?pId=" + promotionId;
+					}
+					else {
+						toastr.error(data.error, 'Thông báo');
+					}
+				},
+				error: function (xhr, textStatus, errorThrown) {
+					toastr.error('Huỷ bỏ chương trình khuyến mãi thất bại!', 'Thông báo');
+				}
+			});
 		});
 	});
 </script>

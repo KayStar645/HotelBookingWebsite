@@ -105,11 +105,13 @@
 					{
 						<tr>
 							<td class="text-center">
-								<a href="@Url.Action("detail", "promotion", new { pId = promotion.Id })">
-									<i class="far fa-pen-to-square pe-3" style="color: #74C0FC; cursor: pointer;"></i>
-								</a>
-
-								<i class="deletes fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
+								@if (promotion.IsDeleted != true)
+								{
+									<a href="@Url.Action("detail", "promotion", new { pId = promotion.Id })">
+										<i class="far fa-pen-to-square pe-3" style="color: #74C0FC; cursor: pointer;"></i>
+									</a>
+									<i class="deletes fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
+								}
 							</td>
 							<td class="text-center d-none" data-id="@promotion?.Id">@promotion?.Id</td>
 							<td class="text-nowrap">

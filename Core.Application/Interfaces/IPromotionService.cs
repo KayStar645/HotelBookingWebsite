@@ -15,5 +15,7 @@ namespace Core.Application.Interfaces
 		Task<PromotionVM> Update(PromotionRQ pRequest);
 
 		Task<bool> Delete(int pId);
+
+		Task<bool> Approve(int pId, string pStatus);
 	}
 }
