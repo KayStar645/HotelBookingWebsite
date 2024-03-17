@@ -2,13 +2,12 @@
 using Core.Application.Interfaces;
 using Core.Application.ViewModels.Common;
 using Core.Application.ViewModels.KindRooms;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Web.Middleware;
 
 namespace Presentation.Web.Controllers.Admin
 {
-    public class KindRoomController : Controller
+	public class KindRoomController : Controller
 	{
 		private readonly IKindRoomService _kindRoomService;
 
@@ -36,7 +35,7 @@ namespace Presentation.Web.Controllers.Admin
 		}
 
 
-		[HttpPost]
+		[HttpPost("/kindroom/create")]
 		[Permission("kindroom-create")]
 		public async Task<IActionResult> Create([FromBody] KindRoomRQ pRequest)
 		{

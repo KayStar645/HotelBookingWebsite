@@ -30,6 +30,7 @@ namespace Presentation.Web.Controllers.Admin
 		public async Task<IActionResult> Detail([FromQuery] int pId)
 		{
 			ViewBag.Detail = await _promotionService.Detail(pId);
+			ViewBag.Rooms = await _promotionService.ListRoomByPromotionId(pId);
 
 			return View();
 		}

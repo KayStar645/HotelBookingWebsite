@@ -4,7 +4,9 @@ using Core.Application.Interfaces.Common;
 using Core.Application.Services.Common;
 using Core.Application.ViewModels.Common;
 using Core.Application.ViewModels.Promotions;
+using Core.Application.ViewModels.Rooms;
 using Core.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Core.Application.Services
 {
@@ -40,6 +42,18 @@ namespace Core.Application.Services
 			await _context.SaveChangesAsync(default(CancellationToken));
 
 			return flag;
+		}
+
+		public async Task<List<RoomVM>> ListRoomByPromotionId(int pId)
+		{
+			var room = await _context.RoomPromotions
+				.Where(x => x.PromotionId == pId)
+				.Include(x => x.Room)
+				.ThenInclude(x => x.KindRoom)
+				.Select(x => x.Room)
+				.ToListAsync();
+
+			return _mapper.Map<List<RoomVM>>(room);
 		}
 
 		protected override IQueryable<Promotion> ApplySearch(IQueryable<Promotion> query, string keyword)

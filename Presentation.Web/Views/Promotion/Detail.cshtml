@@ -1,6 +1,8 @@
 ﻿@using Core.Application.ViewModels.Promotions
+@using Core.Application.ViewModels.Rooms
 @{
 	var promotion = ViewBag.detail as PromotionVM;
+	var rooms = ViewBag.rooms as List<RoomVM>;
 
 	string GetStatusName(string statusCode)
 	{
@@ -14,6 +16,23 @@
 				return "Huỷ bỏ";
 			default:
 				return "Unknown";
+		}
+	}
+
+	string GetStatusRoomName(string? status)
+	{
+		switch (status)
+		{
+			case "E":
+				return "Trống";
+			case "B":
+				return "Đã được đặt";
+			case "L":
+				return "Khách đang ở";
+			case "C":
+				return "Đang dọn dẹp";
+			default:
+				return "";
 		}
 	}
 }
@@ -182,7 +201,7 @@
 				<div class="text-right">
 					<a href="" id="addRoom"
 					   class="btn btn-primary">
-						Cập nhật danh sách
+						Danh sách phòng
 					</a>
 
 				</div>
@@ -195,35 +214,39 @@
 					<table class="table table-hover table-center table-striped table-bordered">
 						<thead>
 							<tr>
-								<th class="th-sm">Mã phòng</th>
+								<th class="th-sm text-center">Mã phòng</th>
 								<th class="th-sm text-center">Số người</th>
 								<th class="th-sm text-center">Hình ảnh</th>
 								<th class="th-sm text-center">Loại phòng</th>
 								<th class="th-sm text-center">Trạng thái</th>
 							</tr>
 						</thead>
-						@* <tbody id="table-body-room">
-						@if (rooms != null)
-						{
-						@foreach (var room in rooms.Data)
-						{
-						<tr>
-						<td class="text-center d-none" data-id="@room?.Id">@room?.Id</td>
-						<td class="text-nowrap">
-						<div>@room?.InternalCode</div>
-						</td>
-						<td class="text-center d-none" data-id="@room?.KindRoom?.Id">@room?.KindRoom?.Id</td>
-						<td class="text-center">
-						@room?.KindRoom?.InternalCode - @room?.KindRoom?.Name
-						</td>
-						<td class="text-center d-none" data-id="@room?.Status">@room?.Status</td>
-						<td class="text-center">
-						@StatusName(room?.Status)
-						</td>
-						</tr>
-						}
-						}
-						</tbody> *@
+						<tbody id="table-body-room">
+							@if (rooms != null)
+							{
+								@foreach (var room in rooms)
+								{
+									<tr>
+										<td class="text-center d-none" data-id="@room?.Id">@room?.Id</td>
+										<td class="text-nowrap">
+											@room?.InternalCode
+										</td>
+										<td class="text-center">
+											@room?.KindRoom?.MaximumPeople
+										</td>
+										<td class="text-center">
+											<img src="@room?.KindRoom?.Images?.FirstOrDefault()" />
+										</td>
+										<td class="text-center">
+											@room?.KindRoom?.Name
+										</td>
+										<td class="text-center">
+											@GetStatusRoomName(room?.Status)
+										</td>
+									</tr>
+								}
+							}
+						</tbody>
 					</table>
 				</div>
 			</div>
