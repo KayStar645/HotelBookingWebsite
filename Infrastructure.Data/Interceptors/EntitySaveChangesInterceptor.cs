@@ -1,5 +1,7 @@
 ﻿using Core.Application.Interfaces.Common;
+using Core.Domain.Auth;
 using Core.Domain.Common.Interfaces;
+using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -49,7 +51,12 @@ namespace Infrastructure.Data.Interceptors
                     entry.Entity.IsDeleted = false;
                 }
 
-                if (entry.State == EntityState.Deleted)
+                if(entry.Entity is RolePermission || entry.Entity is UserPermission ||
+                   entry.Entity is UserRole || entry.Entity is RoomPromotion)
+                {
+                    continue;
+                }
+                else if (entry.State == EntityState.Deleted)
                 {
                     entry.Entity.IsDeleted = true;
                     entry.State = EntityState.Unchanged;

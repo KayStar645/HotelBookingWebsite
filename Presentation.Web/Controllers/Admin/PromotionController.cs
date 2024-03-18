@@ -1,57 +1,43 @@
 ﻿using Core.Application.Exceptions;
-using Core.Application.Interfaces.Auth;
-using Core.Application.ViewModels.Auth;
+using Core.Application.Interfaces;
 using Core.Application.ViewModels.Common;
+using Core.Application.ViewModels.Promotions;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Web.Middleware;
 
-namespace Presentation.Web.Controllers.Auth
+namespace Presentation.Web.Controllers.Admin
 {
-	public class RoleController : Controller
+	public class PromotionController : Controller
 	{
-		private readonly IRoleService _roleService;
-		private readonly IPermissionService _permissionService;
+		private readonly IPromotionService _promotionService;
 
-		public RoleController(IRoleService pRoleService, IPermissionService pPermissionService)
+		public PromotionController(IPromotionService pPromotionService)
 		{
-			_roleService = pRoleService;
-			_permissionService = pPermissionService;
+			_promotionService = pPromotionService;
 		}
 
 		[HttpGet]
-		[Permission("role-view")]
+		[Permission("promotion-view")]
 		public async Task<IActionResult> Index([FromQuery] BaseListRQ pRequest)
 		{
-			ViewBag.List = await _roleService.List(pRequest);
-			ViewBag.Detail = await _permissionService.PermissionByRole();
+			ViewBag.List = await _promotionService.List(pRequest);
 
 			return View();
 		}
 
-		[HttpGet("/role/detail")]
-		[Permission("role-view")]
+		[HttpGet("/promotion/detail")]
+		[Permission("promotion-view")]
 		public async Task<IActionResult> Detail([FromQuery] int pId)
 		{
-			try
-			{
-				var detail = await _permissionService.PermissionByRole(pId);
-				return Json(new { success = true, data = detail });
-			}
-			catch (ValidationCustomException ex)
-			{
-				return Json(new { success = false, errors = ex.Errors });
-			}
-			catch (Exception ex)
-			{
-				return Json(new { success = false, error = "Lỗi server: " + ex.Message });
-			}
+			ViewBag.Detail = await _promotionService.Detail(pId);
+
+			return View();
 		}
 
 
-
 		[HttpPost]
-		[Permission("role-create")]
-		public async Task<IActionResult> Create([FromBody] RoleRQ pRequest)
+		[Permission("promotion-create")]
+		public async Task<IActionResult> Create([FromBody] PromotionRQ pRequest)
 		{
 			try
 			{
@@ -64,7 +50,7 @@ namespace Presentation.Web.Controllers.Auth
 					return Json(new { success = false, errors = modelStateErrors });
 				}
 
-				await _roleService.CreateAsync(pRequest);
+				await _promotionService.Create(pRequest);
 				return Json(new { success = true });
 			}
 			catch (ValidationCustomException ex)
@@ -79,8 +65,8 @@ namespace Presentation.Web.Controllers.Auth
 
 
 		[HttpPut]
-		[Permission("role-update")]
-		public async Task<IActionResult> Update([FromBody] RoleRQ pRequest)
+		[Permission("promotion-update")]
+		public async Task<IActionResult> Update([FromBody] PromotionRQ pRequest)
 		{
 			try
 			{
@@ -93,12 +79,27 @@ namespace Presentation.Web.Controllers.Auth
 					return Json(new { success = false, errors = modelStateErrors });
 				}
 
-				await _roleService.UpdateAsync(pRequest);
+				await _promotionService.Update(pRequest);
 				return Json(new { success = true });
 			}
 			catch (ValidationCustomException ex)
 			{
 				return Json(new { success = false, errors = ex.Errors });
+			}
+			catch (Exception ex)
+			{
+				return Json(new { success = false, error = "Lỗi server: " + ex.Message });
+			}
+		}
+
+		[HttpDelete]
+		[Permission("promotion-delete")]
+		public async Task<IActionResult> Delete([FromQuery] int pId)
+		{
+			try
+			{
+				await _promotionService.Delete(pId);
+				return Json(new { success = true });
 			}
 			catch (Exception ex)
 			{

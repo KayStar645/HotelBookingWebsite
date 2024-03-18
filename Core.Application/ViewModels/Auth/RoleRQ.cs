@@ -1,13 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Core.Application.ViewModels.Common;
+using Core.Application.ViewModels.Common.ValidationAttributes;
+using Core.Domain.Auth;
+using Core.Domain.Common.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace Core.Application.ViewModels.Auth
 {
-    public class RoleRQ
+	public class RoleRQ : BaseRQ
     {
-        public int Id { get; set; }
-
         [Required(ErrorMessage = "Tên vai trò là trường bắt buộc.")]
-        public string? Name { get; set; }
+		[Name<Role, RoleRQ>(ErrorMessage = "Tên loại phòng đã tồn tại.")]
+		public string? Name { get; set; }
 
         public string? Description { get; set; }
 

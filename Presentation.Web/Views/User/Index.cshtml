@@ -2,7 +2,16 @@
 @using Core.Application.ViewModels.Auth
 @{
     var users = ViewBag.list as PaginatedResult<UserVM>;
+	var roles = ViewBag.roles as PaginatedResult<RoleVM>;
 }
+
+<style>
+	.btn-group {
+		width: 100%;
+		border: solid 1px #ccc;
+		border-radius: 5px;
+	}
+</style>
 
 @section TitleHeader
 {
@@ -36,69 +45,618 @@
 	</div>
 }
 
-<div class="card-body">
-	<div class="table-responsive" style="overflow-y: auto;">
-		<table class="table table-hover table-center table-striped table-bordered">
-			<thead>
-				<tr>
-					<th class="min-vw-10"></th>
-					<th class="th-sm text-nowrap">Tên đăng nhập</th>
-					<th class="th-sm text-right">Email</th>
-					<th class="th-sm text-right">Số điện thoại</th>
-					<th class="th-sm text-nowrap">Vai trò</th>
-					<th class="th-sm text-nowrap">Quyền</th>
-					<th class="th-sm text-center">Loại</th>
-				</tr>
-			</thead>
-			<tbody id="table-body-room">
-				@if (users != null)
-				{
-					@foreach (var user in users.Data)
-					{
+<div class="row">
+	<div class="col-8">
+
+		<div class="card">
+			<div class="table-responsive" style="overflow-y: auto;">
+				<table class="table table-hover table-center table-striped table-bordered">
+					<thead>
 						<tr>
-							<td class="text-center">
-								<i class=" updates fa-regular fa-pen-to-square pe-3"
-								   style="color:blue;cursor: pointer;"
-								   data-toggle="modal" data-target="#openPopup"></i>
-								<i class="deletes fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
-							</td>
-							<td class="text-center d-none" data-id="@user?.Id">@user?.Id</td>
-							<td class="text-nowrap">
-								@user?.UserName
-							</td>
-							<td class="text-right">
-								@user?.Email
-							</td>
-							<td class="text-right">
-								@user?.PhoneNumber
-							</td>
-							<td class="text-nowrap">
-								@string.Join(",", user?.Roles)
-							</td>
-							<td class="text-nowrap">
-								@string.Join(",", user?.Permissions)
-							</td>
-							<td class="text-center">
-								<div>@user?.Type</div>
-							</td>
+							<th class="min-vw-10"></th>
+							<th class="th-sm text-nowrap">Tên đăng nhập</th>
+							<th class="th-sm text-right">Email</th>
+							<th class="th-sm text-right">Số điện thoại</th>
+							<th class="th-sm text-nowrap">Vai trò</th>
+							<th class="th-sm text-center">Loại TK</th>
 						</tr>
+					</thead>
+					<tbody id="table-body-user">
+						@if (users != null)
+						{
+							@foreach (var user in users.Data)
+							{
+								<tr>
+									<td class="text-center">
+										<i class="updates fa-regular fa-pen-to-square pe-3"
+										   style="color: #74C0FC;cursor: pointer;"
+										   data-toggle="modal" data-target="#openPopup"></i>
+										<i class="views fa-solid fa-eye" style="color: #74C0FC;cursor: pointer;"></i>
+									</td>
+									<td class="text-center d-none" data-id="@user?.Id">@user?.Id</td>
+									<td class="text-nowrap">
+										@user?.UserName
+									</td>
+									<td class="text-nowrap d-none">
+										@user?.Password
+									</td>
+									<td class="text-right">
+										@user?.Email
+									</td>
+									<td class="text-right">
+										@user?.PhoneNumber
+									</td>
+									<td class="text-nowrap">
+										@string.Join(",", user?.Roles.Select(x => x.Name))
+									</td>
+									<td class="text-center">
+										<div>@user?.Type</div>
+									</td>
+								</tr>
+							}
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+		@* Phân trang *@
+		<div id="paginated" class="d-flex justify-content-end mt-4">
+			<nav aria-label="Page navigation example">
+				<ul class="pagination">
+					@for (int i = 1; i <= users.Extra.TotalPages; i++)
+					{
+						<li class="page-item pageCurrent @(users.Extra.CurrentPage == i ? "active" : "")">
+							<a class="page-link" data-page="@i">@i</a>
+						</li>
 					}
-				}
-			</tbody>
-		</table>
+				</ul>
+			</nav>
+		</div>
+	</div>
+	<div class="col-4">
+		<div class="card">
+			<h5 id="titleLink" class="page-title p-2 text-bold text-center">
+				
+			</h5>
+
+			<input class="form-control d-none" type="text" name="userId" />
+			<input class="form-control d-none" type="text" name="staffId" />
+
+			<div class="row px-4">
+				<div class="col-12">
+					<div class="form-group">
+						<label class="font-weight-bold mb-2">Mã nhân viên</label>
+						<input class="form-control" type="text" id="internalCodeInput" name="internalCode" />
+						<span class="text-danger" id="internalCodeError"></span>
+					</div>
+				</div>
+			</div>
+
+			<div class="row px-4">
+				<div class="col-12">
+					<div class="form-group">
+						<label class="font-weight-bold mb-2">Họ tên</label>
+						<input class="form-control" type="text" name="name" readonly />
+					</div>
+				</div>
+			</div>
+
+			<div class="row px-4">
+				<div class="col-12">
+					<div class="form-group">
+						<label class="font-weight-bold mb-2">Vai trò</label>
+						<select id="multiple-checkboxes" multiple="multiple">
+							@foreach(var role in roles.Data)
+							{
+								<option value="@role.Id">@role.Name</option>
+							}
+						</select>
+					</div>
+				</div>
+			</div>
+
+			<div class="row px-4 mb-3">
+				<div class="col-12">
+					<div class="text-center">
+						<button type="button" id="saveChange" class="btn btn-primary">
+							Liên kết
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 
-@* Phân trang *@
-<div id="paginated" class="d-flex justify-content-end mt-4">
-	<nav aria-label="Page navigation example">
-		<ul class="pagination">
-			@for (int i = 1; i <= users.Extra.TotalPages; i++)
-			{
-				<li class="page-item pageCurrent @(users.Extra.CurrentPage == i ? "active" : "")">
-					<a class="page-link" data-page="@i">@i</a>
-				</li>
-			}
-		</ul>
-	</nav>
+@* Modal *@
+<div class="modal fade" id="openPopup" tabindex="-1" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header bg-success">
+				<h1 class="modal-title text-white font-weight-bold" id="modalTitle"></h1>
+				<button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">×</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-12 d-none">
+						<div class="form-group">
+							<input type="text" name="id" value="" />
+						</div>
+					</div>
+
+					<div class="col-12">
+						<div class="form-group">
+							<label class="font-weight-bold mb-2">Tên đăng nhập</label>
+							<input class="form-control" type="text" name="userName" />
+							<span class="text-danger" id="userNameError"></span>
+						</div>
+					</div>
+
+					<div class="col-12">
+						<div class="form-group">
+							<label class="font-weight-bold mb-2">Mật khẩu</label>
+							<input class="form-control" type="password" name="password" />
+							<span class="text-danger" id="passwordError"></span>
+						</div>
+					</div>
+
+					<div class="col-12">
+						<div class="form-group">
+							<label class="font-weight-bold mb-2">Email</label>
+							<input class="form-control" type="text" name="email" />
+							<span class="text-danger" id="emailError"></span>
+						</div>
+					</div>
+
+					<div class="col-12">
+						<div class="form-group">
+							<label class="font-weight-bold mb-2">Số điện thoại</label>
+							<input class="form-control" type="text" name="phoneNumber" />
+							<span class="text-danger" id="phoneNumberError"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+				<button type="button" id="createButton" class="btn btn-primary">Tạo mới</button>
+				<button type="button" id="updateButton" class="btn btn-primary">Cập nhật</button>
+			</div>
+		</div>
+	</div>
 </div>
+
+@* ĐÂY LÀ JS *@
+@* Active menu *@
+<script>
+	$("#system").addClass("active");
+	$("#system").next("ul").addClass("d-block");
+	$("#system-user").addClass("active");
+
+	$(".link-parent").on("click", function (e) {
+		e.preventDefault();
+
+		$(".nav-childs").removeClass("active");
+		$(".link-parent").removeClass("active");
+
+		$(".link-parent").next("ul").not($(this).next("ul")).removeClass("d-block");
+
+		$(this).closest(".link-parent").addClass("active");
+	});
+</script>
+
+@* Khởi tạo biến *@
+<script>
+	var createOpen = document.getElementById("create");
+	var saveChange = document.getElementById("saveChange");
+	var updateOpens = document.querySelectorAll(".updates");
+	var views = document.querySelectorAll(".views");
+
+	var userNameInput = $('input[name="userName"]');
+	var passwordInput = $('input[name="password"]');
+	var emailInput = $('input[name="email"]');
+	var phoneNumberInput = $('input[name=" phoneNumber"]');
+
+	var searchTimer;
+	var internalCodeTimer;
+</script>
+
+@* Tìm kiếm và lọc *@
+<script>
+	$(document).ready(function () {
+		$('#searchInput').on('input', function () {
+			clearTimeout(searchTimer);
+
+			searchTimer = setTimeout(function () {
+				performSearch();
+			}, 600);
+		});
+
+		$('#internalCodeInput').on('input', function () {
+			clearTimeout(internalCodeTimer);
+
+			internalCodeTimer = setTimeout(function () {
+				performInternalCode();
+			}, 1000);
+		});
+
+		function performSearch() {
+			var searchTerm = $('#searchInput').val();
+
+			$.ajax({
+				url: '/user/index',
+				method: 'GET',
+				data: {
+					search: searchTerm,
+					page: 1,
+				},
+				contentType: 'application/json; charset=utf-8',
+				success: function (data) {
+					var newData = $('<tbody>').html(data).find('#table-body-user').html();
+					$('#table-body-user').html(newData);
+
+					var newPaginated = $('<div>').html(data).find('#paginated').html();
+					$('#paginated').html(newPaginated);
+					resetEvent();
+				},
+				error: function (xhr, textStatus, errorThrown) {
+					toastr.error('Lỗi khi thực hiện tìm kiếm!', 'Thông báo');
+				}
+			});
+		}
+
+		function performInternalCode() {
+			var searchTerm = $('#internalCodeInput').val();
+
+			$.ajax({
+				url: '/staff/detail?pInternalCode=' + searchTerm,
+				method: 'GET',
+				success: function (response) {
+					loadUserToStaff(response.data);
+				},
+				error: function (xhr, status, error) {
+					toastr.error('Lỗi khi thực hiện tìm kiếm nhân viên!', 'Thông báo');
+				}
+			});
+		}
+	});
+</script>
+
+@* Lắng nghe sự kiện + load giao diện và dữ liệu *@
+<script>
+	function resetEvent() {
+		createOpen.addEventListener("click", function (event) {
+			var rowData = {
+				id: 0,
+				userName: "",
+				password: "",
+				email: "",
+				phoneNumber: "",
+				roleId: [],
+				type: "user"
+			};
+
+			document.getElementById("modalTitle").innerText = "Thêm tài khoản mới";
+			document.getElementById("createButton").style.display = "inline-block";
+			document.getElementById("updateButton").style.display = "none";
+
+			loadData(rowData);
+		});
+
+		updateOpens = document.querySelectorAll(".updates");
+		updateOpens.forEach(function (button) {
+			button.addEventListener("click", function () {
+				var parentRow = button.closest("tr");
+				var rowData = {
+					id: parentRow.querySelector("td:nth-child(2)").textContent.trim(),
+					userName: parentRow.querySelector("td:nth-child(3)").textContent.trim(),
+					password: parentRow.querySelector("td:nth-child(4)").textContent.trim(),
+					email: parentRow.querySelector("td:nth-child(5)").textContent.trim(),
+					phoneNumber: parentRow.querySelector("td:nth-child(6)").textContent.trim(),
+				};
+				document.getElementById("modalTitle").innerText = "Cập nhật thông tài khoản";
+				document.getElementById("createButton").style.display = "none";
+				document.getElementById("updateButton").style.display = "inline-block";
+
+				loadData(rowData);
+			});
+		});
+
+		views = document.querySelectorAll(".views");
+		views.forEach(function (button) {
+			button.addEventListener("click", function () {
+				var itemId = $(this).closest("tr").find("td[data-id]").data("id");
+				var userName = button.closest("tr").querySelector("td:nth-child(3)").textContent.trim();
+
+				document.querySelector('input[name="userId"]').value = itemId;
+				document.getElementById("titleLink").innerText = userName;
+				$.ajax({
+					url: "/user/detail?pId=" + itemId,
+					method: "GET",
+					success: function (data) {
+						updateSelectMultiple(data.data.roles);
+						loadUserToStaff(data.data.staff);
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Chi tiết vai trò lỗi!', 'Thông báo');
+					}
+				});
+			});
+		});
+
+		$(document).ready(function () {
+			$('.pagination a').on('click', function (e) {
+				e.preventDefault();
+				var page = $(this).data('page');
+				paginatedResult(page);
+			});
+		});
+
+		function paginatedResult(page) {
+			$.ajax({
+				url: `/room/index?page=${page}`,
+				method: 'GET',
+				success: function (data) {
+					var newData = $('<tbody>').html(data).find('#table-body-room').html();
+					$('#table-body-room').html(newData);
+
+					updatePagination(page);
+				},
+			});
+		}
+
+		function updatePagination(activePage) {
+			$('.pageCurrent').removeClass('active');
+			$('.pagination a[data-page="' + activePage + '"]').addClass('active').closest('.pageCurrent').addClass('active');
+		}
+	}
+
+
+
+	function loadData(data) {
+		document.querySelector('input[name="id"]').value = data.id;
+		document.querySelector('input[name="userName"]').value = data.userName;
+		document.querySelector('input[name="password"]').value = data.password;
+		document.querySelector('input[name="email"]').value = data.email;
+		document.querySelector('input[name="phoneNumber"]').value = data.phoneNumber;
+
+		removeValidator();
+	}
+
+	function loadUserToStaff(data) {
+		document.querySelector('input[name="staffId"]').value = data != null ? data.id : "";
+		document.querySelector('input[name="internalCode"]').value = data != null ? data.internalCode : "";
+		document.querySelector('input[name="name"]').value = data != null ? data.name : "";
+	}
+
+	function updateSelectMultiple(selectedRoles) {
+		var checkboxes = $('.multiselect-container input[type="checkbox"]');
+		var selectedText = '';
+		var selectedValues = [];
+
+		checkboxes.each(function () {
+			var checkboxValue = parseInt($(this).val());
+			var isSelected = selectedRoles.some(role => role.id === checkboxValue);
+			$(this).prop('checked', isSelected);
+
+			if (isSelected) {
+				$(this).closest('li').addClass('active');
+				selectedText += $(this).closest('label').text() + ', ';
+				selectedValues.push(checkboxValue);
+			} else {
+				$(this).closest('li').removeClass('active');
+			}
+		});
+
+		selectedText = selectedText.trim().replace(/,\s*$/, '');
+		selectedText = selectedText || 'None selected';
+
+		$('.multiselect-selected-text').text(selectedText);
+
+		// Cập nhật giá trị cho $('#multiple-checkboxes').val()
+		$('#multiple-checkboxes').val(selectedValues);
+	}
+
+
+	function removeValidator() {
+		$(".text-danger").text("");
+
+		userNameInput.removeClass("border-danger");
+		passwordInput.removeClass("border-danger");
+		emailInput.removeClass("border-danger");
+		phoneNumberInput.removeClass("border-danger");
+	}
+
+	resetEvent();
+</script>
+
+@* Gọi controller xử lý *@
+<script>
+	$(document).ready(function () {
+		$("#createButton").on("click", function (e) {
+			e.preventDefault();
+
+			removeValidator();
+
+			var pRequest = getData();
+			pRequest.id = 0;
+
+			var isValid = validateForm(pRequest);
+
+			if (isValid) {
+				$.ajax({
+					url: "/user/create",
+					method: "POST",
+					data: JSON.stringify(pRequest),
+					contentType: "application/json; charset=utf-8",
+					success: function (data) {
+						if (data.success) {
+							$.ajax({
+								url: "/user/index",
+								method: "GET",
+								data: { page: 1 },
+								contentType: "application/json; charset=utf-8",
+								success: function (data) {
+									var newData = $('<tbody>').html(data).find('#table-body-user').html();
+									$('#table-body-user').html(newData);
+
+									var newPaginated = $('<div>').html(data).find('#paginated').html();
+									$('#paginated').html(newPaginated);
+
+									$('.btn-secondary[data-dismiss="modal"]').click();
+
+									resetEvent();
+								},
+							});
+							toastr.success('Thêm mới phòng thành công!', 'Thông báo');
+						} else {
+							toastr.error(data.errors[0], 'Thông báo');
+						}
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Thêm mới phòng thất bại!', 'Thông báo');
+					}
+				});
+			}
+		});
+
+		$("#updateButton").on("click", function (e) {
+			e.preventDefault();
+
+			removeValidator();
+
+			var pRequest = getData();
+
+			var isValid = validateForm(pRequest);
+
+			if (isValid) {
+				$.ajax({
+					url: "/user/update",
+					method: "PUT",
+					data: JSON.stringify(pRequest),
+					contentType: "application/json; charset=utf-8",
+					success: function (data) {
+						if (data.success) {
+							$.ajax({
+								url: "/user/index",
+								method: "GET",
+								data: { page: 1 },
+								contentType: "application/json; charset=utf-8",
+								success: function (data) {
+									var newData = $('<tbody>').html(data).find('#table-body-user').html();
+									$('#table-body-user').html(newData);
+
+									$('.btn-secondary[data-dismiss="modal"]').click();
+
+									resetEvent();
+								},
+							});
+							toastr.success('Cập nhật thông tài khoản thành công!', 'Thông báo');
+						}
+						else {
+							toastr.error(data.errors[0], 'Thông báo');
+						}
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Cập nhật thông tài khoản thất bại!', 'Thông báo');
+					}
+				});
+			}
+		});
+
+		$("#saveChange").on("click", function (e) {
+			e.preventDefault();
+
+			removeValidator();
+
+			var pRequest = getDataUserToStaff();
+
+			var isValid = true;
+			if (isValid) {
+				$.ajax({
+					url: "/user/link",
+					method: "PUT",
+					data: JSON.stringify(pRequest),
+					contentType: "application/json; charset=utf-8",
+					success: function (data) {
+						if (data.success) {
+							$.ajax({
+								url: "/user/index",
+								method: "GET",
+								data: { page: 1 },
+								contentType: "application/json; charset=utf-8",
+								success: function (data) {
+									var newData = $('<tbody>').html(data).find('#table-body-user').html();
+									$('#table-body-user').html(newData);
+
+									var newPaginated = $('<div>').html(data).find('#paginated').html();
+									$('#paginated').html(newPaginated);
+
+									$('.btn-secondary[data-dismiss="modal"]').click();
+
+									resetEvent();
+								},
+							});
+							toastr.success('Liên kết thành thành công!', 'Thông báo');
+						} else {
+							toastr.error(data.errors[0], 'Thông báo');
+						}
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Liên kết thành thất bại!', 'Thông báo');
+					}
+				});
+			}
+		});
+	});
+
+	function getData() {
+		var formData = {
+			id: $('input[name="id"]').val() || null,
+			userName: $('input[name="userName"]').val() || null,
+			password: $('input[name="password"]').val() || null,
+			email: $('input[name="email"]').val() || null,
+			phoneNumber: $('input[name="phoneNumber"]').val() || null,
+		};
+		return formData;
+	}
+
+	function getDataUserToStaff() {
+		var formData = {
+			userId: $('input[name="userId"]').val() || null,
+			staffId: $('input[name="staffId"]').val() || null,
+			roleIds: $('#multiple-checkboxes').val() || null,
+		};
+		return formData;
+	}
+
+	function validateForm(data) {
+		var isValid = true;
+
+		// Validate userName
+		if (!data.userName) {
+			$("#userNameError").text("Tài khoản được để trống");
+			$('input[name="userName"]').addClass("border-danger");
+			isValid = false;
+		} else if (data.userName.length > 100) {
+			$("#userNameError").text("Tài khoản không được vượt quá 100 ký tự.");
+			$('input[name="userName"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		// Validate password
+		if (!data.password) {
+			$("#passwordError").text("Mật khẩu được để trống");
+			$('input[name="password"]').addClass("border-danger");
+			isValid = false;
+		} else if (data.password.length < 3) {
+			$("#passwordError").text("Mật khẩu không phải có độ dài từ 3 tới 50 kí tự.");
+			$('input[name="password"]').addClass("border-danger");
+			isValid = false;
+		}
+
+		return isValid;
+	}
+</script>

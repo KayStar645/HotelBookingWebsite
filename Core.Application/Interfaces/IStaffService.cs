@@ -10,7 +10,9 @@ namespace Core.Application.Interfaces
 
         Task<StaffVM> Detail(int pId);
 
-        Task<StaffVM> Create(StaffRQ pRequest);
+		Task<StaffVM> DetailByInternalCode(string? pInternalCode);
+
+		Task<StaffVM> Create(StaffRQ pRequest);
 
         Task<StaffVM> Update(StaffRQ pRequest);
 

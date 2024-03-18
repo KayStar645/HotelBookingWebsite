@@ -12,6 +12,9 @@ namespace Core.Application.Interfaces.Common
         DbSet<Service> Services { get; }
         DbSet<Tour> Tours { get; }
         
+        DbSet<Promotion> Promotions { get; }
+        DbSet<RoomPromotion> RoomPromotions { get; }
+
 		DbSet<User> Users { get; }
 		DbSet<Role> Roles { get; }
 		DbSet<Permission> Permissions { get; }
