@@ -40,7 +40,12 @@
 }
 
 <div id="detail-tour" class="card py-4 px-2" data-tour-id="@tours?.Id">
-	<div class="row col-sm-12">
+	<div class="row">
+		<div class="col-md-4 d-none">
+			<div class="form-group">
+				<input type="text" name="id" value="" />
+			</div>
+		</div>
 		<div class="col-sm-4">
 			<div class="form-group">
 				<label class="font-weight-bold mb-2">Mã tour</label>
@@ -127,7 +132,7 @@
 
 @* Khai báo và hàm hỗ trợ *@
 <script>
-	var tourID = document.getElementById('detail-tour').dataset.tourID;
+	var tourID = $("#detail-tour").data("tour-id");
 
 	var internalCodeInput = $('input[name="internalCode"]');
 	var nameInput = $('input[name="name"]');
@@ -252,34 +257,39 @@
 			}
 		});
 
-		$("#updatetour").on("click", function (e) {
-			e.preventDefault();
+		$(document).ready(function () {
+			var tourID = $("#detail-tour").data("tour-id");
 
-			removeValidator();
+			$("#updatetour").on("click", function (e) {
+				e.preventDefault();
 
-			var pRequest = getData(false);
+				removeValidator();
 
-			var isValid = validateForm(pRequest);
+				var pRequest = getData(false);
 
-			if (isValid) {
-				$.ajax({
-					url: "/tour/update",
-					method: "PUT",
-					data: JSON.stringify(pRequest),
-					contentType: "application/json; charset=utf-8",
-					success: function (data) {
-						if (data.success) {
-							window.location.href = "/tour";
-						} else {
-							toastr.error(data.errors[0], 'Thông báo');
+				var isValid = validateForm(pRequest);
+
+				if (isValid) {
+					$.ajax({
+						url: "/tour/update",
+						method: "PUT",
+						data: JSON.stringify(pRequest),
+						contentType: "application/json; charset=utf-8",
+						success: function (data) {
+							if (data.success) {
+								window.location.href = "/tour";
+							} else {
+								toastr.error(data.errors[0], 'Thông báo');
+							}
+						},
+						error: function (xhr, textStatus, errorThrown) {
+							toastr.error('Cập nhật tour thất bại!', 'Thông báo');
 						}
-					},
-					error: function (xhr, textStatus, errorThrown) {
-						toastr.error('Cập nhật tour thất bại!', 'Thông báo');
-					}
-				});
-			}
+					});
+				}
+			});
 		});
+
 	});
 
 </script>

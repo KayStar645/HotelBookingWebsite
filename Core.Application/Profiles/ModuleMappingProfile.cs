@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Core.Application.ViewModels.Auth;
+using Core.Application.ViewModels.Booking;
 using Core.Application.ViewModels.Customers;
 using Core.Application.ViewModels.KindRooms;
 using Core.Application.ViewModels.Promotions;
@@ -41,12 +42,14 @@ namespace Core.Application.Profiles
             CreateMap<Customer, CustomerRQ>().ReverseMap();
             CreateMap<Customer, CustomerVM>().ReverseMap();
 
-            CreateMap<Tour, TourRQ>().ReverseMap();
-            CreateMap<Tour, TourVM>().ReverseMap();
 
 			CreateMap<Booking, BookingRQ>().ReverseMap();
 			CreateMap<Booking, BookingVM>().ReverseMap();
 
+			CreateMap<Tour, TourRQ>().ReverseMap();
+            CreateMap<Tour, TourVM>().ReverseMap();
+
+		
 			CreateMap<Role, RoleRQ>().ReverseMap();
 			CreateMap<Role, RoleVM>().ReverseMap();
 

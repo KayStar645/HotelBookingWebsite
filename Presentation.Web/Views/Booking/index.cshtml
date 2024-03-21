@@ -1,0 +1,600 @@
+﻿@using Core.Application.Responses
+@using Core.Application.ViewModels.Booking
+@using Core.Application.ViewModels.Tour
+@{
+	var bookings = ViewBag.list as PaginatedResult<BookingVM>;
+	var tours = ViewBag.Tours as PaginatedResult<TourVM>;
+}
+
+@section TitleHeader
+{
+	<div class="row">
+		<div class="col-sm-12 mt-3">
+			<h3 class="page-title mt-3">
+				Danh sách phòng
+			</h3>
+			<div class="row mt-3">
+				<div class="col-sm-4">
+					<label class="font-weight-bold mb-1">Tìm kiếm</label>
+					<div class="form-outline p-0" data-mdb-input-init>
+						<input type="search" class="form-control" id="searchInput" placeholder="Tìm kiếm..." />
+					</div>
+				</div>
+				<div class="col-sm-3">
+					<label class="font-weight-bold mb-1">Tour</label>
+					<div class="form-outline p-0">
+						<select id="filterTour" class="form-control" name="filterTour">
+							<option value="" selected>Tất cả</option>
+							@foreach (var tour in tours.Data)
+							{
+								<option value="@tour.Id">@tour.InternalCode - @tour.Name</option>
+							}
+						</select>
+					</div>
+				</div>
+				<div class="col-sm-1"></div>
+				<div class="col-sm-2">
+					<div class="text-right">
+						<button type="button" id="create" class="btn btn-primary"
+								data-toggle="modal" data-target="#openPopup">
+							Thêm mới
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+<div class="card-body">
+	<div class="table-responsive" style="overflow-y: auto;">
+		<table class="table table-hover table-center table-striped table-bordered">
+			<thead>
+				<tr>
+					<th class="min-vw-10"></th>
+					<th class="th-sm">Mã đặt tour</th>
+					<th class="th-sm">Tên Tour</th>
+					<th class="th-sm">Tên Khách hàng</th>
+					<th class="th-sm">Email Khách hàng</th>
+					<th class="th-sm">Ngày Đặt</th>
+					<th class="th-sm">Số lượng người</th>
+					<th class="th-sm">Tổng giá</th>
+					<th class="th-sm"></th>
+					<th class="th-sm"></th>
+				</tr>
+			</thead>
+			<tbody id="table-body-booking">
+				@if (bookings != null)
+				{
+					@foreach (var booking in bookings.Data)
+					{
+						<tr data-deleted="@booking.IsDeleted">
+							<td class="text-center">
+								@if (booking.IsDeleted != true)
+								{
+									<i class="updates fa-regular fa-pen-to-square pe-3" style="cursor: pointer;"
+									   data-toggle="modal" data-target="#openPopup"></i>
+									<i class="deletes fa-solid fa-trash" style="color:red; cursor: pointer;"></i>
+								}
+							</td>
+							<td class="text-center d-none" data-id="@booking?.Id">@booking?.Id</td>
+							<td class="text-nowrap">
+								<div>@booking?.InternalCode</div>
+							</td>
+							<td class="text-center d-none" data-id="@booking?.Tour?.Id">@booking?.Tour?.Id</td>
+							<td class="text-center">
+								@booking?.Tour?.InternalCode - @booking?.Tour?.Name
+							</td>
+							<td class="text-center">@booking?.CustomerName</td>
+							<td class="text-center">@booking?.CustomerEmail</td>
+							<td class="text-center">
+								@((booking.BookingDate.HasValue ?
+															booking.BookingDate.Value.ToString("dd/MM/yyyy") :
+															"---"))
+							</td>
+							<td class="text-center">@booking?.NumberOfPersons</td>
+							<td class="text-center">@booking?.TotalPrice</td>
+							<td class="text-center">
+								@if (booking.IsDeleted == true)
+								{
+									<span class='badge badge-pill bg-danger inv-badge'>Đã xoá</span>
+								}
+								else
+								{
+									@if (booking.BookingDate < DateTime.Now)
+									{
+										<span class='badge badge-pill bg-info inv-badge'>Đã qua</span>
+									}
+									else if (booking.BookingDate > DateTime.Now)
+									{
+										<span class='badge badge-pill bg-success inv-badge'>Chờ duyệt</span>
+									}
+								}
+							</td>
+						</tr>
+					}
+				}
+			</tbody>
+
+		</table>
+	</div>
+</div>
+
+@* Phân trang *@
+<div id="paginated" class="d-flex justify-content-end mt-4">
+	<nav aria-label="Page navigation example">
+		<ul class="pagination">
+			@for (int i = 1; i <= bookings.Extra.TotalPages; i++)
+			{
+				<li class="page-item pageCurrent @(bookings.Extra.CurrentPage == i ? "active" : "")">
+					<a class="page-link" data-page="@i">@i</a>
+				</li>
+			}
+		</ul>
+	</nav>
+</div>
+
+@* Modal *@
+<div class="modal fade" id="openPopup" tabindex="-1" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header bg-success">
+				<h1 class="modal-title text-white font-weight-bold" id="modalTitle"></h1>
+				<button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">×</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-12 d-none">
+						<div class="form-group">
+							<input type="text" name="id" value="" />
+						</div>
+					</div>
+
+					<div class="col-12">
+						<div class="form-group">
+							<label class="font-weight-bold mb-2">Mã đặt tour</label>
+							<input class="form-control" type="text" name="internalCode" />
+							<span class="text-danger" id="internalCodeError"></span>
+						</div>
+					</div>
+					<div class="col-12">
+						<div class="form-group">
+							<label class="font-weight-bold mb-2">Tên Tour</label>
+							<select class="form-control" name="tourID">
+								@foreach (var tour in tours.Data)
+								{
+									<option value="@tour.Id">@tour.InternalCode - @tour.Name</option>
+								}
+							</select>
+							<span class="text-danger" id="tourIdError"></span>
+						</div>
+					</div>
+					<div class="col-12">
+						<div class="form-group">
+							<label class="font-weight-bold mb-2">Tên khách hàng</label>
+							<input class="form-control" type="text" name="customerName" />
+							<span class="text-danger" id="customerNameError"></span>
+						</div>
+					</div>
+					<div class="col-12">
+						<div class="form-group">
+							<label class="font-weight-bold mb-2">Email khách hàng</label>
+							<input class="form-control" type="text" name="customerEmail" />
+							<span class="text-danger" id="customerEmailError"></span>
+						</div>
+					</div>
+					<div class="col-12">
+						<div class="form-group">
+							<label class="font-weight-bold mb-2">Ngày đặt tour</label>
+							<div class="">
+								<input type="date" class="form-control" placeholder="dd-mm-yyyy"
+									   min="1950-01-01" max="2030-12-31" name="bookingDate" />
+							</div>
+							<span class="text-danger" id="bookingDateError"></span>
+						</div>
+					</div>
+					<div class="col-12">
+						<div class="form-group">
+							<label class="font-weight-bold mb-2">Số lượng người</label>
+							<input class="form-control" type="text" name="numberOfPersons" />
+							<span class="text-danger" id="numberOfPersonsError"></span>
+						</div>
+					</div>
+					<div class="col-12">
+						<div class="form-group">
+							<label class="font-weight-bold mb-2">Tổng tiền</label>
+							<input class="form-control" type="text" name="totalPrice" />
+							<span class="text-danger" id="totalPriceError"></span>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+				<button type="button" id="createButton" class="btn btn-primary">Tạo mới</button>
+				<button type="button" id="updateButton" class="btn btn-primary">Cập nhật</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+@* Đây là JS nè *@
+<script>
+	$("#business").addClass("active");
+	$("#business").next("ul").addClass("d-block");
+	$("#business-booking-tour").addClass("active");
+
+	$(".link-parent").on("click", function (e) {
+		e.preventDefault();
+
+		$(".nav-childs").removeClass("active");
+		$(".link-parent").removeClass("active");
+
+		$(".link-parent").next("ul").not($(this).next("ul")).removeClass("d-block");
+
+		$(this).closest(".link-parent").addClass("active");
+	});
+</script>
+
+@* Khởi tạo biến *@
+<script>
+	var createOpen = document.getElementById("create");
+	var updateOpens = document.querySelectorAll(".updates");
+
+
+	var internalCodeInput = $('input[name="internalCode"]');
+	var tourInput = $('input[name=" tourID"]');
+	var customernameInput = $('input[name=" customerName"]');
+	var customeremailInput = $('input[name=" customerEmail"]');
+	var bookingdateInpput = $('input[name=" bookingDate"]');
+	var numofpersonsInpput = $('input[name=" numberOfPersons"]');
+	var totalpriceInpput = $('input[name=" totalPrice"]');
+
+	var searchTimer;
+	var sorted_asc = true;
+</script>
+
+@* Tìm kiếm và lọc *@
+<script>
+	$(document).ready(function () {
+		$('#searchInput').on('input', function () {
+			clearTimeout(searchTimer);
+
+			searchTimer = setTimeout(function () {
+				performSearch();
+			}, 600);
+		});
+
+		$('#filterTour').change(function () {
+			performSearch();
+		});
+
+		
+
+		function performSearch() {
+			var searchTerm = $('#searchInput').val();
+			var selectedTour = $('#filterTour').val();
+			
+
+			$.ajax({
+				url: '/booking/index',
+				method: 'GET',
+				data: {
+					search: searchTerm,
+					page: 1,
+					sorts: null,
+					filters: `TourID:${selectedTour}`
+				},
+				contentType: 'application/json; charset=utf-8',
+				success: function (data) {
+					var newData = $('<tbody>').html(data).find('#table-body-booking').html();
+					$('#table-body-booking').html(newData);
+
+					var newPaginated = $('<div>').html(data).find('#paginated').html();
+					$('#paginated').html(newPaginated);
+					resetEvent();
+				},
+				error: function (xhr, textStatus, errorThrown) {
+					toastr.error('Lỗi khi thực hiện tìm kiếm!', 'Thông báo');
+				}
+			});
+		}
+	});
+</script>
+
+@* Lắng nghe sự kiện + load giao diện và dữ liệu *@
+<script>
+	function resetEvent() {
+		createOpen.addEventListener("click", function (event) {
+			var rowData = {
+				id: 0,
+				internalCode: "",
+				tourID: "1",
+				customerName: "",
+				customerEmail: "",
+				bookingDate: "",
+				numberOfPersons: "",
+				totalPrice: ""
+
+			};
+
+			document.getElementById("modalTitle").innerText = "Thêm mới";
+			document.getElementById("createButton").style.display = "inline-block";
+			document.getElementById("updateButton").style.display = "none";
+
+			loadData(rowData);
+		});
+
+		updateOpens = document.querySelectorAll(".updates");
+		updateOpens.forEach(function (button) {
+			button.addEventListener("click", function () {
+				var parentRow = button.closest("tr");
+				var rowData = {
+					id: parentRow.querySelector("td:nth-child(2)").textContent.trim(),
+					internalCode: parentRow.querySelector("td:nth-child(3)").textContent.trim(),
+					tourID: parentRow.querySelector("td:nth-child(4)").textContent.trim(),
+					customerName: parentRow.querySelector("td:nth-child(6)").textContent.trim(),
+					customerEmail: parentRow.querySelector("td:nth-child(7)").textContent.trim(),
+					bookingDate: parentRow.querySelector("td:nth-child(8)").textContent.trim(),
+					numberOfPersons: parentRow.querySelector("td:nth-child(9)").textContent.trim(),
+					totalPrice: parentRow.querySelector("td:nth-child(10)").textContent.trim()
+				};
+				document.getElementById("modalTitle").innerText = "Cập nhật thông tin";
+				document.getElementById("createButton").style.display = "none";
+				document.getElementById("updateButton").style.display = "inline-block";
+
+				loadData(rowData);
+			});
+		});
+
+		$(document).ready(function () {
+			$(".deletes").on("click", function () {
+				var itemId = $(this).closest("tr").find("td[data-id]").data("id");
+
+				$.ajax({
+					url: "/booking/delete?pId=" + itemId,
+					method: "DELETE",
+					success: function (data) {
+						if (data.success) {
+							$.ajax({
+								url: "/booking/index",
+								method: "GET",
+								success: function (data) {
+									var newData = $('<tbody>').html(data).find('#table-body-booking').html();
+									$('#table-body-booking').html(newData);
+
+									var newPaginated = $('<div>').html(data).find('#paginated').html();
+									$('#paginated').html(newPaginated);
+
+									resetEvent();
+								},
+							});
+							toastr.success('Xoá thành công!', 'Thông báo');
+						}
+						else {
+							toastr.error(data.errors[0], 'Thông báo');
+						}
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Xoá thất bại!', 'Thông báo');
+					}
+				});
+			});
+		});
+
+
+		$(document).ready(function () {
+			$('.pagination a').on('click', function (e) {
+				e.preventDefault();
+				var page = $(this).data('page');
+				paginatedResult(page);
+			});
+		});
+
+		function paginatedResult(page) {
+			$.ajax({
+				url: `/booking/index?page=${page}`,
+				method: 'GET',
+				success: function (data) {
+					var newData = $('<tbody>').html(data).find('#table-body-booking').html();
+					$('#table-body-booking').html(newData);
+
+					updatePagination(page);
+				},	
+			});
+		}
+
+		function updatePagination(activePage) {
+			$('.pageCurrent').removeClass('active');
+			$('.pagination a[data-page="' + activePage + '"]').addClass('active').closest('.pageCurrent').addClass('active');
+		}
+	}
+
+
+
+	function loadData(data) {
+		$('input[name="id"]').val(data.id);
+		$('input[name="internalCode"]').val(data.internalCode);
+		$('select[name="tourID"]').val(data.tourID);
+		$('input[name="customerName"]').val(data.customerName);
+		$('input[name="customerEmail"]').val(data.customerEmail);
+		$('input[name="bookingDate"]').val(data.bookingDate);
+		$('input[name="numberOfPersons"]').val(data.numberOfPersons);
+		$('input[name="totalPrice"]').val(data.totalPrice);
+
+
+		removeValidator();
+	}
+
+	function removeValidator() {
+		$(".text-danger").text("");
+	}
+
+	resetEvent();
+</script>
+
+@* Gọi controller xử lý *@
+<script>
+	$(document).ready(function () {
+		$("#createButton").on("click", function (e) {
+			e.preventDefault();
+
+			removeValidator();
+
+			var pRequest = getData();
+			pRequest.id = 0;
+
+			var isValid = validateForm(pRequest);
+
+			if (isValid) {
+				$.ajax({
+					url: "/booking/create",
+					method: "POST",
+					data: JSON.stringify(pRequest),
+					contentType: "application/json; charset=utf-8",
+					success: function (data) {
+						if (data.success) {
+							$.ajax({
+								url: "/booking/index",
+								method: "GET",
+								data: { page: 1 },
+								contentType: "application/json; charset=utf-8",
+								success: function (data) {
+									var newData = $('<tbody>').html(data).find('#table-body-booking').html();
+									$('#table-body-booking').html(newData);
+
+									var newPaginated = $('<div>').html(data).find('#paginated').html();
+									$('#paginated').html(newPaginated);
+
+									$('.btn-secondary[data-dismiss="modal"]').click();
+
+									resetEvent();
+								},
+							});
+							toastr.success('Thêm mới thành công!', 'Thông báo');
+						} else {
+							toastr.error(data.errors[0], 'Thông báo');
+						}
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Thêm mới thất bại!', 'Thông báo');
+					}
+				});
+			}
+		});
+
+		$("#updateButton").on("click", function (e) {
+			e.preventDefault();
+
+			removeValidator();
+
+			var pRequest = getData();
+
+			var isValid = validateForm(pRequest);
+
+			if (isValid) {
+				$.ajax({
+					url: "/booking/update",
+					method: "PUT",
+					data: JSON.stringify(pRequest),
+					contentType: "application/json; charset=utf-8",
+					success: function (data) {
+						if (data.success) {
+							$.ajax({
+								url: "/booking/index",
+								method: "GET",
+								data: { page: 1 },
+								contentType: "application/json; charset=utf-8",
+								success: function (data) {
+									var newData = $('<tbody>').html(data).find('#table-body-booking').html();
+									$('#table-body-booking').html(newData);
+
+									$('.btn-secondary[data-dismiss="modal"]').click();
+
+									resetEvent();
+								},
+							});
+							toastr.success('Cập nhật thông tin  thành công!', 'Thông báo');
+						}
+						else {
+							toastr.error(data.errors[0], 'Thông báo');
+						}
+					},
+					error: function (xhr, textStatus, errorThrown) {
+						toastr.error('Cập nhật thông tin thất bại!', 'Thông báo');
+					}
+				});
+			}
+		});
+	});
+
+	function getData() {
+		var formData = {
+			id: $('input[name="id"]').val() || null,
+			internalCode: $('input[name="internalCode"]').val() || null,
+			tourID: $('select[name="tourID"]').val() || null,
+			customerName: $('input[name="customerName"]').val() || null,
+			customerEmail: $('input[name="customerEmail"]').val() || null,
+			bookingDate: $('input[name="bookingDate"]').val() || null,
+			numberOfPersons: $('input[name="numberOfPersons"]').val() || null,
+			totalPrice: $('input[name="totalPrice"]').val() || null
+		};
+		return formData;
+
+	}
+
+	function validateForm(data) {
+		var isValid = true;
+
+		if (!data.internalCode) {
+			$("#internalCodeError").text("Mã đặt tour không được để trống");
+			isValid = false;
+		}
+
+		if (!data.tourID) {
+			$("#tourIdError").text("Vui lòng chọn tour");
+			isValid = false;
+		}
+
+		if (!data.customerName) {
+			$("#customerNameError").text("Tên khách hàng không được để trống");
+			isValid = false;
+		}
+
+		if (!data.customerEmail) {
+			$("#customerEmailError").text("Email khách hàng không được để trống");
+			isValid = false;
+		}
+
+		if (!data.bookingDate) {
+			$("#bookingDateError").text("Ngày đặt tour không được để trống");
+			isValid = false;
+		}
+
+		if (!data.numberOfPersons) {
+			$("#numberOfPersonsError").text("Số lượng người không được để trống");
+			isValid = false;
+		}
+
+		if (!data.totalPrice) {
+			$("#totalPriceError").text("Tổng giá không được để trống");
+			isValid = false;
+		}
+
+		return isValid;
+	}
+
+	$(document).ready(function () {
+		$("#table-body-booking tr").each(function () {
+			var isDeleted = $(this).data("deleted");
+			if (isDeleted) {
+				$(this).addClass("deleted-booking");
+				$(this).find(".deletes, .updates").hide();
+			}
+		});
+	});
+
+</script>

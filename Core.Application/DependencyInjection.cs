@@ -35,6 +35,7 @@ namespace Core.Application
             services.AddScoped<IRoleService, RoleService>();
 			services.AddScoped<IServiceService, ServiceService>();
 			services.AddScoped<ITourService, TourService>();
+			services.AddScoped<IBookingService, BookingService>();
 			services.AddScoped<ICustomerService, CustomerService>();
       
 			return services;

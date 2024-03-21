@@ -24,7 +24,8 @@ namespace Infrastructure.Data
         public DbSet<Service> Services => Set<Service>();
         public DbSet<Customer> Customers => Set<Customer>();
         public DbSet<Tour> Tours => Set<Tour>();    
-        public DbSet<Promotion> Promotions => Set<Promotion>();
+        public DbSet<Booking> Bookings => Set<Booking>();
+		public DbSet<Promotion> Promotions => Set<Promotion>();
         public DbSet<RoomPromotion> RoomPromotions => Set<RoomPromotion>();
 
 		public DbSet<User> Users => Set<User>();

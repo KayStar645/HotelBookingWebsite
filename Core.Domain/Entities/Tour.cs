@@ -4,7 +4,7 @@ using Core.Domain.Common;
 
 namespace Core.Domain.Entities
 {
-    public class Tour : AuditableEntity, IInternalCode
+    public class Tour : AuditableEntity, IInternalCode, IName
     {
         public string? InternalCode { get; set; }
 

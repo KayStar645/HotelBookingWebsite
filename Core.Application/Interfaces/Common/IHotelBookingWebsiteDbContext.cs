@@ -11,8 +11,9 @@ namespace Core.Application.Interfaces.Common
         DbSet<Room> Rooms { get; }
         DbSet<Service> Services { get; }
         DbSet<Tour> Tours { get; }
-        
-        DbSet<Promotion> Promotions { get; }
+        DbSet<Booking> Bookings { get; }
+
+		DbSet<Promotion> Promotions { get; }
         DbSet<RoomPromotion> RoomPromotions { get; }
 
 		DbSet<User> Users { get; }

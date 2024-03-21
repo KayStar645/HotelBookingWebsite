@@ -19,13 +19,13 @@ namespace Presentation.Web.Middleware
                 {
 					var endpoint = httpContext.GetEndpoint();
 
-					if (endpoint == null)
-					{
-						httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                    if (endpoint == null)
+                    {
+                        httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
                         break;
-					}
+                    }
 
-					if (endpoint?.Metadata.GetMetadata<IAllowAnonymous>() != null)
+                    if (endpoint?.Metadata.GetMetadata<IAllowAnonymous>() != null)
 					{
 						await next(httpContext);
 						return;
@@ -56,8 +56,8 @@ namespace Presentation.Web.Middleware
 					httpContext.User = principal;
 
 
-					// Lấy danh sách quyền của người dùng từ token
-					var permissions = jwtToken.Claims
+                    // Lấy danh sách quyền của người dùng từ token
+                    var permissions = jwtToken.Claims
                                             .Where(c => c.Type == ClaimCommon.Permission)
                                             .Select(c => c.Value).ToList();
 
@@ -68,10 +68,10 @@ namespace Presentation.Web.Middleware
                         break;
                     }
 
-                      var requiredRoles = authorizeAttributes
-                                            .SelectMany(attr => (attr.Policy ?? "").Split(','))
-                                            .Where(role => !string.IsNullOrEmpty(role))
-                                            .Distinct().ToList();
+                    var requiredRoles = authorizeAttributes
+                                          .SelectMany(attr => (attr.Policy ?? "").Split(','))
+                                          .Where(role => !string.IsNullOrEmpty(role))
+                                          .Distinct().ToList();
 
                     if (requiredRoles.Except(permissions).Any())
                     {

@@ -20,14 +20,21 @@
 				</div>
 				<div class="col-sm-2">
 				</div>
-				<div class="col-sm-4">
-				</div>
+				
 				<div class="col-sm-2">
 					<div class="text-right">
 						<a href="@Url.Action("detail", "tour", new { pId = 0 })"
 						   id="createtours" class="btn btn-primary">
 							Thêm mới
 						</a>
+					</div>
+				</div>
+				<div class="col-sm-2">
+					<div class="text-right">
+						<a href="@Url.Action("index", "booking", new { pId = 0 })"
+						   id="" class="btn btn-primary">
+							Đơn đặt
+							</a>
 					</div>
 				</div>
 			</div>
@@ -46,7 +53,7 @@
 					<th class="th-sm text-center">Hướng dẫn viên</th>
 					<th class="th-sm text-center">Ngày khởi hành </th>
 					<th class="th-sm text-center">Giá tiền</th>
-					<th class="th-sm text-center">Trạng thái</th> <!-- Thêm cột trạng thái -->
+					<th class="th-sm text-center">Trạng thái</th>
 				</tr>
 			</thead>
 			<tbody id="table-body-tour" class="table-body">
@@ -58,14 +65,10 @@
 							<td class="text-center">
 								@if (tour.IsDeleted != true)
 								{
-									if (tour.DateStart > DateTime.Now)
-									{
 										<a href="@Url.Action("detail", "tour", new { pId = tour.Id })" class="updatetour">
 											<i class="far fa-pen-to-square pe-3" style="color: blue; cursor: pointer;"></i>
 										</a>
-
 										<i class="deletetour fa-solid fa-trash" style="color:red;cursor: pointer;"></i>
-									}
 								}
 							</td>
 							<td class="text-center d-none" data-id="@tour?.Id">@tour?.Id</td>
@@ -168,7 +171,12 @@
 								url: "/tour/index",
 								method: "GET",
 								success: function (data) {
-									$('#table-body-tour').html(data);
+									var newData = $('<tbody>').html(data).find('#table-body-tour').html();
+									$('#table-body-tour').html(newData);
+
+									var newPaginated = $('<div>').html(data).find('#paginated').html();
+									$('#paginated').html(newPaginated);
+
 									resetEvent();
 								},
 							});

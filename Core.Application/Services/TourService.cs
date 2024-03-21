@@ -11,7 +11,7 @@ namespace Core.Application.Services
     public class TourService : BaseService<Tour, TourRQ, TourVM, BaseListRQ>, ITourService
     {
         public TourService(IHotelBookingWebsiteDbContext pContext, IMapper pMapper) :
-            base(pContext, pMapper)
+          base(pContext, pMapper)
         { }
 
         protected override IQueryable<Tour> ApplySearch(IQueryable<Tour> query, string keyword)
