@@ -43,7 +43,10 @@ namespace Core.Application.Profiles
 
             CreateMap<Tour, TourRQ>().ReverseMap();
             CreateMap<Tour, TourVM>().ReverseMap();
-        }
+
+			CreateMap<Booking, BookingRQ>().ReverseMap();
+			CreateMap<Booking, BookingVM>().ReverseMap();
+
 			CreateMap<Role, RoleRQ>().ReverseMap();
 			CreateMap<Role, RoleVM>().ReverseMap();
 
